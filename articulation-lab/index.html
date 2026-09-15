@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.4.2</title>
+  <title>Articulation Lab v0.4.3</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.4.2</small></h1>
+        <h1>Articulation Lab <small>v0.4.3</small></h1>
         <p>Hear real human vowels in Vowel Buttons, or switch to Mouth Synth and play the synthetic vocal tract continuously.</p>
       </div>
       <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
@@ -65,9 +65,9 @@
         <section class="panel buttons-only">
           <div class="section-title">Human recording</div>
           <div id="recordingHint" class="mini-note">Loading local recording set…</div>
-          <p class="mini-note">Japanese buttons use one Japanese speaker’s public-domain recordings. The source contains very short repeated kana tokens, so v0.4.2 detects an actual voiced token, keeps a small onset/offset margin, then applies pitch-preserving time-stretch. The resulting button vowels are about 0.39–0.41 s of audible material rather than a longer file dominated by silence.</p>
-          <p class="mini-note">English-labelled buttons use a CC0 human IPA reference set, not a General American population norm. v0.4.2 active-RMS matches all ten English samples to about −16.5 dBFS; unusually quiet recordings are safely lifted only within peak headroom.</p>
-          <p class="mini-note">Male / female / child language-matched sets are being added only when the recording license and speaker metadata are explicit.</p>
+          <p class="mini-note">Japanese buttons use one Japanese speaker’s public-domain recordings. The source contains very short repeated kana tokens, so v0.4.3 detects an actual voiced token, keeps a small onset/offset margin, then applies pitch-preserving time-stretch. The resulting button vowels are about 0.39–0.41 s of audible material rather than a longer file dominated by silence.</p>
+          <p class="mini-note">English buttons are human recordings from redistribution-safe sources. Most still use the CC0 IPA reference set, but KIT /ɪ/ now comes from the vowel nucleus of a real US-English <em>kid</em> recording. The /k/ aspiration and /d/ closure are cut away; the ~0.11 s vowel is intentionally not time-stretched, so its natural short-vowel character remains.</p>
+          <p class="mini-note">Processed button levels are active-RMS matched for easier comparison while respecting peak headroom. Male / female / child language-matched sets are added only when recording rights and speaker metadata are explicit.</p>
         </section>
 
         <section class="panel synth-only">
