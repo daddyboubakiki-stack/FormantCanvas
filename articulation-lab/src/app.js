@@ -38,12 +38,13 @@ window.ArticulationLab = window.ArticulationLab || {};
   function playPreset(langId, id, preset) {
     if (playMode !== 'buttons') return;
     const current = store.getState();
+    const target = NS.ConstraintMapper.derive({ ...current, ...NS.ConstraintMapper.sanitize(preset.articulation) });
     vowelMap.setSelected(langId, id);
     vowelMap.pulse(langId, id);
     $('#selectedVowel').textContent = `${langs[langId].label} ${preset.label} · ${preset.name}`;
     animateTo(preset.articulation, 220);
     engine.setVoiceProfile(voiceProfileId);
-    const ok = engine.playBurst(current, 500);
+    const ok = engine.playBurst(target, 500);
     if (!ok) $('#status').textContent = 'Web Audio API is unavailable here; the tongue animation still works.';
     else $('#status').textContent = `${langs[langId].label} ${preset.label} — short vowel burst.`;
   }
@@ -134,7 +135,7 @@ window.ArticulationLab = window.ArticulationLab || {};
 
     store.subscribe(state => {
       mouthRenderer.render(state);
-      engine.setArticulation(state);
+      if (playMode === 'synth') engine.setArticulation(state);
       const est = engine.getAcousticEstimate(state);
       $('#f1Value').textContent = `${Math.round(est.f1Hz)} Hz`;
       $('#f2Value').textContent = `${Math.round(est.f2Hz)} Hz`;
