@@ -1,0 +1,39 @@
+name: Fix remaining Formantasia wording
+
+on:
+  push:
+    branches: [rebrand-formantasia]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rebrand-formantasia
+      - name: Fix remaining user-facing Canvas wording
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          old = 'transitionをCanvasで生成しています。'
+          new = 'transitionをアプリで生成しています。'
+          if old not in text:
+              raise SystemExit('Target wording not found')
+          text = text.replace(old, new)
+          if old in text:
+              raise SystemExit('Stale wording remains')
+          p.write_text(text, encoding='utf-8')
+      - name: Commit wording fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Fix remaining Formantasia wording"
+          git push origin HEAD:rebrand-formantasia
