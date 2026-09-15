@@ -6,8 +6,8 @@
       "clipStart": 1.1050000000000002,
       "clipDurationBeforeStretch": 0.1499999999999997,
       "selectedVoicedDuration": 0.09999999999999987,
-      "stretchFactor": 2.0,
-      "outputDuration": 0.15,
+      "stretchFactor": 3.0,
+      "outputDuration": 0.355958,
       "detection": {
         "frameMs": 10,
         "peakDbfs": -21.72364537053099,
@@ -15,7 +15,7 @@
         "closedGapMs": 20,
         "selectedStart": 1.1300000000000001,
         "selectedEnd": 1.23,
-        "selectedDuration": 0.09999999999999987,
+        "selectedDuration": 0.1,
         "detectedSegments": [
           {
             "start": 0.14,
@@ -36,26 +36,26 @@
         "selectionScore": 12.45046153591575
       },
       "levelMatch": {
-        "activeRmsBeforeDbfs": -16.67525219352513,
+        "activeRmsBeforeDbfs": -18.040055088884003,
         "targetActiveRmsDbfs": -17.0,
-        "thresholdDbfs": -38.430378505593694,
-        "appliedGainDb": -0.3247478064748707,
-        "peakBeforeDbfs": -2.2380096185479976
+        "thresholdDbfs": -38.654094877240176,
+        "appliedGainDb": 0.7734082721175402,
+        "peakBeforeDbfs": -2.273408272117539
       },
       "sourceFile": "jp_a.ogg",
       "output": "jp_reference/a.wav"
     },
     "i": {
       "sourceDuration": 2.728526,
-      "clipStart": 0.0,
+      "clipStart": 0,
       "clipDurationBeforeStretch": 0.145,
       "selectedVoicedDuration": 0.11,
-      "stretchFactor": 2.0,
-      "outputDuration": 0.145,
+      "stretchFactor": 3.0,
+      "outputDuration": 0.335,
       "detection": {
         "frameMs": 10,
         "peakDbfs": -26.341356099028474,
-        "thresholdDbfs": -52.0,
+        "thresholdDbfs": -52,
         "closedGapMs": 20,
         "selectedStart": 0.01,
         "selectedEnd": 0.12,
@@ -80,30 +80,30 @@
         "selectionScore": 13.454057997869269
       },
       "levelMatch": {
-        "activeRmsBeforeDbfs": -11.109207804602516,
+        "activeRmsBeforeDbfs": -12.051639566989973,
         "targetActiveRmsDbfs": -17.0,
-        "thresholdDbfs": -33.27890868569053,
-        "appliedGainDb": -5.890792195397484,
-        "peakBeforeDbfs": -2.325912020030028
+        "thresholdDbfs": -33.040101539151756,
+        "appliedGainDb": -4.948360433010027,
+        "peakBeforeDbfs": -2.2390386101543975
       },
       "sourceFile": "jp_i.ogg",
       "output": "jp_reference/i.wav"
     },
     "u": {
       "sourceDuration": 2.658866,
-      "clipStart": 0.0,
+      "clipStart": 0,
       "clipDurationBeforeStretch": 0.155,
       "selectedVoicedDuration": 0.12000000000000001,
-      "stretchFactor": 2.0,
-      "outputDuration": 0.155,
+      "stretchFactor": 2.967741935483871,
+      "outputDuration": 0.371667,
       "detection": {
         "frameMs": 10,
         "peakDbfs": -26.569871989886114,
-        "thresholdDbfs": -52.0,
+        "thresholdDbfs": -52,
         "closedGapMs": 20,
         "selectedStart": 0.01,
         "selectedEnd": 0.13,
-        "selectedDuration": 0.12000000000000001,
+        "selectedDuration": 0.12,
         "detectedSegments": [
           {
             "start": 0.01,
@@ -124,11 +124,11 @@
         "selectionScore": 14.247565727744227
       },
       "levelMatch": {
-        "activeRmsBeforeDbfs": -10.421610485484543,
+        "activeRmsBeforeDbfs": -11.595337713288032,
         "targetActiveRmsDbfs": -17.0,
-        "thresholdDbfs": -32.36875989337338,
-        "appliedGainDb": -6.578389514515457,
-        "peakBeforeDbfs": -2.1805797797019424
+        "thresholdDbfs": -32.93805120098574,
+        "appliedGainDb": -5.404662286711968,
+        "peakBeforeDbfs": -2.183987614663291
       },
       "sourceFile": "jp_u.ogg",
       "output": "jp_reference/u.wav"
@@ -138,16 +138,16 @@
       "clipStart": 1.0550000000000002,
       "clipDurationBeforeStretch": 0.1499999999999997,
       "selectedVoicedDuration": 0.09999999999999987,
-      "stretchFactor": 2.0,
-      "outputDuration": 0.15,
+      "stretchFactor": 3.0,
+      "outputDuration": 0.356917,
       "detection": {
         "frameMs": 10,
         "peakDbfs": -24.91407123657902,
-        "thresholdDbfs": -52.0,
+        "thresholdDbfs": -52,
         "closedGapMs": 20,
         "selectedStart": 1.08,
         "selectedEnd": 1.18,
-        "selectedDuration": 0.09999999999999987,
+        "selectedDuration": 0.1,
         "detectedSegments": [
           {
             "start": 0.08,
@@ -168,11 +168,11 @@
         "selectionScore": 12.50782156715629
       },
       "levelMatch": {
-        "activeRmsBeforeDbfs": -14.493601998630636,
+        "activeRmsBeforeDbfs": -17.509595606199827,
         "targetActiveRmsDbfs": -17.0,
-        "thresholdDbfs": -36.266260949868055,
-        "appliedGainDb": -2.506398001369364,
-        "peakBeforeDbfs": -2.1208196996971678
+        "thresholdDbfs": -37.82463093113102,
+        "appliedGainDb": 0.5095956061998281,
+        "peakBeforeDbfs": -2.184328471707897
       },
       "sourceFile": "jp_e.ogg",
       "output": "jp_reference/e.wav"
@@ -182,16 +182,16 @@
       "clipStart": 0.995,
       "clipDurationBeforeStretch": 0.17000000000000004,
       "selectedVoicedDuration": 0.1200000000000001,
-      "stretchFactor": 2.0,
-      "outputDuration": 0.17,
+      "stretchFactor": 2.7058823529411757,
+      "outputDuration": 0.401458,
       "detection": {
         "frameMs": 10,
         "peakDbfs": -24.97966079038953,
-        "thresholdDbfs": -52.0,
+        "thresholdDbfs": -52,
         "closedGapMs": 20,
         "selectedStart": 1.02,
         "selectedEnd": 1.1400000000000001,
-        "selectedDuration": 0.1200000000000001,
+        "selectedDuration": 0.12,
         "detectedSegments": [
           {
             "start": 0.02,
@@ -212,11 +212,11 @@
         "selectionScore": 14.376272798278418
       },
       "levelMatch": {
-        "activeRmsBeforeDbfs": -15.755383152013014,
+        "activeRmsBeforeDbfs": -19.40208624303348,
         "targetActiveRmsDbfs": -17.0,
-        "thresholdDbfs": -37.6429781982972,
-        "appliedGainDb": -1.244616847986986,
-        "peakBeforeDbfs": -4.248535309444125
+        "thresholdDbfs": -39.96469873783026,
+        "appliedGainDb": 2.40208624303348,
+        "peakBeforeDbfs": -6.603256447690309
       },
       "sourceFile": "jp_o.ogg",
       "output": "jp_reference/o.wav"
@@ -502,11 +502,11 @@
         "output": "ipa_reference/i.wav",
         "outputDuration": 0.51,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -17.221133495662503,
+          "activeRmsBeforeDbfs": -17.42148778221636,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -37.28281363962056,
-          "appliedGainDb": 0.22113349566250395,
-          "peakBeforeDbfs": -7.746831717132209
+          "thresholdDbfs": -37.48316381503108,
+          "appliedGainDb": 0.4214877822163595,
+          "peakBeforeDbfs": -7.947012457634469
         }
       },
       "ɪ": {
@@ -518,11 +518,11 @@
         "output": "ipa_reference/I.wav",
         "outputDuration": 0.38,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -17.727361337780692,
+          "activeRmsBeforeDbfs": -14.534908032351922,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -39.03635118940988,
-          "appliedGainDb": 0.7273613377806931,
-          "peakBeforeDbfs": -5.267479823198339
+          "thresholdDbfs": -35.843890962722995,
+          "appliedGainDb": -2.4650919676480774,
+          "peakBeforeDbfs": -2.075258034754116
         }
       },
       "ɛ": {
@@ -534,11 +534,11 @@
         "output": "ipa_reference/epsilon.wav",
         "outputDuration": 0.49,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -11.798854866108224,
+          "activeRmsBeforeDbfs": -18.048294220892473,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -33.12352336488266,
-          "appliedGainDb": -5.201145133891776,
-          "peakBeforeDbfs": -1.9835130793696367
+          "thresholdDbfs": -39.34358971840337,
+          "appliedGainDb": 1.048294220892473,
+          "peakBeforeDbfs": -7.541681425614438
         }
       },
       "æ": {
@@ -548,13 +548,13 @@
         "clipStart": 1.1250000000000002,
         "clipDuration": 0.4699999999999999,
         "output": "ipa_reference/ae.wav",
-        "outputDuration": 0.47,
+        "outputDuration": 0.480167,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -15.495756696754723,
+          "activeRmsBeforeDbfs": -19.005671896478585,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -35.680967490438334,
-          "appliedGainDb": -1.504243303245277,
-          "peakBeforeDbfs": -2.0081955518455024
+          "thresholdDbfs": -38.619741681198306,
+          "appliedGainDb": 2.0056718964785856,
+          "peakBeforeDbfs": -4.9468041030247925
         }
       },
       "ʌ": {
@@ -564,13 +564,13 @@
         "clipStart": 29.905,
         "clipDuration": 0.540000000000002,
         "output": "ipa_reference/turned_v.wav",
-        "outputDuration": 0.54,
+        "outputDuration": 0.550167,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -13.580051781205466,
+          "activeRmsBeforeDbfs": -18.153929868998734,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -32.91951064464136,
-          "appliedGainDb": -3.419948218794533,
-          "peakBeforeDbfs": -2.0045220945532503
+          "thresholdDbfs": -37.37836603145061,
+          "appliedGainDb": 1.1539298689987343,
+          "peakBeforeDbfs": -6.274503296866776
         }
       },
       "ə": {
@@ -582,11 +582,11 @@
         "output": "ipa_reference/schwa.wav",
         "outputDuration": 0.53,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -12.216186543900744,
+          "activeRmsBeforeDbfs": -17.384947958478254,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -31.871796093034227,
-          "appliedGainDb": -4.783813456099255,
-          "peakBeforeDbfs": -2.007193545772053
+          "thresholdDbfs": -36.682649415093366,
+          "appliedGainDb": 0.3849479584782529,
+          "peakBeforeDbfs": -6.118698408341739
         }
       },
       "ɑ": {
@@ -596,13 +596,13 @@
         "clipStart": 28.865000000000002,
         "clipDuration": 0.5600000000000016,
         "output": "ipa_reference/alpha.wav",
-        "outputDuration": 0.56,
+        "outputDuration": 0.570167,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -11.997218098340623,
+          "activeRmsBeforeDbfs": -17.963652470943664,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -31.37726889292232,
-          "appliedGainDb": -5.002781901659378,
-          "peakBeforeDbfs": -1.9975134417974483
+          "thresholdDbfs": -37.41532400427049,
+          "appliedGainDb": 0.9636524709436639,
+          "peakBeforeDbfs": -7.645248726371029
         }
       },
       "ɔ": {
@@ -614,11 +614,11 @@
         "output": "ipa_reference/open_o.wav",
         "outputDuration": 0.58,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -18.522486312046496,
+          "activeRmsBeforeDbfs": -17.537599928437132,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -39.465251263367534,
-          "appliedGainDb": 1.5224863120464962,
-          "peakBeforeDbfs": -7.5790265360603755
+          "thresholdDbfs": -38.480403022899765,
+          "appliedGainDb": 0.5375999284371318,
+          "peakBeforeDbfs": -6.594190347695116
         }
       },
       "ʊ": {
@@ -630,11 +630,11 @@
         "output": "ipa_reference/U.wav",
         "outputDuration": 0.51,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -11.219491905493824,
+          "activeRmsBeforeDbfs": -17.755334549536272,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -31.197939457488737,
-          "appliedGainDb": -5.780508094506176,
-          "peakBeforeDbfs": -2.0011839355428833
+          "thresholdDbfs": -37.60979822998293,
+          "appliedGainDb": 0.7553345495362715,
+          "peakBeforeDbfs": -8.413289342803193
         }
       },
       "u": {
@@ -646,11 +646,11 @@
         "output": "ipa_reference/u.wav",
         "outputDuration": 0.49,
         "levelMatch": {
-          "activeRmsBeforeDbfs": -19.461543528688317,
+          "activeRmsBeforeDbfs": -17.45858854155297,
           "targetActiveRmsDbfs": -17.0,
-          "thresholdDbfs": -40.338699178025585,
-          "appliedGainDb": 2.461543528688317,
-          "peakBeforeDbfs": -8.263755709308898
+          "thresholdDbfs": -38.335820319528,
+          "appliedGainDb": 0.4585885415529703,
+          "peakBeforeDbfs": -6.260867246406776
         }
       }
     }
