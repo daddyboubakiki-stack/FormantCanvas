@@ -90,10 +90,11 @@ jobs:
         run: |
           set -euxo pipefail
           target='articulation-lab/assets/audio/real'
-          rm -rf "$target/jp_reference" "$target/ipa_reference"
+          rm -rf "$target/jp_reference" "$target/ipa_reference" "$target/en_us_word_reference"
           mkdir -p "$target"
           cp -R /tmp/articulation-voice-build/jp_reference "$target/jp_reference"
           cp -R /tmp/articulation-voice-build/ipa_reference "$target/ipa_reference"
+          cp -R /tmp/articulation-voice-build/en_us_word_reference "$target/en_us_word_reference"
           cp /tmp/articulation-voice-build/build-report.json "$target/build-report.json"
           cp /tmp/articulation-voice-build/real-voice-sources.json "$target/real-voice-sources.json"
           git config user.name 'github-actions[bot]'
