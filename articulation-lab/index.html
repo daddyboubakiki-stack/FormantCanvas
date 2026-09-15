@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.4</title>
+  <title>Articulation Lab v0.4.1</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.4</small></h1>
+        <h1>Articulation Lab <small>v0.4.1</small></h1>
         <p>Hear real human vowels in Vowel Buttons, or switch to Mouth Synth and play the synthetic vocal tract continuously.</p>
       </div>
       <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
@@ -65,7 +65,8 @@
         <section class="panel buttons-only">
           <div class="section-title">Human recording</div>
           <div id="recordingHint" class="mini-note">Loading local recording set…</div>
-          <p class="mini-note">Japanese buttons use one Japanese speaker’s public-domain recordings. English-labelled buttons currently use a CC0 human IPA reference set, not a General American population norm.</p>
+          <p class="mini-note">Japanese buttons use one Japanese speaker’s public-domain recordings. The original kana tokens are unusually short, so v0.4.1 detects the voiced token and lengthens it with pitch-preserving time-stretch for clearer button playback. This is a duration-adjusted human recording, not the speaker’s original natural duration.</p>
+          <p class="mini-note">English-labelled buttons use a CC0 human IPA reference set, not a General American population norm. v0.4.1 also active-RMS level-matches the button samples so quieter vowels such as /ɔ/ are easier to compare.</p>
           <p class="mini-note">Male / female / child language-matched sets are being added only when the recording license and speaker metadata are explicit.</p>
         </section>
 
@@ -86,7 +87,7 @@
 
         <section class="panel note buttons-only">
           <strong>Vowel Buttons = recorded humans</strong><br />
-          Each tap retriggers a short locally bundled WAV. The tongue animation is intentionally independent of the recording, so a visual morph cannot create a fake consonant transition.
+          Each tap retriggers a locally bundled WAV. The tongue animation is intentionally independent of the recording, so a visual morph cannot create a fake consonant transition.
         </section>
 
         <section class="panel note synth-only">
@@ -96,7 +97,7 @@
 
         <section class="panel note">
           <strong>Evidence boundary</strong><br />
-          A human recording is evidence for how that recorded person sounded. The drawn tongue pose is a teaching model unless measured articulatory data says otherwise.
+          A human recording is evidence for how that recorded person sounded. Duration/level processing is documented separately. The drawn tongue pose is a teaching model unless measured articulatory data says otherwise.
         </section>
       </aside>
     </div>
