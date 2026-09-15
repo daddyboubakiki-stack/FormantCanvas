@@ -1,4 +1,4 @@
-# Articulation Lab — v0.4.1 staging build
+# Articulation Lab — v0.4.2 staging build
 
 Articulation Lab is a proposed sister app to Formant Canvas.
 
@@ -12,7 +12,7 @@ The app deliberately separates two play experiences.
 
 This keeps “hear a real vowel example” and “freely play an articulatory model” from pretending to be the same scientific object.
 
-## v0.4.1 implementation status
+## v0.4.2 implementation status
 
 Implemented:
 
@@ -27,27 +27,34 @@ Implemented:
 - Child / Teen / Adult / Soft-airy synth-rendering profiles
 - synth F1/F2/F3 estimates shown only in Mouth Synth
 - automated real-voice bundle and self-contained preview builds
+- fail-closed duration/loudness validation for processed teaching samples
 
-## v0.4.1 audio correction
+## v0.4.2 audio optimization
 
-User listening exposed two problems in the first v0.4 bundle: Japanese samples sounded abnormally short, Japanese `/i/` was effectively silent, and English `/ɔ/` was a little quieter than the other buttons.
+Listening on a real user device exposed three useful defects in the first real-voice bundle:
 
-The cause was preprocessing, not the language data itself:
+- Japanese buttons felt much shorter than the English buttons;
+- Japanese `/i/` was effectively inaudible;
+- English `/ɔ/` was noticeably quieter.
 
-- the Japanese source files contain several very short kana repetitions separated by long silence;
-- v0.4 cropped a fixed window around the file midpoint, which could capture mostly silence;
-- sample levels were not sufficiently matched for direct A/B button comparison.
+The user report was confirmed by inspecting the bundled WAVs. The old Japanese files could contain a long file window but only a very short audible token, and the old Japanese `/i/` and English `/ɔ/` were substantially below neighboring samples in active RMS level.
 
-v0.4.1 therefore:
+v0.4.2 therefore rebuilds the button audio with these rules:
 
-1. detects an actual voiced Japanese token rather than cropping the file midpoint;
-2. adds a small onset/offset margin;
-3. uses pitch-preserving `atempo` processing to lengthen the unusually short Japanese source token for clearer button playback, capped at 3×;
-4. active-RMS level-matches all bundled button samples to approximately **-17 dBFS**, subject to peak headroom.
+1. **Japanese voiced-token detection** — find an actual voiced kana token rather than using a fixed midpoint crop.
+2. **Small onset/offset margin** — retain a little real context around the detected nucleus.
+3. **Pitch-preserving duration adjustment** — the unusually short Japanese source tokens are lengthened with chained `atempo`, capped at 4×. The current outputs contain about **0.39–0.41 s of audible vowel material**.
+4. **Active-RMS comparison target** — all English reference buttons target roughly **−16.5 dBFS** active RMS; Japanese samples are brought into the same usable comparison window while respecting peak headroom.
+5. **Safe gain recovery** — unusually quiet source recordings may receive up to +24 dB gain, but the independent peak-headroom bound remains the clipping guard.
+6. **Fail-closed CI** — Japanese output duration must be 0.38–0.62 s, all button samples must fall between −19 and −14 dBFS active RMS, and suspiciously low peaks are rejected.
 
-The resulting Japanese WAV durations are roughly **0.34–0.40 s**. This processing is intentionally disclosed: they remain recordings of a real speaker, but their playback duration is **not the speaker’s untouched natural token duration**.
+Current verified examples after processing:
 
-English `/ɔ/` is now level-matched using the same active-RMS target as the other button samples.
+- Japanese `/i/`: about 0.392 s, active RMS about −16.5 dBFS
+- English `/ɔ/`: about 0.58 s, active RMS about −16.5 dBFS
+- English `/ɪ/`: about 0.38 s, active RMS about −16.9 dBFS
+
+The Japanese duration processing is intentionally disclosed: these remain recordings of a real speaker, but the button duration is **not the speaker’s untouched natural token duration**.
 
 ## Real-voice sets currently bundled
 
@@ -73,7 +80,7 @@ English `/ɔ/` is now level-matched using the same active-RMS target as the othe
 
 A human recording tells us how **that recorded person** sounded. Audio processing such as trimming, time-stretch, fades, and level matching is documented separately. The mouth pose drawn above it is a pedagogical model unless measured articulatory data says otherwise.
 
-Therefore v0.4.1 intentionally separates:
+Therefore v0.4.2 intentionally separates:
 
 - **recorded audio evidence** — human voice sample, with documented preprocessing
 - **articulatory teaching target** — modeled tongue/lip posture
@@ -89,10 +96,10 @@ For that reason, corpora such as JVPD or other research datasets are not copied 
 
 ## Distribution build
 
-`.github/workflows/articulation-v04-preview.yml` validates JavaScript syntax and builds:
+`.github/workflows/articulation-v04-preview.yml` validates JavaScript syntax, the processed-audio report, and builds:
 
-- `ArticulationLab_v0.4.1.html` — self-contained single-file preview with CSS, JavaScript, and vetted WAV samples embedded
-- `ArticulationLab_v0.4.1_source.zip` — modular source bundle
+- `ArticulationLab_v0.4.2.html` — self-contained single-file preview with CSS, JavaScript, and vetted WAV samples embedded
+- `ArticulationLab_v0.4.2_source.zip` — modular source bundle
 
 The self-contained build contains no local external script, stylesheet, or audio-file dependency.
 
@@ -114,4 +121,4 @@ The self-contained build contains no local external script, stylesheet, or audio
 
 ## Repository status
 
-This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical; the staged app itself is now v0.4.1. It remains intentionally isolated from Formant Canvas `main` and should not be merged merely to ship this staging folder.
+This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical; the staged app itself is now v0.4.2. It remains intentionally isolated from Formant Canvas `main` and should not be merged merely to ship this staging folder.
