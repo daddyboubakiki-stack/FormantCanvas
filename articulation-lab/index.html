@@ -4,64 +4,105 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.1</title>
+  <title>Articulation Lab v0.3</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.1</small></h1>
-        <p>Play the mouth like an instrument. Drag the tongue, round the lips, and hear the vowel color change continuously.</p>
+        <h1>Articulation Lab <small>v0.3</small></h1>
+        <p>Tap vowels like little sound buttons, or switch to Mouth Synth and play the tongue continuously.</p>
       </div>
-      <button id="voiceButton" class="voice" type="button">VOICE ON</button>
+      <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
     </header>
 
+    <section class="mode-switch panel compact-panel" aria-label="Play mode">
+      <div class="mode-copy">
+        <strong id="modeTitle">Vowel Buttons</strong>
+        <span id="modeDescription">Tap an IPA button: the tongue moves and the vowel sounds for about 0.5 seconds.</span>
+      </div>
+      <div class="segmented two mode-tabs">
+        <button type="button" class="selected" data-play-mode="buttons">Vowel Buttons</button>
+        <button type="button" data-play-mode="synth">Mouth Synth</button>
+      </div>
+    </section>
+
     <div class="layout">
-      <section class="panel">
+      <section class="panel stage-panel">
         <div class="stage-head">
-          <div><div class="eyebrow">Simple skin · sagittal view</div><strong>Drag the purple tongue handle</strong></div>
-          <div id="nearest" class="badge">closest /ə/</div>
+          <div><div class="eyebrow">Simple skin · sagittal view</div><strong id="selectedVowel">Choose a vowel below</strong></div>
+          <div class="legend buttons-only"><span class="dot en"></span>EN <span class="dot jp"></span>JP</div>
         </div>
         <div id="mouthMount"></div>
+        <div id="dragHint" class="drag-hint">The tongue will move when you tap a vowel button.</div>
+
+        <section id="vowelMapSection" class="vowel-map-section buttons-only" aria-labelledby="vowelMapTitle">
+          <div class="map-head">
+            <div>
+              <div class="eyebrow">Schematic vowel space</div>
+              <strong id="vowelMapTitle">Tap a vowel</strong>
+            </div>
+            <div class="segmented three language-tabs">
+              <button type="button" data-language-mode="english">English</button>
+              <button type="button" data-language-mode="japanese">日本語</button>
+              <button type="button" class="selected" data-language-mode="both">Both</button>
+            </div>
+          </div>
+          <div id="vowelMapMount"></div>
+          <p class="mini-note map-note">This quadrilateral is a simplified phonetic map, not a literal anatomical coordinate system. Button positions are pedagogical-model positions in v0.3.</p>
+        </section>
+
         <div class="readouts">
-          <div class="readout"><span>F1 estimate</span><strong id="f1Value">—</strong></div>
-          <div class="readout"><span>F2 estimate</span><strong id="f2Value">—</strong></div>
-          <div class="readout"><span>F3 estimate</span><strong id="f3Value">—</strong></div>
+          <div class="readout"><span>Synth F1</span><strong id="f1Value">—</strong></div>
+          <div class="readout"><span>Synth F2</span><strong id="f2Value">—</strong></div>
+          <div class="readout"><span>Synth F3</span><strong id="f3Value">—</strong></div>
         </div>
-        <div class="model-tag">MVP acoustic mapping · pedagogical model, not empirical anatomy</div>
+        <div class="model-tag">v0.3 articulation map = pedagogical model · not measured anatomy</div>
       </section>
 
       <aside class="side">
         <section class="panel">
-          <div class="section-title">Vowel presets</div>
-          <div id="presetButtons" class="presets"></div>
-        </section>
-        <section class="panel">
-          <div class="section-title">Instrument controls</div>
+          <div class="section-title">Voice character</div>
+          <label class="select-label" for="voiceProfile">Voice</label>
+          <select id="voiceProfile" class="voice-select"></select>
+          <div id="voiceHint" class="mini-note"></div>
           <label class="control">
+            <span class="control-row"><span>Pitch</span><span id="f0Value">245 Hz</span></span>
+            <input id="f0" type="range" min="80" max="320" step="1" value="245" />
+          </label>
+          <label class="control synth-only">
             <span class="control-row"><span>Lip rounding</span><span>flat ↔ round</span></span>
             <input id="lipRounding" type="range" min="0" max="1" step="0.01" value="0.1" />
           </label>
-          <label class="control">
-            <span class="control-row"><span>F0</span><span id="f0Value">125 Hz</span></span>
-            <input id="f0" type="range" min="80" max="260" step="1" value="125" />
-          </label>
         </section>
+
+        <section class="panel note buttons-only">
+          <strong>Vowel Buttons</strong><br />
+          Each tap triggers a short ~0.5 s vowel burst. The mouth above shows the corresponding modeled tongue/lip posture. Switch English / 日本語 / Both to compare the inventories visually.
+        </section>
+
+        <section class="panel note synth-only">
+          <strong>Mouth Synth</strong><br />
+          Turn VOICE ON, then drag the tongue continuously. This mode is intentionally button-free so the mouth itself feels like the instrument.
+        </section>
+
         <section class="panel note">
-          <strong>Science status</strong><br />
-          This build keeps articulation state, graphics, and audio separate so Simple / Anatomy / Cute skins can share the same underlying state. The current vowel/formant mapping is an explicit demo model; source-backed English/Japanese data comes next.
+          <strong>Sound model</strong><br />
+          Lightweight harmonic glottal-style source + breath noise + formant resonators. It is more voice-like than v0.1, but still a synthesizer rather than a physical vocal-tract simulation.
         </section>
       </aside>
     </div>
-    <div id="status" class="status" aria-live="polite">Press VOICE ON, then drag the tongue.</div>
+    <div id="status" class="status" aria-live="polite">Tap a vowel button to hear it.</div>
   </main>
 
+  <script src="data/voice-profiles.js"></script>
   <script src="data/vowel-presets.js"></script>
   <script src="src/state-store.js"></script>
   <script src="src/constraint-mapper.js"></script>
   <script src="src/audio/formant-engine.js"></script>
   <script src="src/renderers/simple-renderer.js"></script>
+  <script src="src/renderers/vowel-map.js"></script>
   <script src="src/app.js"></script>
 </body>
 </html>
