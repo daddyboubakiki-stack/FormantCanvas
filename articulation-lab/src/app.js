@@ -5,12 +5,19 @@ window.ArticulationLab = window.ArticulationLab || {};
   const engine = NS.createFormantEngine();
   const samplePlayer = NS.createSamplePlayer();
   const mouthRenderer = NS.createSimpleRenderer();
+  const frontalRenderer = NS.createFrontalRenderer();
   const vowelMap = NS.createVowelMap();
   const langs = NS.VOWEL_PRESETS.languages;
   let playMode = 'buttons';
   let languageMode = 'both';
+  let viewMode = 'both';
   let voiceProfileId = 'child';
   let morphFrame = null;
+
+  function articulationForPreset(preset) {
+    const id = preset && preset.articulationTargetId;
+    return (id && NS.ARTICULATION_TARGETS && NS.ARTICULATION_TARGETS.targets[id]) || preset.articulation || {};
+  }
 
   function updateState(partial) {
     const clean = NS.ConstraintMapper.sanitize(partial);
@@ -32,7 +39,10 @@ window.ArticulationLab = window.ArticulationLab || {};
     if (morphFrame) cancelAnimationFrame(morphFrame);
     const from = store.getState();
     const target = NS.ConstraintMapper.derive({ ...from, ...NS.ConstraintMapper.sanitize(articulation) });
-    const keys = ['tongueBodyFrontBack','tongueBodyHeight','lipRounding','jawOpening'];
+    const keys = [
+      'tongueBodyFrontBack','tongueBodyHeight','tongueRootRetraction',
+      'lipRounding','lipSpread','jawOpening'
+    ];
     const start = performance.now();
     function tick(now) {
       const raw = Math.min(1, (now - start) / duration);
@@ -48,13 +58,14 @@ window.ArticulationLab = window.ArticulationLab || {};
 
   async function playPreset(langId, id, preset) {
     if (playMode !== 'buttons') return;
+    const articulation = articulationForPreset(preset);
     const current = store.getState();
-    const target = NS.ConstraintMapper.derive({ ...current, ...NS.ConstraintMapper.sanitize(preset.articulation) });
+    const target = NS.ConstraintMapper.derive({ ...current, ...NS.ConstraintMapper.sanitize(articulation) });
     const lang = langs[langId];
     vowelMap.setSelected(langId, id);
     vowelMap.pulse(langId, id);
     $('#selectedVowel').textContent = `${lang.label} ${preset.label} · ${preset.name}`;
-    animateTo(preset.articulation, 220);
+    animateTo(articulation, 240);
     engine.stop();
 
     if (preset.realAudio) {
@@ -63,15 +74,21 @@ window.ArticulationLab = window.ArticulationLab || {};
       if (ok) {
         const audioSet = lang.audioSet;
         $('#recordingHint').textContent = `${audioSet.label} · ${audioSet.license}`;
-        $('#status').textContent = `${lang.label} ${preset.label} — human recording.`;
+        $('#status').textContent = `${lang.label} ${preset.label} — human recording · visual posture = pedagogical model.`;
         return;
       }
     }
 
     engine.setVoiceProfile(voiceProfileId);
     const ok = engine.playBurst(target, 500);
-    if (!ok) $('#status').textContent = 'Audio playback is unavailable here; the tongue animation still works.';
+    if (!ok) $('#status').textContent = 'Audio playback is unavailable here; the articulation animation still works.';
     else $('#status').textContent = `${lang.label} ${preset.label} — synth fallback (recording unavailable).`;
+  }
+
+  function applyView(mode) {
+    viewMode = ['sagittal','frontal','both'].includes(mode) ? mode : 'both';
+    document.body.dataset.viewMode = viewMode;
+    document.querySelectorAll('[data-view-mode]').forEach(b => b.classList.toggle('selected', b.dataset.viewMode === viewMode));
   }
 
   function applyMode(mode) {
@@ -81,18 +98,20 @@ window.ArticulationLab = window.ArticulationLab || {};
     updateState({ voicing: false });
     if (playMode === 'buttons') {
       mouthRenderer.setInteractive(false);
+      frontalRenderer.setInteractive(false);
       $('#modeTitle').textContent = 'Vowel Buttons';
-      $('#modeDescription').textContent = 'Tap an IPA button: hear a short human recording while the modeled tongue moves into position.';
-      $('#dragHint').textContent = 'The mouth is a teaching model; the sound is a real human recording when available.';
+      $('#modeDescription').textContent = 'Tap an IPA button: hear a human recording while sagittal and frontal teaching models move together.';
+      $('#dragHint').textContent = 'Both views share one articulation state; the drawing is a teaching model, while the button sound is a human recording.';
       $('#status').textContent = 'Tap a vowel button to hear a human recording.';
       if ($('#selectedVowel').textContent === 'Free articulation') $('#selectedVowel').textContent = 'Choose a vowel below';
     } else {
       mouthRenderer.setInteractive(true);
+      frontalRenderer.setInteractive(false);
       vowelMap.setSelected(null, null);
       $('#selectedVowel').textContent = 'Free articulation';
       $('#modeTitle').textContent = 'Mouth Synth';
-      $('#modeDescription').textContent = 'Turn the synthetic voice on and drag the tongue continuously like an instrument.';
-      $('#dragHint').textContent = 'VOICE ON → drag the purple tongue handle continuously.';
+      $('#modeDescription').textContent = 'Turn the synthetic voice on and manipulate tongue, jaw and lips like an instrument.';
+      $('#dragHint').textContent = 'VOICE ON → drag the tongue; jaw, lip spread and lip rounding have their own controls.';
       $('#status').textContent = 'Press VOICE ON, then play the mouth.';
     }
     document.body.dataset.playMode = playMode;
@@ -119,6 +138,7 @@ window.ArticulationLab = window.ArticulationLab || {};
 
   function initControls() {
     document.querySelectorAll('[data-play-mode]').forEach(btn => btn.addEventListener('click', () => applyMode(btn.dataset.playMode)));
+    document.querySelectorAll('[data-view-mode]').forEach(btn => btn.addEventListener('click', () => applyView(btn.dataset.viewMode)));
     document.querySelectorAll('[data-language-mode]').forEach(btn => btn.addEventListener('click', () => {
       languageMode = btn.dataset.languageMode;
       vowelMap.setLanguageMode(languageMode);
@@ -143,6 +163,14 @@ window.ArticulationLab = window.ArticulationLab || {};
       if (playMode !== 'synth') return;
       updateState({ lipRounding: Number(ev.target.value) });
     });
+    $('#lipSpread').addEventListener('input', ev => {
+      if (playMode !== 'synth') return;
+      updateState({ lipSpread: Number(ev.target.value) });
+    });
+    $('#jawOpening').addEventListener('input', ev => {
+      if (playMode !== 'synth') return;
+      updateState({ jawOpening: Number(ev.target.value) });
+    });
     $('#f0').addEventListener('input', ev => {
       if (playMode !== 'synth') return;
       updateState({ f0Hz: Number(ev.target.value) });
@@ -155,6 +183,7 @@ window.ArticulationLab = window.ArticulationLab || {};
       updateState(partial);
       $('#selectedVowel').textContent = 'Free articulation';
     });
+    frontalRenderer.mount($('#frontalMount'));
     vowelMap.mount($('#vowelMapMount'), playPreset);
     vowelMap.setLanguageMode(languageMode);
     initVoiceOptions();
@@ -162,6 +191,7 @@ window.ArticulationLab = window.ArticulationLab || {};
 
     store.subscribe(state => {
       mouthRenderer.render(state);
+      frontalRenderer.render(state);
       if (playMode === 'synth') engine.setArticulation(state);
       const est = engine.getAcousticEstimate(state);
       $('#f1Value').textContent = `${Math.round(est.f1Hz)} Hz`;
@@ -169,19 +199,22 @@ window.ArticulationLab = window.ArticulationLab || {};
       $('#f3Value').textContent = `${Math.round(est.f3Hz)} Hz`;
       $('#f0Value').textContent = `${Math.round(state.f0Hz)} Hz`;
       $('#lipRounding').value = state.lipRounding;
+      $('#lipSpread').value = state.lipSpread;
+      $('#jawOpening').value = state.jawOpening;
       $('#f0').value = state.f0Hz;
       $('#voiceButton').textContent = state.voicing ? 'VOICE OFF' : 'VOICE ON';
       $('#voiceButton').classList.toggle('active', state.voicing);
       if (playMode === 'synth') {
         $('#status').textContent = state.voicing
-          ? `${NS.VOICE_PROFILES[voiceProfileId].label} synth voice on — drag the tongue continuously.`
+          ? `${NS.VOICE_PROFILES[voiceProfileId].label} synth voice on — tongue, jaw and lips share one state.`
           : 'Press VOICE ON, then play the mouth.';
       }
     });
 
     $('#voiceHint').textContent = `Child: ${NS.VOICE_PROFILES.child.defaultF0} Hz base · synth rendering preset`;
-    $('#recordingHint').textContent = 'Japanese: language-specific PD recording · English buttons: CC0 human IPA reference';
+    $('#recordingHint').textContent = 'Japanese: language-specific PD recording · English buttons: redistribution-safe human references';
     samplePlayer.preload(allRealAudioUrls());
+    applyView('both');
     applyMode('buttons');
     window.addEventListener('pagehide', () => {
       samplePlayer.stop();
