@@ -1,0 +1,21 @@
+name: Package Formant Canvas preview
+
+on:
+  push:
+    branches:
+      - feat/hillenbrand-trajectories
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare preview file
+        run: cp index.html FormantCanvas_hillenbrand_preview.html
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FormantCanvas_hillenbrand_preview
+          path: FormantCanvas_hillenbrand_preview.html
+          if-no-files-found: error
