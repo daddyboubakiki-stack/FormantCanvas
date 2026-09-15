@@ -6,6 +6,14 @@ window.ArticulationLab = window.ArticulationLab || {};
     let selectedKey = null;
     let onPreset = null;
 
+    function targetForPreset(preset) {
+      const id = preset.articulationTargetId;
+      return (NS.ARTICULATION_TARGETS && NS.ARTICULATION_TARGETS.targets[id]) || preset.articulation || {
+        tongueBodyFrontBack: .5,
+        tongueBodyHeight: .5
+      };
+    }
+
     function mapPoint(articulation) {
       const yNorm = Math.max(0, Math.min(1, articulation.tongueBodyHeight));
       const xNorm = Math.max(0, Math.min(1, articulation.tongueBodyFrontBack));
@@ -40,7 +48,7 @@ window.ArticulationLab = window.ArticulationLab || {};
       use.forEach(langId => {
         const lang = langs[langId];
         Object.entries(lang.vowels).forEach(([id, preset]) => {
-          const p = mapPoint(preset.articulation);
+          const p = mapPoint(targetForPreset(preset));
           const key = `${langId}:${id}`;
           const btn = document.createElement('button');
           btn.type = 'button';
