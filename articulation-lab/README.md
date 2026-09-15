@@ -1,4 +1,4 @@
-# Articulation Lab — v0.4.2 staging build
+# Articulation Lab — v0.4.3 staging build
 
 Articulation Lab is a proposed sister app to Formant Canvas.
 
@@ -12,7 +12,7 @@ The app deliberately separates two play experiences.
 
 This keeps “hear a real vowel example” and “freely play an articulatory model” from pretending to be the same scientific object.
 
-## v0.4.2 implementation status
+## v0.4.3 implementation status
 
 Implemented:
 
@@ -29,32 +29,41 @@ Implemented:
 - automated real-voice bundle and self-contained preview builds
 - fail-closed duration/loudness validation for processed teaching samples
 
-## v0.4.2 audio optimization
+## v0.4.2 Japanese/loudness repair
 
-Listening on a real user device exposed three useful defects in the first real-voice bundle:
+User-device listening exposed that the first real-voice bundle made Japanese vowels feel much too short, Japanese `/i/` was effectively inaudible, and English `/ɔ/` was quieter than its neighbors. v0.4.2 therefore changed Japanese preprocessing from fixed midpoint cropping to voiced-token detection, added pitch-preserving duration adjustment for the unusually short Japanese source tokens, and active-RMS matched the button recordings with peak-headroom protection.
 
-- Japanese buttons felt much shorter than the English buttons;
-- Japanese `/i/` was effectively inaudible;
-- English `/ɔ/` was noticeably quieter.
+Current Japanese outputs contain about **0.39–0.41 s of audible vowel material**. The duration adjustment is intentionally disclosed: they remain recordings of a real speaker, but the button duration is not the speaker’s untouched token duration.
 
-The user report was confirmed by inspecting the bundled WAVs. The old Japanese files could contain a long file window but only a very short audible token, and the old Japanese `/i/` and English `/ɔ/` were substantially below neighboring samples in active RMS level.
+## v0.4.3 KIT `/ɪ/` replacement
 
-v0.4.2 therefore rebuilds the button audio with these rules:
+A second listening review found that the isolated IPA-reference `/ɪ/` could sound unlike a familiar English KIT vowel when heard by itself. Rather than treating a generic isolated IPA production as if it were automatically the best English-teaching example, v0.4.3 replaces only the KIT button with a language-specific US-English source.
 
-1. **Japanese voiced-token detection** — find an actual voiced kana token rather than using a fixed midpoint crop.
-2. **Small onset/offset margin** — retain a little real context around the detected nucleus.
-3. **Pitch-preserving duration adjustment** — the unusually short Japanese source tokens are lengthened with chained `atempo`, capped at 4×. The current outputs contain about **0.39–0.41 s of audible vowel material**.
-4. **Active-RMS comparison target** — all English reference buttons target roughly **−16.5 dBFS** active RMS; Japanese samples are brought into the same usable comparison window while respecting peak headroom.
-5. **Safe gain recovery** — unusually quiet source recordings may receive up to +24 dB gain, but the independent peak-headroom bound remains the clipping guard.
-6. **Fail-closed CI** — Japanese output duration must be 0.38–0.62 s, all button samples must fall between −19 and −14 dBFS active RMS, and suspiciously low peaks are rejected.
+Source:
 
-Current verified examples after processing:
+- **word:** `kid`
+- **recording:** `En-us-kid.ogg`
+- **speaker/author:** Dvortygirl
+- **variety:** US English, as described by the source page
+- **source:** Wikimedia Commons
+- **license used by this app:** **CC BY-SA 2.5** (the original is dual-licensed with GFDL 1.2+)
 
-- Japanese `/i/`: about 0.392 s, active RMS about −16.5 dBFS
-- English `/ɔ/`: about 0.58 s, active RMS about −16.5 dBFS
-- English `/ɪ/`: about 0.38 s, active RMS about −16.9 dBFS
+Acoustic inspection of the source gives a clean segmentation:
 
-The Japanese duration processing is intentionally disclosed: these remain recordings of a real speaker, but the button duration is **not the speaker’s untouched natural token duration**.
+- approximately **0.09–0.20 s:** `/k/` release and aspiration
+- approximately **0.205–0.315 s:** voiced KIT vowel nucleus
+- after approximately **0.32 s:** transition into `/d/` closure
+
+The app therefore exports the approximately **0.110 s** vowel interval from `0.205–0.315 s`. It receives only:
+
+- mono 24 kHz conversion
+- 6 ms fade-in
+- 10 ms fade-out
+- active-RMS level matching
+
+It receives **no time-stretch**. Preserving this short duration is deliberate: duration is part of the natural English realization rather than a defect to be equalized away.
+
+The adapted KIT clip remains attributed to Dvortygirl and is distributed under CC BY-SA 2.5. Source/provenance metadata are also preserved in `assets/audio/real/real-voice-sources.json` and `build-report.json`.
 
 ## Real-voice sets currently bundled
 
@@ -64,23 +73,32 @@ The Japanese duration processing is intentionally disclosed: these remain record
 - one Japanese speaker
 - source license recorded as **Public Domain (PD-self)**
 - voiced token detected automatically from each source recording
-- duration adjusted for button usability as described above
+- duration adjusted for button usability
 - examples of one speaker, not a population norm
 
-### English-labelled IPA reference
+### Generic IPA reference
 
-- ten vowels extracted from a human “All IPA Vowels” reference recording
-- source license recorded as **CC0 1.0**
+Nine current English-labelled buttons still use vowels extracted from the human “All IPA Vowels” reference recording:
+
+- source license **CC0 1.0**
 - active-RMS level-matched for button comparison
 - generic human IPA reference, **not** a General American population norm
 
-`assets/audio/real/real-voice-sources.json` and `build-report.json` preserve provenance and processing metadata.
+KIT `/ɪ/` is intentionally excluded from this source set as of v0.4.3.
+
+### US-English KIT reference
+
+- `/ɪ/` extracted from `kid`
+- Dvortygirl
+- CC BY-SA 2.5
+- no time-stretch
+- language-specific English word evidence rather than an isolated generic IPA demonstration
 
 ## Scientific boundary
 
 A human recording tells us how **that recorded person** sounded. Audio processing such as trimming, time-stretch, fades, and level matching is documented separately. The mouth pose drawn above it is a pedagogical model unless measured articulatory data says otherwise.
 
-Therefore v0.4.2 intentionally separates:
+Articulation Lab intentionally separates:
 
 - **recorded audio evidence** — human voice sample, with documented preprocessing
 - **articulatory teaching target** — modeled tongue/lip posture
@@ -98,10 +116,10 @@ For that reason, corpora such as JVPD or other research datasets are not copied 
 
 `.github/workflows/articulation-v04-preview.yml` validates JavaScript syntax, the processed-audio report, and builds:
 
-- `ArticulationLab_v0.4.2.html` — self-contained single-file preview with CSS, JavaScript, and vetted WAV samples embedded
-- `ArticulationLab_v0.4.2_source.zip` — modular source bundle
+- `ArticulationLab_v0.4.3.html` — self-contained single-file preview with CSS, JavaScript, and vetted WAV samples embedded
+- `ArticulationLab_v0.4.3_source.zip` — modular source bundle
 
-The self-contained build contains no local external script, stylesheet, or audio-file dependency.
+The self-contained build contains no local external script, stylesheet, or audio-file dependency. Attribution links for the adapted CC BY-SA KIT source remain visible in the UI.
 
 ## Non-goals
 
@@ -111,7 +129,7 @@ The self-contained build contains no local external script, stylesheet, or audio
 - full jaw/tongue-tip control
 - claiming a unique inverse mapping from acoustics to anatomy
 - claiming current teaching postures are measured anatomy
-- claiming the English IPA reference voice is a population norm
+- claiming the generic English IPA reference voice is a population norm
 
 ## Planned educational modes
 
@@ -121,4 +139,4 @@ The self-contained build contains no local external script, stylesheet, or audio
 
 ## Repository status
 
-This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical; the staged app itself is now v0.4.2. It remains intentionally isolated from Formant Canvas `main` and should not be merged merely to ship this staging folder.
+This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical; the staged app itself is now v0.4.3. It remains intentionally isolated from Formant Canvas `main` and should not be merged merely to ship this staging folder.
