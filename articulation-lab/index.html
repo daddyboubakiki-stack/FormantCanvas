@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.3</title>
+  <title>Articulation Lab v0.3.1</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.3</small></h1>
+        <h1>Articulation Lab <small>v0.3.1</small></h1>
         <p>Tap vowels like little sound buttons, or switch to Mouth Synth and play the tongue continuously.</p>
       </div>
       <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
@@ -50,7 +50,7 @@
             </div>
           </div>
           <div id="vowelMapMount"></div>
-          <p class="mini-note map-note">This quadrilateral is a simplified phonetic map, not a literal anatomical coordinate system. Button positions are pedagogical-model positions in v0.3.</p>
+          <p class="mini-note map-note">This quadrilateral is a simplified phonetic map, not a literal anatomical coordinate system. Button positions are pedagogical-model positions in v0.3.1.</p>
         </section>
 
         <div class="readouts">
@@ -58,7 +58,7 @@
           <div class="readout"><span>Synth F2</span><strong id="f2Value">—</strong></div>
           <div class="readout"><span>Synth F3</span><strong id="f3Value">—</strong></div>
         </div>
-        <div class="model-tag">v0.3 articulation map = pedagogical model · not measured anatomy</div>
+        <div class="model-tag">v0.3.1 articulation map = pedagogical model · not measured anatomy</div>
       </section>
 
       <aside class="side">
@@ -79,7 +79,7 @@
 
         <section class="panel note buttons-only">
           <strong>Vowel Buttons</strong><br />
-          Each tap triggers a short ~0.5 s vowel burst. The mouth above shows the corresponding modeled tongue/lip posture. Switch English / 日本語 / Both to compare the inventories visually.
+          Each tap triggers a short ~0.5 s steady-vowel burst. The mouth above may animate into position, but that visual morph is not synthesized as a consonant-like transition.
         </section>
 
         <section class="panel note synth-only">
