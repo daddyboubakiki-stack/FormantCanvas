@@ -29,6 +29,8 @@ Implemented:
 - automated real-voice bundle and self-contained preview builds
 - fail-closed duration/loudness validation for processed teaching samples
 
+The generated v0.4.3 audio bundle has passed the source, duration, level, and asset-path checks described below; the distributable workflow re-validates the committed bundle before packaging.
+
 ## v0.4.2 Japanese/loudness repair
 
 User-device listening exposed that the first real-voice bundle made Japanese vowels feel much too short, Japanese `/i/` was effectively inaudible, and English `/ɔ/` was quieter than its neighbors. v0.4.2 therefore changed Japanese preprocessing from fixed midpoint cropping to voiced-token detection, added pitch-preserving duration adjustment for the unusually short Japanese source tokens, and active-RMS matched the button recordings with peak-headroom protection.
