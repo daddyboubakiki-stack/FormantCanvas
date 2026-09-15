@@ -1,32 +1,32 @@
 window.ArticulationLab = window.ArticulationLab || {};
 window.ArticulationLab.VOWEL_PRESETS = {
-  schema: 'articulation-lab.vowel-presets.v0.1',
-  evidenceNotice: 'MVP pedagogical model values. These are not yet source-backed empirical language norms.',
-  presets: {
-    i: {
-      label: '/i/', name: 'high front unrounded',
-      articulation: { tongueBodyFrontBack: 0.10, tongueBodyHeight: 0.08, lipRounding: 0.02, jawOpening: 0.18 },
-      acousticTarget: { f1Hz: 300, f2Hz: 2450, f3Hz: 3150, evidenceType: 'pedagogical_model', sourceId: 'mvp-model-v0.1' }
+  schema: 'articulation-lab.vowel-presets.v0.3',
+  evidenceNotice: 'Articulatory locations in this prototype are pedagogical model positions, not measured anatomy. Source-backed English/Japanese acoustic targets will be layered in separately.',
+  languages: {
+    english: {
+      id: 'english', label: 'English', short: 'EN',
+      vowels: {
+        en_i:   { label:'/i/',  name:'FLEECE', articulation:{ tongueBodyFrontBack:.08, tongueBodyHeight:.08, lipRounding:.01 } },
+        en_I:   { label:'/ɪ/',  name:'KIT',    articulation:{ tongueBodyFrontBack:.18, tongueBodyHeight:.22, lipRounding:.01 } },
+        en_e:   { label:'/ɛ/',  name:'DRESS',  articulation:{ tongueBodyFrontBack:.19, tongueBodyHeight:.48, lipRounding:.01 } },
+        en_ae:  { label:'/æ/',  name:'TRAP',   articulation:{ tongueBodyFrontBack:.17, tongueBodyHeight:.79, lipRounding:.01 } },
+        en_uh:  { label:'/ʌ/',  name:'STRUT',  articulation:{ tongueBodyFrontBack:.51, tongueBodyHeight:.57, lipRounding:.02 } },
+        en_sch: { label:'/ə/',  name:'schwa',  articulation:{ tongueBodyFrontBack:.50, tongueBodyHeight:.49, lipRounding:.08 } },
+        en_a:   { label:'/ɑ/',  name:'PALM',   articulation:{ tongueBodyFrontBack:.85, tongueBodyHeight:.86, lipRounding:.03 } },
+        en_o:   { label:'/ɔ/',  name:'THOUGHT',articulation:{ tongueBodyFrontBack:.82, tongueBodyHeight:.59, lipRounding:.58 } },
+        en_U:   { label:'/ʊ/',  name:'FOOT',   articulation:{ tongueBodyFrontBack:.75, tongueBodyHeight:.29, lipRounding:.52 } },
+        en_u:   { label:'/u/',  name:'GOOSE',  articulation:{ tongueBodyFrontBack:.88, tongueBodyHeight:.12, lipRounding:.94 } }
+      }
     },
-    ae: {
-      label: '/æ/', name: 'low front unrounded',
-      articulation: { tongueBodyFrontBack: 0.18, tongueBodyHeight: 0.82, lipRounding: 0.02, jawOpening: 0.82 },
-      acousticTarget: { f1Hz: 720, f2Hz: 1800, f3Hz: 2800, evidenceType: 'pedagogical_model', sourceId: 'mvp-model-v0.1' }
-    },
-    aa: {
-      label: '/ɑ/', name: 'low back unrounded',
-      articulation: { tongueBodyFrontBack: 0.86, tongueBodyHeight: 0.88, lipRounding: 0.06, jawOpening: 0.90 },
-      acousticTarget: { f1Hz: 760, f2Hz: 1150, f3Hz: 2550, evidenceType: 'pedagogical_model', sourceId: 'mvp-model-v0.1' }
-    },
-    schwa: {
-      label: '/ə/', name: 'mid central',
-      articulation: { tongueBodyFrontBack: 0.50, tongueBodyHeight: 0.50, lipRounding: 0.10, jawOpening: 0.48 },
-      acousticTarget: { f1Hz: 500, f2Hz: 1500, f3Hz: 2700, evidenceType: 'pedagogical_model', sourceId: 'mvp-model-v0.1' }
-    },
-    u: {
-      label: '/u/', name: 'high back rounded',
-      articulation: { tongueBodyFrontBack: 0.86, tongueBodyHeight: 0.12, lipRounding: 0.95, jawOpening: 0.22 },
-      acousticTarget: { f1Hz: 330, f2Hz: 850, f3Hz: 2350, evidenceType: 'pedagogical_model', sourceId: 'mvp-model-v0.1' }
+    japanese: {
+      id: 'japanese', label: 'Japanese', short: 'JP',
+      vowels: {
+        jp_i: { label:'/i/', name:'い', articulation:{ tongueBodyFrontBack:.12, tongueBodyHeight:.10, lipRounding:.01 } },
+        jp_e: { label:'/e/', name:'え', articulation:{ tongueBodyFrontBack:.24, tongueBodyHeight:.37, lipRounding:.01 } },
+        jp_a: { label:'/a/', name:'あ', articulation:{ tongueBodyFrontBack:.55, tongueBodyHeight:.72, lipRounding:.02 } },
+        jp_o: { label:'/o/', name:'お', articulation:{ tongueBodyFrontBack:.72, tongueBodyHeight:.40, lipRounding:.58 } },
+        jp_u: { label:'/ɯ/', name:'う ≈ [ɯᵝ]', articulation:{ tongueBodyFrontBack:.79, tongueBodyHeight:.18, lipRounding:.24 } }
+      }
     }
   }
 };
