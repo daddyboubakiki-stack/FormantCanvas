@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Build redistribution-safe short vowel samples for Articulation Lab v0.4.
+"""Build redistribution-safe short vowel samples for Articulation Lab v0.4.1.
 
 Inputs are downloaded by CI from sources listed in data/real-voice-sources.json.
 The script intentionally uses only Python stdlib + ffmpeg/ffprobe.
+
+v0.4.1 fixes:
+- Japanese samples are no longer cropped from the file midpoint. A voiced token is detected first.
+- Output WAVs are level-matched using active-speech RMS, which also fixes quiet IPA samples such as /ɔ/.
 """
 from __future__ import annotations
 
@@ -37,31 +41,37 @@ def duration(path: Path) -> float:
     return float(run("ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(path)))
 
 
-def render_clip(src: Path, dst: Path, start: float, dur: float = 0.55) -> None:
+def render_clip(src: Path, dst: Path, start: float, dur: float, atempo: float = 1.0) -> None:
+    """Render a mono PCM excerpt with short fades.
+
+    atempo < 1.0 slows the clip while preserving pitch reasonably well.
+    """
     dst.parent.mkdir(parents=True, exist_ok=True)
     start = max(0.0, start)
     total = duration(src)
-    dur = min(dur, max(0.20, total - start))
-    fade_out_start = max(0.02, dur - 0.045)
-    af = (
-        "loudnorm=I=-20:TP=-2:LRA=7,"
-        "afade=t=in:st=0:d=0.02,"
-        f"afade=t=out:st={fade_out_start:.4f}:d=0.04"
-    )
+    dur = min(dur, max(0.08, total - start))
+
+    filters = []
+    tempo = max(0.25, min(2.0, float(atempo)))
+    # ffmpeg atempo accepts 0.5..100. Chain when a slower factor is needed.
+    while tempo < 0.5:
+        filters.append("atempo=0.5")
+        tempo /= 0.5
+    if abs(tempo - 1.0) > 1e-4:
+        filters.append(f"atempo={tempo:.6f}")
+
+    # Initial loudnorm is only coarse; a deterministic active-RMS pass follows.
+    filters.append("loudnorm=I=-18:TP=-2:LRA=7")
+    rendered_dur = dur / max(0.001, atempo)
+    filters.append("afade=t=in:st=0:d=0.018")
+    filters.append(f"afade=t=out:st={max(0.025, rendered_dur - 0.045):.4f}:d=0.04")
+
     subprocess.run([
         "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
         "-ss", f"{start:.4f}", "-i", str(src), "-t", f"{dur:.4f}",
-        "-ac", "1", "-ar", "24000", "-af", af, "-c:a", "pcm_s16le", str(dst)
+        "-ac", "1", "-ar", "24000", "-af", ",".join(filters),
+        "-c:a", "pcm_s16le", str(dst)
     ], check=True)
-
-
-def central_clip(src: Path, dst: Path, target_dur: float = 0.55) -> dict:
-    total = duration(src)
-    dur = min(target_dur, max(0.30, total * 0.55))
-    # Stay away from onset/offset and use the stable central portion of sustained-vowel recordings.
-    start = max(0.0, (total - dur) / 2.0)
-    render_clip(src, dst, start, dur)
-    return {"sourceDuration": total, "clipStart": start, "clipDuration": dur}
 
 
 def pcm_frames(wav_path: Path, frame_ms: int = 10):
@@ -115,12 +125,174 @@ def segments_from(active: list[bool], min_frames: int) -> list[tuple[int, int]]:
     return segs
 
 
-def detect_ipa_segments(src: Path, work: Path) -> tuple[list[tuple[float, float]], dict]:
-    analysis_wav = work / "all_ipa_analysis.wav"
+def decode_analysis(src: Path, wav: Path) -> None:
     subprocess.run([
         "ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(src),
-        "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", str(analysis_wav)
+        "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", str(wav)
     ], check=True)
+
+
+def detect_japanese_token(src: Path, work: Path, key: str) -> tuple[tuple[float, float], dict]:
+    """Detect one clearly voiced kana token from recordings that may contain repeated utterances.
+
+    The old midpoint crop could land in silence. We search several thresholds and choose
+    a strong, self-contained voiced segment instead.
+    """
+    analysis_wav = work / f"jp_{key}_analysis.wav"
+    decode_analysis(src, analysis_wav)
+    _rate, dbs = pcm_frames(analysis_wav, 10)
+    if not dbs:
+        raise RuntimeError(f"No analyzable audio for Japanese {key}")
+
+    peak_db = max(dbs)
+    candidates = []
+    for drop in (16, 18, 20, 22, 24, 26, 28):
+        threshold = max(-52.0, peak_db - drop)
+        for gap_frames in (2, 3, 4, 5):
+            active = close_short_gaps([db > threshold for db in dbs], gap_frames)
+            segs = segments_from(active, min_frames=4)  # >= 40 ms
+            plausible = [s for s in segs if 4 <= (s[1] - s[0]) <= 80]  # 40..800 ms
+            if not plausible:
+                continue
+            # Prefer longer tokens and thresholds near peak-22 dB; avoid edge fragments.
+            for a, b in plausible:
+                dur_frames = b - a
+                edge_penalty = 0.15 if a == 0 or b >= len(dbs) else 0.0
+                level = sum(dbs[a:b]) / max(1, dur_frames)
+                score = dur_frames + 0.12 * (level - threshold) - edge_penalty
+                candidates.append((score, threshold, gap_frames, a, b, plausible))
+
+    if not candidates:
+        raise RuntimeError(f"Could not find voiced token in Japanese {key}")
+
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    score, threshold, gap_frames, a, b, plausible = candidates[0]
+    start, end = a * 0.01, b * 0.01
+    report = {
+        "frameMs": 10,
+        "peakDbfs": peak_db,
+        "thresholdDbfs": threshold,
+        "closedGapMs": gap_frames * 10,
+        "selectedStart": start,
+        "selectedEnd": end,
+        "selectedDuration": end - start,
+        "detectedSegments": [
+            {"start": x * 0.01, "end": y * 0.01, "duration": (y - x) * 0.01}
+            for x, y in plausible
+        ],
+        "selectionScore": score,
+    }
+    return (start, end), report
+
+
+def level_match_active_rms(wav_path: Path, target_dbfs: float = -17.0) -> dict:
+    """Match active-frame RMS while preserving headroom.
+
+    This is intentionally simple and deterministic for short isolated vowels.
+    """
+    with wave.open(str(wav_path), "rb") as wf:
+        params = wf.getparams()
+        if params.nchannels != 1 or params.sampwidth != 2:
+            raise RuntimeError("level matching expects mono 16-bit PCM")
+        raw = wf.readframes(params.nframes)
+
+    sample_count = len(raw) // 2
+    if sample_count == 0:
+        return {"appliedGainDb": 0.0, "reason": "empty"}
+
+    import array
+    samples = array.array("h")
+    samples.frombytes(raw)
+    if samples.itemsize != 2:
+        raise RuntimeError("unexpected int16 size")
+    if __import__("sys").byteorder != "little":
+        samples.byteswap()
+
+    rate = params.framerate
+    frame_len = max(1, int(rate * 0.01))
+    frame_rms = []
+    for i in range(0, len(samples), frame_len):
+        chunk = samples[i:i + frame_len]
+        if not chunk:
+            continue
+        ss = sum(float(v) * float(v) for v in chunk)
+        rms = math.sqrt(ss / len(chunk))
+        db = -120.0 if rms <= 0 else 20.0 * math.log10(rms / 32768.0)
+        frame_rms.append((i, min(len(samples), i + frame_len), rms, db))
+
+    max_db = max((x[3] for x in frame_rms), default=-120.0)
+    threshold = max(-45.0, max_db - 24.0)
+    active = [x for x in frame_rms if x[3] > threshold]
+    if not active:
+        return {"appliedGainDb": 0.0, "reason": "no_active_frames", "thresholdDbfs": threshold}
+
+    sumsq = 0.0
+    count = 0
+    for a, b, _rms, _db in active:
+        for v in samples[a:b]:
+            sumsq += float(v) * float(v)
+            count += 1
+    active_rms = math.sqrt(sumsq / max(1, count))
+    active_db = -120.0 if active_rms <= 0 else 20.0 * math.log10(active_rms / 32768.0)
+
+    desired_gain = 10.0 ** ((target_dbfs - active_db) / 20.0)
+    peak = max(abs(v) for v in samples) / 32768.0
+    peak_limit = 10.0 ** (-1.5 / 20.0)
+    headroom_gain = peak_limit / max(1e-9, peak)
+    gain = min(desired_gain, headroom_gain, 4.0)
+    gain = max(0.25, gain)
+
+    for i, v in enumerate(samples):
+        samples[i] = int(max(-32768, min(32767, round(v * gain))))
+
+    if __import__("sys").byteorder != "little":
+        samples.byteswap()
+    with wave.open(str(wav_path), "wb") as wf:
+        wf.setparams(params)
+        wf.writeframes(samples.tobytes())
+
+    return {
+        "activeRmsBeforeDbfs": active_db,
+        "targetActiveRmsDbfs": target_dbfs,
+        "thresholdDbfs": threshold,
+        "appliedGainDb": 20.0 * math.log10(max(1e-9, gain)),
+        "peakBeforeDbfs": -120.0 if peak <= 0 else 20.0 * math.log10(peak),
+    }
+
+
+def build_japanese_sample(src: Path, dst: Path, work: Path, key: str) -> dict:
+    total = duration(src)
+    (a, b), detect = detect_japanese_token(src, work, key)
+    token_dur = b - a
+
+    # Include a little natural onset/offset context.
+    margin = 0.025
+    clip_start = max(0.0, a - margin)
+    clip_end = min(total, b + margin)
+    clip_dur = clip_end - clip_start
+
+    # The source files contain short kana repetitions. Mildly sustain very short tokens
+    # (max 2x duration) so button playback is comparable to the English reference samples.
+    desired_voiced = 0.36
+    stretch = min(2.0, max(1.0, desired_voiced / max(0.08, token_dur)))
+    atempo = 1.0 / stretch
+    render_clip(src, dst, clip_start, clip_dur, atempo=atempo)
+    level = level_match_active_rms(dst, target_dbfs=-17.0)
+    return {
+        "sourceDuration": total,
+        "clipStart": clip_start,
+        "clipDurationBeforeStretch": clip_dur,
+        "selectedVoicedDuration": token_dur,
+        "stretchFactor": stretch,
+        "outputDuration": duration(dst),
+        "detection": detect,
+        "levelMatch": level,
+    }
+
+
+def detect_ipa_segments(src: Path, work: Path) -> tuple[list[tuple[float, float]], dict]:
+    analysis_wav = work / "all_ipa_analysis.wav"
+    decode_analysis(src, analysis_wav)
     _rate, dbs = pcm_frames(analysis_wav, 10)
     candidates = []
     # Search sensible thresholds/gap closures rather than hardcoding timestamps.
@@ -159,11 +331,11 @@ def build(args) -> dict:
     work = Path(args.work_dir)
     out.mkdir(parents=True, exist_ok=True)
     work.mkdir(parents=True, exist_ok=True)
-    report = {"japanese": {}, "ipaReference": {}}
+    report = {"version": "v0.4.1", "japanese": {}, "ipaReference": {}}
 
     jp_out = out / "jp_reference"
     for key, filename in JP_EXPORTS.items():
-        info = central_clip(src / filename, jp_out / f"{key}.wav")
+        info = build_japanese_sample(src / filename, jp_out / f"{key}.wav", work, key)
         info.update({"sourceFile": filename, "output": f"jp_reference/{key}.wav"})
         report["japanese"][key] = info
 
@@ -178,11 +350,15 @@ def build(args) -> dict:
         center = (a + b) / 2.0
         clip_dur = min(0.60, max(0.38, (b - a) + 0.05))
         start = max(0.0, min(total - clip_dur, center - clip_dur / 2.0))
-        render_clip(ipa_src, ipa_out / filename, start, clip_dur)
+        dst = ipa_out / filename
+        render_clip(ipa_src, dst, start, clip_dur)
+        level = level_match_active_rms(dst, target_dbfs=-17.0)
         report["ipaReference"]["exports"][IPA_SEQUENCE[idx]] = {
             "sequenceIndex": idx, "segmentStart": a, "segmentEnd": b,
             "clipStart": start, "clipDuration": clip_dur,
             "output": f"ipa_reference/{filename}",
+            "outputDuration": duration(dst),
+            "levelMatch": level,
         }
 
     with (out / "build-report.json").open("w", encoding="utf-8") as fh:
