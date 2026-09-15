@@ -104,6 +104,8 @@ jobs:
             echo 'Generated audio assets already up to date.'
           else
             git commit -m 'Bundle vetted real-vowel samples'
+            git fetch origin design/articulation-lab-v0.1
+            git rebase origin/design/articulation-lab-v0.1
             git push origin HEAD:design/articulation-lab-v0.1
           fi
 
