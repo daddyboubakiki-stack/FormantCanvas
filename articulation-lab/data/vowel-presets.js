@@ -1,20 +1,20 @@
 window.ArticulationLab = window.ArticulationLab || {};
 window.ArticulationLab.VOWEL_PRESETS = {
-  schema: 'articulation-lab.vowel-presets.v0.4',
+  schema: 'articulation-lab.vowel-presets.v0.4.3',
   evidenceNotice: 'Vowel Buttons use redistribution-safe human recordings when available. Mouth posture remains a pedagogical articulation model and is not claimed to be the recorded speaker’s measured anatomy.',
   languages: {
     english: {
       id: 'english', label: 'English', short: 'EN',
       audioSet: {
-        id: 'ipa_reference_cc0_2021',
-        label: 'Human IPA reference',
+        id: 'english_mixed_human_reference_v043',
+        label: 'Human English/IPA references',
         evidenceType: 'human_recording',
-        scope: 'generic_ipa_reference_not_population_norm',
-        license: 'CC0 1.0'
+        scope: 'mixed_source_reference_not_population_norm',
+        license: 'Mixed: CC0 1.0 + CC BY-SA 2.5'
       },
       vowels: {
         en_i:   { label:'/i/',  name:'FLEECE', articulation:{ tongueBodyFrontBack:.08, tongueBodyHeight:.08, lipRounding:.01 }, realAudio:'assets/audio/real/ipa_reference/i.wav', audioEvidence:'human_recording', voiceSetId:'ipa_reference_cc0_2021' },
-        en_I:   { label:'/ɪ/',  name:'KIT',    articulation:{ tongueBodyFrontBack:.18, tongueBodyHeight:.22, lipRounding:.01 }, realAudio:'assets/audio/real/ipa_reference/I.wav', audioEvidence:'human_recording', voiceSetId:'ipa_reference_cc0_2021' },
+        en_I:   { label:'/ɪ/',  name:'KIT',    articulation:{ tongueBodyFrontBack:.18, tongueBodyHeight:.22, lipRounding:.01 }, realAudio:'assets/audio/real/en_us_word_reference/I.wav', audioEvidence:'human_recording', voiceSetId:'en_us_word_reference_dvortygirl_2006', sourceWord:'kid', durationCue:'naturally short' },
         en_e:   { label:'/ɛ/',  name:'DRESS',  articulation:{ tongueBodyFrontBack:.19, tongueBodyHeight:.48, lipRounding:.01 }, realAudio:'assets/audio/real/ipa_reference/epsilon.wav', audioEvidence:'human_recording', voiceSetId:'ipa_reference_cc0_2021' },
         en_ae:  { label:'/æ/',  name:'TRAP',   articulation:{ tongueBodyFrontBack:.17, tongueBodyHeight:.79, lipRounding:.01 }, realAudio:'assets/audio/real/ipa_reference/ae.wav', audioEvidence:'human_recording', voiceSetId:'ipa_reference_cc0_2021' },
         en_uh:  { label:'/ʌ/',  name:'STRUT',  articulation:{ tongueBodyFrontBack:.51, tongueBodyHeight:.57, lipRounding:.02 }, realAudio:'assets/audio/real/ipa_reference/turned_v.wav', audioEvidence:'human_recording', voiceSetId:'ipa_reference_cc0_2021' },
