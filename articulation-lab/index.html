@@ -4,15 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.4.3</title>
+  <title>Articulation Lab v0.5-alpha</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.4.3</small></h1>
-        <p>Hear real human vowels in Vowel Buttons, or switch to Mouth Synth and play the synthetic vocal tract continuously.</p>
+        <h1>Articulation Lab <small>v0.5-alpha</small></h1>
+        <p>Hear real human vowels, then see the same pedagogical articulation from the side and from the front. Mouth Synth keeps the playful continuous model.</p>
       </div>
       <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
     </header>
@@ -20,7 +20,7 @@
     <section class="mode-switch panel compact-panel" aria-label="Play mode">
       <div class="mode-copy">
         <strong id="modeTitle">Vowel Buttons</strong>
-        <span id="modeDescription">Tap an IPA button: hear a short human recording while the modeled tongue moves into position.</span>
+        <span id="modeDescription">Tap an IPA button: hear a human recording while sagittal and frontal teaching models move together.</span>
       </div>
       <div class="segmented two mode-tabs">
         <button type="button" class="selected" data-play-mode="buttons">Vowel Buttons</button>
@@ -31,11 +31,31 @@
     <div class="layout">
       <section class="panel stage-panel">
         <div class="stage-head">
-          <div><div class="eyebrow">Simple skin · sagittal view</div><strong id="selectedVowel">Choose a vowel below</strong></div>
-          <div class="legend buttons-only"><span class="dot en"></span>EN <span class="dot jp"></span>JP</div>
+          <div>
+            <div class="eyebrow">Simple skin · shared articulation state</div>
+            <strong id="selectedVowel">Choose a vowel below</strong>
+          </div>
+          <div class="stage-tools">
+            <div class="segmented three view-tabs" aria-label="Articulation view">
+              <button type="button" data-view-mode="sagittal">Side</button>
+              <button type="button" data-view-mode="frontal">Front</button>
+              <button type="button" class="selected" data-view-mode="both">Both</button>
+            </div>
+            <div class="legend buttons-only"><span class="dot en"></span>EN <span class="dot jp"></span>JP</div>
+          </div>
         </div>
-        <div id="mouthMount"></div>
-        <div id="dragHint" class="drag-hint">The mouth is a teaching model; the sound is a real human recording when available.</div>
+
+        <div class="visual-stage-grid">
+          <div class="view-card sagittal-view-card">
+            <div class="view-label">Sagittal · side</div>
+            <div id="mouthMount"></div>
+          </div>
+          <div class="view-card frontal-view-card">
+            <div class="view-label">Frontal · front</div>
+            <div id="frontalMount"></div>
+          </div>
+        </div>
+        <div id="dragHint" class="drag-hint">Both views share one articulation state; the drawing is a teaching model, while the button sound is a human recording.</div>
 
         <section id="vowelMapSection" class="vowel-map-section buttons-only" aria-labelledby="vowelMapTitle">
           <div class="map-head">
@@ -50,7 +70,7 @@
             </div>
           </div>
           <div id="vowelMapMount"></div>
-          <p class="mini-note map-note">This quadrilateral is a simplified phonetic map, not literal measured tongue geometry. The mouth posture is pedagogical; the button audio is a separate human recording.</p>
+          <p class="mini-note map-note">This quadrilateral is a simplified phonetic map, not literal measured tongue geometry. The two mouth views use a separate pedagogical articulation target; button audio is human recording evidence.</p>
         </section>
 
         <div class="readouts synth-only">
@@ -65,14 +85,13 @@
         <section class="panel buttons-only">
           <div class="section-title">Human recording</div>
           <div id="recordingHint" class="mini-note">Loading local recording set…</div>
-          <p class="mini-note">Japanese buttons use one Japanese speaker’s public-domain recordings. The source contains very short repeated kana tokens, so v0.4.3 detects an actual voiced token, keeps a small onset/offset margin, then applies pitch-preserving time-stretch. The resulting button vowels are about 0.39–0.41 s of audible material rather than a longer file dominated by silence.</p>
-          <p class="mini-note">English buttons are human recordings from redistribution-safe sources. Most still use the CC0 IPA reference set, but KIT /ɪ/ now comes from the vowel nucleus of a real US-English <em>kid</em> recording. The /k/ aspiration and /d/ closure are cut away; the ~0.11 s vowel is intentionally not time-stretched, so its natural short-vowel character remains.</p>
-          <p class="mini-note">KIT source: <a href="https://commons.wikimedia.org/wiki/File:En-us-kid.ogg" target="_blank" rel="noreferrer">Dvortygirl, “En-us-kid.ogg”</a>, adapted from US-English word audio under <a href="https://creativecommons.org/licenses/by-sa/2.5/" target="_blank" rel="noreferrer">CC BY-SA 2.5</a>. Adaptation: vowel-nucleus trim, 6/10 ms edge fades, mono 24 kHz conversion, and active-RMS level matching.</p>
-          <p class="mini-note">Processed button levels are active-RMS matched for easier comparison while respecting peak headroom. Male / female / child language-matched sets are added only when recording rights and speaker metadata are explicit.</p>
+          <p class="mini-note">Audio evidence and articulation targets are now stored separately. A recording tells us how that speaker sounded; the side/front drawings show a teaching target and do not claim to reconstruct that speaker’s measured anatomy.</p>
+          <p class="mini-note">Japanese buttons use one Japanese speaker’s public-domain recordings. Most English buttons use a redistribution-safe IPA reference; KIT /ɪ/ uses the natural vowel nucleus cut from US-English <em>kid</em>.</p>
+          <p class="mini-note">KIT source: <a href="https://commons.wikimedia.org/wiki/File:En-us-kid.ogg" target="_blank" rel="noreferrer">Dvortygirl, “En-us-kid.ogg”</a>, adapted under <a href="https://creativecommons.org/licenses/by-sa/2.5/" target="_blank" rel="noreferrer">CC BY-SA 2.5</a>.</p>
         </section>
 
         <section class="panel synth-only">
-          <div class="section-title">Synth voice character</div>
+          <div class="section-title">Synth voice + articulation</div>
           <label class="select-label" for="voiceProfile">Voice</label>
           <select id="voiceProfile" class="voice-select"></select>
           <div id="voiceHint" class="mini-note"></div>
@@ -81,24 +100,32 @@
             <input id="f0" type="range" min="80" max="320" step="1" value="245" />
           </label>
           <label class="control">
+            <span class="control-row"><span>Jaw opening</span><span>closed ↔ open</span></span>
+            <input id="jawOpening" type="range" min="0" max="1" step="0.01" value="0.48" />
+          </label>
+          <label class="control">
+            <span class="control-row"><span>Lip spread</span><span>neutral ↔ wide</span></span>
+            <input id="lipSpread" type="range" min="0" max="1" step="0.01" value="0.12" />
+          </label>
+          <label class="control">
             <span class="control-row"><span>Lip rounding</span><span>flat ↔ round</span></span>
             <input id="lipRounding" type="range" min="0" max="1" step="0.01" value="0.1" />
           </label>
         </section>
 
         <section class="panel note buttons-only">
-          <strong>Vowel Buttons = recorded humans</strong><br />
-          Each tap retriggers a locally bundled WAV. The tongue animation is intentionally independent of the recording, so a visual morph cannot create a fake consonant transition.
+          <strong>Try /æ/ vs /ɑ/</strong><br />
+          Watch both views. The v0.5 teaching targets give /æ/ stronger lateral lip spread and a front-low tongue, while /ɑ/ uses a more posterior tongue/root configuration and a slightly larger vertical jaw opening.
         </section>
 
         <section class="panel note synth-only">
           <strong>Mouth Synth = continuous synthesis</strong><br />
-          Turn VOICE ON, then drag the tongue continuously. This remains the playful instrument mode where every in-between position needs a model-generated sound.
+          Drag the tongue in the side view and independently change jaw opening, lip spread, and lip rounding. The front view follows the same state.
         </section>
 
         <section class="panel note">
           <strong>Evidence boundary</strong><br />
-          A human recording is evidence for how that recorded person sounded. Duration/level processing is documented separately. The drawn tongue pose is a teaching model unless measured articulatory data says otherwise.
+          These normalized postures are pedagogical. Human anatomy varies, multiple articulations may lead to similar acoustics, and the cavity shading is not a measured area function.
         </section>
       </aside>
     </div>
@@ -106,12 +133,14 @@
   </main>
 
   <script src="data/voice-profiles.js"></script>
+  <script src="data/articulation-targets.js"></script>
   <script src="data/vowel-presets.js"></script>
   <script src="src/state-store.js"></script>
   <script src="src/constraint-mapper.js"></script>
   <script src="src/audio/formant-engine.js"></script>
   <script src="src/audio/sample-player.js"></script>
   <script src="src/renderers/simple-renderer.js"></script>
+  <script src="src/renderers/frontal-renderer.js"></script>
   <script src="src/renderers/vowel-map.js"></script>
   <script src="src/app.js"></script>
 </body>
