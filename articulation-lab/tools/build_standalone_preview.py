@@ -66,7 +66,7 @@ def build(app_dir: Path, output: Path) -> None:
     if 'assets/audio/real/' in html:
         raise RuntimeError('Standalone build still contains unembedded real-audio paths')
 
-    banner = '<!-- Articulation Lab v0.4 standalone build: local CSS/JS and vetted real-voice WAVs are embedded. -->\n'
+    banner = '<!-- Articulation Lab v0.4.2 standalone build: local CSS/JS and vetted real-voice WAVs are embedded. -->\n'
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(banner + html, encoding='utf-8')
     print(f'Wrote {output} ({output.stat().st_size} bytes)')
