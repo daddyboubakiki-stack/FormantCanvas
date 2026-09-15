@@ -7,7 +7,24 @@
     "dataset_file": "h95-alldata.zip / bigdata.dat",
     "sampling": "F1/F2/F3 at 10%-80% of vowel duration in 10% steps",
     "missing_value_rule": "0 in source is treated as missing and excluded point-wise",
-    "aggregation": "arithmetic mean by speaker type x intended vowel x normalized time point"
+    "aggregation": "arithmetic mean by speaker type x intended vowel x normalized time point",
+    "source_vowel_counts": {
+      "ae": 139,
+      "ah": 139,
+      "aw": 139,
+      "eh": 139,
+      "ei": 139,
+      "er": 139,
+      "ih": 139,
+      "iy": 139,
+      "oa": 139,
+      "oo": 139,
+      "uh": 139,
+      "uw": 139
+    },
+    "code_normalization": {
+      "ei": "ey (HAYED /eɪ/)"
+    }
   },
   "time_points": [
     10,
@@ -24,6 +41,9 @@
       "ae": {
         "word": "had",
         "ipa": "æ",
+        "source_code": [
+          "ae"
+        ],
         "token_n": 45,
         "mean_duration_ms": 271.6,
         "points": [
@@ -128,6 +148,9 @@
       "ah": {
         "word": "hod",
         "ipa": "ɑ",
+        "source_code": [
+          "ah"
+        ],
         "token_n": 45,
         "mean_duration_ms": 260.9,
         "points": [
@@ -232,6 +255,9 @@
       "aw": {
         "word": "hawed",
         "ipa": "ɔ",
+        "source_code": [
+          "aw"
+        ],
         "token_n": 45,
         "mean_duration_ms": 274.8,
         "points": [
@@ -336,6 +362,9 @@
       "eh": {
         "word": "head",
         "ipa": "ɛ",
+        "source_code": [
+          "eh"
+        ],
         "token_n": 45,
         "mean_duration_ms": 195.6,
         "points": [
@@ -440,6 +469,9 @@
       "er": {
         "word": "heard",
         "ipa": "ɝ",
+        "source_code": [
+          "er"
+        ],
         "token_n": 45,
         "mean_duration_ms": 263.5,
         "points": [
@@ -541,9 +573,119 @@
           }
         ]
       },
+      "ey": {
+        "word": "hayed",
+        "ipa": "eɪ",
+        "source_code": [
+          "ei"
+        ],
+        "token_n": 45,
+        "mean_duration_ms": 267.2,
+        "points": [
+          {
+            "t": 0.1,
+            "pct": 10,
+            "F1": 493.9,
+            "F2": 2064.4,
+            "F3": 2671.3,
+            "n": {
+              "F1": 45,
+              "F2": 45,
+              "F3": 45
+            }
+          },
+          {
+            "t": 0.2,
+            "pct": 20,
+            "F1": 478.8,
+            "F2": 2089.0,
+            "F3": 2698.5,
+            "n": {
+              "F1": 45,
+              "F2": 45,
+              "F3": 43
+            }
+          },
+          {
+            "t": 0.3,
+            "pct": 30,
+            "F1": 463.0,
+            "F2": 2122.0,
+            "F3": 2710.1,
+            "n": {
+              "F1": 45,
+              "F2": 45,
+              "F3": 43
+            }
+          },
+          {
+            "t": 0.4,
+            "pct": 40,
+            "F1": 449.7,
+            "F2": 2154.5,
+            "F3": 2715.4,
+            "n": {
+              "F1": 45,
+              "F2": 45,
+              "F3": 43
+            }
+          },
+          {
+            "t": 0.5,
+            "pct": 50,
+            "F1": 437.2,
+            "F2": 2180.6,
+            "F3": 2727.0,
+            "n": {
+              "F1": 45,
+              "F2": 45,
+              "F3": 43
+            }
+          },
+          {
+            "t": 0.6,
+            "pct": 60,
+            "F1": 427.7,
+            "F2": 2204.7,
+            "F3": 2737.4,
+            "n": {
+              "F1": 45,
+              "F2": 45,
+              "F3": 43
+            }
+          },
+          {
+            "t": 0.7,
+            "pct": 70,
+            "F1": 413.2,
+            "F2": 2221.8,
+            "F3": 2740.9,
+            "n": {
+              "F1": 45,
+              "F2": 45,
+              "F3": 43
+            }
+          },
+          {
+            "t": 0.8,
+            "pct": 80,
+            "F1": 399.6,
+            "F2": 2229.2,
+            "F3": 2741.7,
+            "n": {
+              "F1": 45,
+              "F2": 45,
+              "F3": 43
+            }
+          }
+        ]
+      },
       "ih": {
         "word": "hid",
         "ipa": "ɪ",
+        "source_code": [
+          "ih"
+        ],
         "token_n": 45,
         "mean_duration_ms": 192.9,
         "points": [
@@ -648,6 +790,9 @@
       "iy": {
         "word": "heed",
         "ipa": "i",
+        "source_code": [
+          "iy"
+        ],
         "token_n": 45,
         "mean_duration_ms": 243.5,
         "points": [
@@ -752,6 +897,9 @@
       "oa": {
         "word": "hoed",
         "ipa": "oʊ",
+        "source_code": [
+          "oa"
+        ],
         "token_n": 45,
         "mean_duration_ms": 266.0,
         "points": [
@@ -856,6 +1004,9 @@
       "oo": {
         "word": "hood",
         "ipa": "ʊ",
+        "source_code": [
+          "oo"
+        ],
         "token_n": 45,
         "mean_duration_ms": 192.9,
         "points": [
@@ -960,6 +1111,9 @@
       "uh": {
         "word": "hud",
         "ipa": "ʌ",
+        "source_code": [
+          "uh"
+        ],
         "token_n": 45,
         "mean_duration_ms": 194.2,
         "points": [
@@ -1064,6 +1218,9 @@
       "uw": {
         "word": "who'd",
         "ipa": "u",
+        "source_code": [
+          "uw"
+        ],
         "token_n": 45,
         "mean_duration_ms": 236.7,
         "points": [
@@ -1170,6 +1327,9 @@
       "ae": {
         "word": "had",
         "ipa": "æ",
+        "source_code": [
+          "ae"
+        ],
         "token_n": 48,
         "mean_duration_ms": 334.2,
         "points": [
@@ -1274,6 +1434,9 @@
       "ah": {
         "word": "hod",
         "ipa": "ɑ",
+        "source_code": [
+          "ah"
+        ],
         "token_n": 48,
         "mean_duration_ms": 324.3,
         "points": [
@@ -1378,6 +1541,9 @@
       "aw": {
         "word": "hawed",
         "ipa": "ɔ",
+        "source_code": [
+          "aw"
+        ],
         "token_n": 48,
         "mean_duration_ms": 350.5,
         "points": [
@@ -1482,6 +1648,9 @@
       "eh": {
         "word": "head",
         "ipa": "ɛ",
+        "source_code": [
+          "eh"
+        ],
         "token_n": 48,
         "mean_duration_ms": 251.6,
         "points": [
@@ -1586,6 +1755,9 @@
       "er": {
         "word": "heard",
         "ipa": "ɝ",
+        "source_code": [
+          "er"
+        ],
         "token_n": 48,
         "mean_duration_ms": 321.6,
         "points": [
@@ -1687,9 +1859,119 @@
           }
         ]
       },
+      "ey": {
+        "word": "hayed",
+        "ipa": "eɪ",
+        "source_code": [
+          "ei"
+        ],
+        "token_n": 48,
+        "mean_duration_ms": 320.9,
+        "points": [
+          {
+            "t": 0.1,
+            "pct": 10,
+            "F1": 547.8,
+            "F2": 2483.7,
+            "F3": 3061.5,
+            "n": {
+              "F1": 48,
+              "F2": 48,
+              "F3": 44
+            }
+          },
+          {
+            "t": 0.2,
+            "pct": 20,
+            "F1": 534.1,
+            "F2": 2514.3,
+            "F3": 3053.3,
+            "n": {
+              "F1": 48,
+              "F2": 48,
+              "F3": 44
+            }
+          },
+          {
+            "t": 0.3,
+            "pct": 30,
+            "F1": 510.2,
+            "F2": 2539.2,
+            "F3": 3035.2,
+            "n": {
+              "F1": 48,
+              "F2": 48,
+              "F3": 43
+            }
+          },
+          {
+            "t": 0.4,
+            "pct": 40,
+            "F1": 493.0,
+            "F2": 2577.9,
+            "F3": 3040.8,
+            "n": {
+              "F1": 48,
+              "F2": 48,
+              "F3": 42
+            }
+          },
+          {
+            "t": 0.5,
+            "pct": 50,
+            "F1": 476.4,
+            "F2": 2611.4,
+            "F3": 3042.7,
+            "n": {
+              "F1": 48,
+              "F2": 48,
+              "F3": 42
+            }
+          },
+          {
+            "t": 0.6,
+            "pct": 60,
+            "F1": 463.4,
+            "F2": 2636.3,
+            "F3": 3051.9,
+            "n": {
+              "F1": 48,
+              "F2": 48,
+              "F3": 41
+            }
+          },
+          {
+            "t": 0.7,
+            "pct": 70,
+            "F1": 452.4,
+            "F2": 2672.3,
+            "F3": 3066.9,
+            "n": {
+              "F1": 48,
+              "F2": 48,
+              "F3": 40
+            }
+          },
+          {
+            "t": 0.8,
+            "pct": 80,
+            "F1": 446.9,
+            "F2": 2692.8,
+            "F3": 3075.8,
+            "n": {
+              "F1": 48,
+              "F2": 48,
+              "F3": 41
+            }
+          }
+        ]
+      },
       "ih": {
         "word": "hid",
         "ipa": "ɪ",
+        "source_code": [
+          "ih"
+        ],
         "token_n": 48,
         "mean_duration_ms": 241.4,
         "points": [
@@ -1794,6 +2076,9 @@
       "iy": {
         "word": "heed",
         "ipa": "i",
+        "source_code": [
+          "iy"
+        ],
         "token_n": 48,
         "mean_duration_ms": 306.8,
         "points": [
@@ -1898,6 +2183,9 @@
       "oa": {
         "word": "hoed",
         "ipa": "oʊ",
+        "source_code": [
+          "oa"
+        ],
         "token_n": 48,
         "mean_duration_ms": 326.7,
         "points": [
@@ -2002,6 +2290,9 @@
       "oo": {
         "word": "hood",
         "ipa": "ʊ",
+        "source_code": [
+          "oo"
+        ],
         "token_n": 48,
         "mean_duration_ms": 249.3,
         "points": [
@@ -2106,6 +2397,9 @@
       "uh": {
         "word": "hud",
         "ipa": "ʌ",
+        "source_code": [
+          "uh"
+        ],
         "token_n": 48,
         "mean_duration_ms": 236.5,
         "points": [
@@ -2210,6 +2504,9 @@
       "uw": {
         "word": "who'd",
         "ipa": "u",
+        "source_code": [
+          "uw"
+        ],
         "token_n": 48,
         "mean_duration_ms": 303.8,
         "points": [
@@ -2316,6 +2613,9 @@
       "ae": {
         "word": "had",
         "ipa": "æ",
+        "source_code": [
+          "ae"
+        ],
         "token_n": 27,
         "mean_duration_ms": 320.3,
         "points": [
@@ -2420,6 +2720,9 @@
       "ah": {
         "word": "hod",
         "ipa": "ɑ",
+        "source_code": [
+          "ah"
+        ],
         "token_n": 27,
         "mean_duration_ms": 308.2,
         "points": [
@@ -2524,6 +2827,9 @@
       "aw": {
         "word": "hawed",
         "ipa": "ɔ",
+        "source_code": [
+          "aw"
+        ],
         "token_n": 27,
         "mean_duration_ms": 311.8,
         "points": [
@@ -2628,6 +2934,9 @@
       "eh": {
         "word": "head",
         "ipa": "ɛ",
+        "source_code": [
+          "eh"
+        ],
         "token_n": 27,
         "mean_duration_ms": 236.2,
         "points": [
@@ -2732,6 +3041,9 @@
       "er": {
         "word": "heard",
         "ipa": "ɝ",
+        "source_code": [
+          "er"
+        ],
         "token_n": 27,
         "mean_duration_ms": 311.1,
         "points": [
@@ -2833,9 +3145,119 @@
           }
         ]
       },
+      "ey": {
+        "word": "hayed",
+        "ipa": "eɪ",
+        "source_code": [
+          "ei"
+        ],
+        "token_n": 27,
+        "mean_duration_ms": 306.7,
+        "points": [
+          {
+            "t": 0.1,
+            "pct": 10,
+            "F1": 569.1,
+            "F2": 2572.3,
+            "F3": 3281.4,
+            "n": {
+              "F1": 27,
+              "F2": 27,
+              "F3": 26
+            }
+          },
+          {
+            "t": 0.2,
+            "pct": 20,
+            "F1": 564.7,
+            "F2": 2613.6,
+            "F3": 3278.6,
+            "n": {
+              "F1": 27,
+              "F2": 27,
+              "F3": 26
+            }
+          },
+          {
+            "t": 0.3,
+            "pct": 30,
+            "F1": 546.9,
+            "F2": 2658.6,
+            "F3": 3278.1,
+            "n": {
+              "F1": 27,
+              "F2": 27,
+              "F3": 26
+            }
+          },
+          {
+            "t": 0.4,
+            "pct": 40,
+            "F1": 528.4,
+            "F2": 2696.9,
+            "F3": 3288.9,
+            "n": {
+              "F1": 27,
+              "F2": 27,
+              "F3": 26
+            }
+          },
+          {
+            "t": 0.5,
+            "pct": 50,
+            "F1": 514.0,
+            "F2": 2722.1,
+            "F3": 3280.0,
+            "n": {
+              "F1": 27,
+              "F2": 27,
+              "F3": 26
+            }
+          },
+          {
+            "t": 0.6,
+            "pct": 60,
+            "F1": 504.1,
+            "F2": 2761.1,
+            "F3": 3266.5,
+            "n": {
+              "F1": 27,
+              "F2": 27,
+              "F3": 26
+            }
+          },
+          {
+            "t": 0.7,
+            "pct": 70,
+            "F1": 494.7,
+            "F2": 2785.5,
+            "F3": 3253.1,
+            "n": {
+              "F1": 27,
+              "F2": 27,
+              "F3": 25
+            }
+          },
+          {
+            "t": 0.8,
+            "pct": 80,
+            "F1": 487.3,
+            "F2": 2806.6,
+            "F3": 3358.4,
+            "n": {
+              "F1": 27,
+              "F2": 27,
+              "F3": 25
+            }
+          }
+        ]
+      },
       "ih": {
         "word": "hid",
         "ipa": "ɪ",
+        "source_code": [
+          "ih"
+        ],
         "token_n": 27,
         "mean_duration_ms": 239.4,
         "points": [
@@ -2940,6 +3362,9 @@
       "iy": {
         "word": "heed",
         "ipa": "i",
+        "source_code": [
+          "iy"
+        ],
         "token_n": 27,
         "mean_duration_ms": 290.5,
         "points": [
@@ -3044,6 +3469,9 @@
       "oa": {
         "word": "hoed",
         "ipa": "oʊ",
+        "source_code": [
+          "oa"
+        ],
         "token_n": 27,
         "mean_duration_ms": 303.7,
         "points": [
@@ -3148,6 +3576,9 @@
       "oo": {
         "word": "hood",
         "ipa": "ʊ",
+        "source_code": [
+          "oo"
+        ],
         "token_n": 27,
         "mean_duration_ms": 243.2,
         "points": [
@@ -3252,6 +3683,9 @@
       "uh": {
         "word": "hud",
         "ipa": "ʌ",
+        "source_code": [
+          "uh"
+        ],
         "token_n": 27,
         "mean_duration_ms": 240.0,
         "points": [
@@ -3356,6 +3790,9 @@
       "uw": {
         "word": "who'd",
         "ipa": "u",
+        "source_code": [
+          "uw"
+        ],
         "token_n": 27,
         "mean_duration_ms": 271.5,
         "points": [
@@ -3462,6 +3899,9 @@
       "ae": {
         "word": "had",
         "ipa": "æ",
+        "source_code": [
+          "ae"
+        ],
         "token_n": 19,
         "mean_duration_ms": 324.6,
         "points": [
@@ -3566,6 +4006,9 @@
       "ah": {
         "word": "hod",
         "ipa": "ɑ",
+        "source_code": [
+          "ah"
+        ],
         "token_n": 19,
         "mean_duration_ms": 309.6,
         "points": [
@@ -3670,6 +4113,9 @@
       "aw": {
         "word": "hawed",
         "ipa": "ɔ",
+        "source_code": [
+          "aw"
+        ],
         "token_n": 19,
         "mean_duration_ms": 333.8,
         "points": [
@@ -3774,6 +4220,9 @@
       "eh": {
         "word": "head",
         "ipa": "ɛ",
+        "source_code": [
+          "eh"
+        ],
         "token_n": 19,
         "mean_duration_ms": 251.4,
         "points": [
@@ -3878,6 +4327,9 @@
       "er": {
         "word": "heard",
         "ipa": "ɝ",
+        "source_code": [
+          "er"
+        ],
         "token_n": 19,
         "mean_duration_ms": 305.4,
         "points": [
@@ -3979,9 +4431,119 @@
           }
         ]
       },
+      "ey": {
+        "word": "hayed",
+        "ipa": "eɪ",
+        "source_code": [
+          "ei"
+        ],
+        "token_n": 19,
+        "mean_duration_ms": 323.3,
+        "points": [
+          {
+            "t": 0.1,
+            "pct": 10,
+            "F1": 577.6,
+            "F2": 2657.1,
+            "F3": 3379.9,
+            "n": {
+              "F1": 19,
+              "F2": 19,
+              "F3": 18
+            }
+          },
+          {
+            "t": 0.2,
+            "pct": 20,
+            "F1": 568.7,
+            "F2": 2704.7,
+            "F3": 3384.3,
+            "n": {
+              "F1": 19,
+              "F2": 19,
+              "F3": 18
+            }
+          },
+          {
+            "t": 0.3,
+            "pct": 30,
+            "F1": 554.6,
+            "F2": 2740.5,
+            "F3": 3367.1,
+            "n": {
+              "F1": 19,
+              "F2": 19,
+              "F3": 17
+            }
+          },
+          {
+            "t": 0.4,
+            "pct": 40,
+            "F1": 533.3,
+            "F2": 2756.9,
+            "F3": 3370.4,
+            "n": {
+              "F1": 19,
+              "F2": 19,
+              "F3": 17
+            }
+          },
+          {
+            "t": 0.5,
+            "pct": 50,
+            "F1": 512.1,
+            "F2": 2800.2,
+            "F3": 3368.9,
+            "n": {
+              "F1": 19,
+              "F2": 19,
+              "F3": 17
+            }
+          },
+          {
+            "t": 0.6,
+            "pct": 60,
+            "F1": 490.8,
+            "F2": 2816.3,
+            "F3": 3369.5,
+            "n": {
+              "F1": 19,
+              "F2": 19,
+              "F3": 17
+            }
+          },
+          {
+            "t": 0.7,
+            "pct": 70,
+            "F1": 485.3,
+            "F2": 2851.9,
+            "F3": 3370.9,
+            "n": {
+              "F1": 19,
+              "F2": 19,
+              "F3": 17
+            }
+          },
+          {
+            "t": 0.8,
+            "pct": 80,
+            "F1": 484.2,
+            "F2": 2844.7,
+            "F3": 3367.1,
+            "n": {
+              "F1": 19,
+              "F2": 19,
+              "F3": 17
+            }
+          }
+        ]
+      },
       "ih": {
         "word": "hid",
         "ipa": "ɪ",
+        "source_code": [
+          "ih"
+        ],
         "token_n": 19,
         "mean_duration_ms": 258.0,
         "points": [
@@ -4086,6 +4648,9 @@
       "iy": {
         "word": "heed",
         "ipa": "i",
+        "source_code": [
+          "iy"
+        ],
         "token_n": 19,
         "mean_duration_ms": 307.9,
         "points": [
@@ -4190,6 +4755,9 @@
       "oa": {
         "word": "hoed",
         "ipa": "oʊ",
+        "source_code": [
+          "oa"
+        ],
         "token_n": 19,
         "mean_duration_ms": 321.5,
         "points": [
@@ -4294,6 +4862,9 @@
       "oo": {
         "word": "hood",
         "ipa": "ʊ",
+        "source_code": [
+          "oo"
+        ],
         "token_n": 19,
         "mean_duration_ms": 253.4,
         "points": [
@@ -4398,6 +4969,9 @@
       "uh": {
         "word": "hud",
         "ipa": "ʌ",
+        "source_code": [
+          "uh"
+        ],
         "token_n": 19,
         "mean_duration_ms": 237.6,
         "points": [
@@ -4502,6 +5076,9 @@
       "uw": {
         "word": "who'd",
         "ipa": "u",
+        "source_code": [
+          "uw"
+        ],
         "token_n": 19,
         "mean_duration_ms": 293.5,
         "points": [
