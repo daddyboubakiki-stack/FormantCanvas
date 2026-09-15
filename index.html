@@ -49,10 +49,10 @@
   body[data-ui-mode="casual"] .research-only,
   body[data-ui-mode="casual"] .learning-only,
   body[data-ui-mode="casual"] .learning-plus { display:none!important; }
-  body[data-ui-mode="casual"] .casual-only { display:initial; }
+  body[data-ui-mode="casual"] .casual-only { display:revert; }
   body[data-ui-mode="learning"] .casual-only,
   body[data-ui-mode="learning"] .research-only { display:none!important; }
-  body[data-ui-mode="learning"] .learning-only { display:initial; }
+  body[data-ui-mode="learning"] .learning-only { display:revert; }
   body[data-ui-mode="research"] .casual-only,
   body[data-ui-mode="research"] .learning-only { display:none!important; }
   body[data-ui-mode="casual"] .settings { grid-template-columns:repeat(3,minmax(0,1fr)); }
