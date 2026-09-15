@@ -1,0 +1,73 @@
+:root {
+  --bg: #fbf8f3;
+  --panel: #fffdf9;
+  --card: #fff8f1;
+  --text: #2c2a31;
+  --muted: #746f79;
+  --border: #ded6cf;
+  --accent: #6c63d9;
+  --accent-soft: #eceafd;
+  --tongue: #f47f98;
+  --palate: #cf9b78;
+  --lip: #d96d82;
+  --airway: #9b86b8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: ui-rounded, "Hiragino Maru Gothic ProN", "Yu Gothic", system-ui, sans-serif; }
+button, input { font: inherit; }
+button { touch-action: manipulation; }
+.app { max-width: 1120px; margin: 0 auto; padding: 18px; }
+.hero { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:14px; }
+.hero h1 { font-size: clamp(1.35rem, 4vw, 2rem); margin:0 0 5px; }
+.hero p { margin:0; color:var(--muted); max-width:720px; line-height:1.55; }
+.voice { min-height:48px; border:0; border-radius:16px; padding:0 18px; background:var(--accent); color:white; font-weight:800; cursor:pointer; box-shadow:0 5px 0 rgba(53,46,120,.16); }
+.voice.active { background:#d45d76; }
+.layout { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(270px,.72fr); gap:14px; }
+.panel { background:var(--panel); border:1px solid var(--border); border-radius:22px; padding:14px; }
+.stage-head { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:8px; }
+.eyebrow { color:var(--muted); font-size:.82rem; }
+.badge { border:1px solid var(--border); border-radius:999px; padding:6px 10px; background:white; color:var(--muted); font-size:.85rem; }
+#mouthMount { width:100%; }
+.mouth-svg { width:100%; height:auto; display:block; touch-action:none; }
+.cavity-bg { fill:#fffaf5; stroke:var(--border); }
+.face-line,.jaw-line { fill:none; stroke:#8f8891; stroke-width:6; stroke-linecap:round; }
+.palate-line { fill:none; stroke:var(--palate); stroke-width:10; stroke-linecap:round; }
+.nasal-line { fill:none; stroke:#c7bec9; stroke-width:4; stroke-linecap:round; }
+.teeth-line { fill:none; stroke:#544f57; stroke-width:6; stroke-linecap:round; }
+.lip-line { fill:none; stroke:var(--lip); stroke-width:11; stroke-linecap:round; }
+.pharynx-line { fill:none; stroke:var(--airway); stroke-width:11; stroke-linecap:round; }
+.velum-line { fill:none; stroke:#b58caa; stroke-width:8; stroke-linecap:round; }
+.tongue-shape { fill:url(#tongueGlow); fill-opacity:.72; stroke:#d95d79; stroke-width:4; stroke-linejoin:round; }
+.tongue-handle { fill:var(--accent); stroke:white; stroke-width:5; cursor:grab; }
+.tongue-handle:active { cursor:grabbing; }
+.tongue-handle:focus { outline:none; stroke:#332c83; stroke-width:7; }
+.tongue-handle-dot { fill:white; }
+.anatomy-label { font-size:12px; fill:var(--muted); }
+.readouts { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px; }
+.readout { border:1px solid var(--border); border-radius:14px; padding:9px; text-align:center; background:white; }
+.readout span { display:block; color:var(--muted); font-size:.75rem; }
+.readout strong { display:block; margin-top:2px; }
+.side { display:flex; flex-direction:column; gap:12px; }
+.section-title { font-size:.9rem; font-weight:800; margin-bottom:8px; }
+.presets { display:grid; gap:7px; }
+.vowel-btn { min-height:48px; border:1px solid var(--border); background:white; border-radius:14px; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 11px; cursor:pointer; color:var(--text); }
+.vowel-btn span { font-size:1.15rem; font-weight:800; }
+.vowel-btn small { color:var(--muted); text-align:right; }
+.vowel-btn.selected { border-color:var(--accent); background:var(--accent-soft); }
+.control { display:block; margin:12px 0; }
+.control-row { display:flex; justify-content:space-between; gap:8px; font-size:.88rem; }
+.control-row span:last-child { color:var(--muted); }
+input[type=range] { width:100%; margin-top:8px; accent-color:var(--accent); min-height:28px; }
+.note { font-size:.82rem; line-height:1.5; color:var(--muted); }
+.status { margin-top:12px; min-height:24px; color:var(--muted); font-size:.9rem; }
+.model-tag { display:inline-block; margin-top:8px; border-radius:999px; background:#f0ece7; padding:5px 8px; font-size:.74rem; color:#625d64; }
+@media (max-width:760px) {
+  .app { padding:12px; }
+  .hero { flex-direction:column; }
+  .voice { width:100%; }
+  .layout { grid-template-columns:1fr; }
+  .presets { grid-template-columns:repeat(5,1fr); }
+  .vowel-btn { display:block; padding:8px 4px; }
+  .vowel-btn small { display:none; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior:auto !important; } }
