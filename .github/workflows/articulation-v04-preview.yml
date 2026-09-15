@@ -1,0 +1,57 @@
+name: Articulation Lab v0.4 preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - design/articulation-lab-v0.1
+    paths:
+      - 'articulation-lab/**'
+      - '.github/workflows/articulation-v04-preview.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JavaScript syntax
+        run: |
+          set -euxo pipefail
+          node --check articulation-lab/data/voice-profiles.js
+          node --check articulation-lab/data/vowel-presets.js
+          node --check articulation-lab/src/state-store.js
+          node --check articulation-lab/src/constraint-mapper.js
+          node --check articulation-lab/src/audio/formant-engine.js
+          node --check articulation-lab/src/audio/sample-player.js
+          node --check articulation-lab/src/renderers/simple-renderer.js
+          node --check articulation-lab/src/renderers/vowel-map.js
+          node --check articulation-lab/src/app.js
+
+      - name: Build standalone HTML
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/articulation-v04
+          python3 articulation-lab/tools/build_standalone_preview.py \
+            --app-dir articulation-lab \
+            --output /tmp/articulation-v04/ArticulationLab_v0.4.html
+          grep -q 'data:audio/x-wav;base64\|data:audio/wav;base64' /tmp/articulation-v04/ArticulationLab_v0.4.html
+          ! grep -q 'assets/audio/real/' /tmp/articulation-v04/ArticulationLab_v0.4.html
+
+      - name: Package modular source
+        run: |
+          set -euxo pipefail
+          zip -qr /tmp/articulation-v04/ArticulationLab_v0.4_source.zip articulation-lab \
+            -x 'articulation-lab/tools/__pycache__/*'
+          ls -lh /tmp/articulation-v04
+
+      - name: Upload distributables
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArticulationLab-v0.4-distributables
+          path: /tmp/articulation-v04
+          if-no-files-found: error
+          retention-days: 14
