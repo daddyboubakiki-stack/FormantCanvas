@@ -1,24 +1,30 @@
 #!/usr/bin/env python3
-"""Build redistribution-safe vowel samples for Articulation Lab v0.4.2.
+"""Build redistribution-safe vowel samples for Articulation Lab v0.4.3.
 
 Japanese source files contain several very short kana repetitions separated by silence,
 so midpoint cropping is unsafe. This build detects a genuinely voiced token, keeps a
 small onset/offset margin, duration-equalizes it toward ~0.50 s with pitch-preserving
 `atempo`, and active-RMS matches every exported button sample.
 
-The build also fails closed: a Japanese sample that is still too short / too quiet, or
-an English reference vowel whose post-normalization level is far outside the comparison
-window, makes CI fail instead of silently shipping a bad teaching sample.
+English buttons mostly use the CC0 isolated IPA-vowel reference. KIT /ɪ/ is intentionally
+an exception: v0.4.3 takes the naturally short vowel nucleus from Dvortygirl's US-English
+"kid" recording, excludes the /k/ aspiration and /d/ closure, does not time-stretch it,
+and applies only short edge fades plus level matching.
+
+The build fails closed when a bundled teaching sample is suspiciously quiet or loud.
 """
 from __future__ import annotations
 import argparse, array, audioop, json, math, subprocess, sys, wave
 from pathlib import Path
 
 IPA_SEQUENCE = ["a","æ","ɛ","e̞","e","ɪ","i","y","ʏ","ø","ø̞","œ","ɶ","ä","ɐ","ɜ","ə","ɘ","ɪ̈","ɨ","ʉ","ʊ̈","ɵ̞","ɞ","ɞ̞","ɒ̈","ɑ","ʌ","ɤ̞","ɤ","ʊ","ɯ","u","o","o̞","ɔ","ɒ"]
-IPA_EXPORTS = {6:"i.wav",5:"I.wav",2:"epsilon.wav",1:"ae.wav",27:"turned_v.wav",16:"schwa.wav",26:"alpha.wav",35:"open_o.wav",30:"U.wav",32:"u.wav"}
+# /ɪ/ is deliberately omitted here; it is built from the US-English word "kid" below.
+IPA_EXPORTS = {6:"i.wav",2:"epsilon.wav",1:"ae.wav",27:"turned_v.wav",16:"schwa.wav",26:"alpha.wav",35:"open_o.wav",30:"U.wav",32:"u.wav"}
 JP_EXPORTS = {"a":"jp_a.ogg","i":"jp_i.ogg","u":"jp_u.ogg","e":"jp_e.ogg","o":"jp_o.ogg"}
 TARGET_ACTIVE_RMS_DBFS = -16.5
 JP_TARGET_DURATION = 0.50
+KIT_START = 0.205
+KIT_DURATION = 0.110
 
 
 def run(*args):
@@ -69,18 +75,20 @@ def segments(active, min_frames):
     return out
 
 
-def render_clip(src,dst,start,dur,stretch=1.0):
+def render_clip(src,dst,start,dur,stretch=1.0,fade_in=0.018,fade_out=0.040):
     """Trim before tempo processing so stretched audio is not truncated."""
     dst.parent.mkdir(parents=True,exist_ok=True)
-    total=duration(src); start=max(0.0,start); dur=min(dur,max(0.08,total-start))
+    total=duration(src); start=max(0.0,start); dur=min(dur,max(0.05,total-start))
     stretch=max(0.5,min(4.0,float(stretch))); tempo=1.0/stretch
     filters=[f"atrim=duration={dur:.6f}","asetpts=PTS-STARTPTS"]
-    # ffmpeg atempo accepts 0.5..100. Chain stages for slower-than-0.5 playback.
     while tempo<0.5:
         filters.append("atempo=0.5"); tempo/=0.5
     if abs(tempo-1.0)>1e-4: filters.append(f"atempo={tempo:.6f}")
-    expected=max(0.08,dur*stretch)
-    filters += ["afade=t=in:st=0:d=0.018",f"afade=t=out:st={max(.025,expected-.045):.4f}:d=0.04"]
+    expected=max(0.05,dur*stretch)
+    fade_in=max(0.0,min(float(fade_in),expected*.25))
+    fade_out=max(0.0,min(float(fade_out),expected*.30))
+    if fade_in>0: filters.append(f"afade=t=in:st=0:d={fade_in:.4f}")
+    if fade_out>0: filters.append(f"afade=t=out:st={max(0.0,expected-fade_out):.4f}:d={fade_out:.4f}")
     subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-ss",f"{start:.4f}","-i",str(src),"-ac","1","-ar","24000","-af",",".join(filters),"-c:a","pcm_s16le",str(dst)],check=True)
 
 
@@ -112,9 +120,6 @@ def level_match(path,target=TARGET_ACTIVE_RMS_DBFS):
     params,s,threshold,db,peak,peak_db=_level_stats(path)
     if db<=-119: return {"reason":"no_active_frames","appliedGainDb":0,"postActiveRmsDbfs":db,"postPeakDbfs":peak_db}
     wanted=10**((target-db)/20); head=(10**(-1.5/20))/max(peak,1e-9)
-    # Some source vowels (notably IPA /ɪ/) are genuinely recorded at a very low level.
-    # Let them recover by up to +24 dB, while the independent peak-headroom bound
-    # remains the actual clipping guard.
     gain=max(.25,min(wanted,head,16.0))
     for i,v in enumerate(s): s[i]=int(max(-32768,min(32767,round(v*gain))))
     if sys.byteorder!="little": s.byteswap()
@@ -131,6 +136,8 @@ def validate_export(path, *, kind, label):
     d=duration(path); _,_,_,active_db,_,peak_db=_level_stats(path)
     if kind=="japanese" and not (0.38 <= d <= 0.62):
         raise RuntimeError(f"{label}: Japanese button duration {d:.3f}s outside 0.38..0.62s")
+    if kind=="kit" and not (0.09 <= d <= 0.16):
+        raise RuntimeError(f"{label}: natural KIT nucleus duration {d:.3f}s outside 0.09..0.16s")
     if active_db < -19.0:
         raise RuntimeError(f"{label}: post-normalization active RMS too quiet ({active_db:.2f} dBFS)")
     if active_db > -14.0:
@@ -157,7 +164,6 @@ def detect_jp(src,work,key):
 
 def build_jp(src,dst,work,key):
     total=duration(src); (a,b),det=detect_jp(src,work,key); token=b-a
-    # Keep enough real onset/offset around the detected nucleus to avoid a synthetic hard edge.
     start=max(0,a-.035); end=min(total,b+.035); raw=end-start
     stretch=min(4.0,max(1.0,JP_TARGET_DURATION/max(.08,raw)))
     render_clip(src,dst,start,raw,stretch)
@@ -183,10 +189,26 @@ def detect_ipa(src,work):
     return sec,{"frameMs":10,"thresholdDbfs":th,"closedGapMs":gap*10,"detectedCount":len(segs),"expectedCount":37,"candidateScore":score,"segments":[{"index":i,"ipa":IPA_SEQUENCE[i],"start":a,"end":b,"duration":b-a} for i,(a,b) in enumerate(sec)]}
 
 
+def build_kit(src,dst):
+    # Manual boundary inspection of En-us-kid.ogg:
+    # ~0.09–0.20 s = /k/ release/aspiration; ~0.205–0.315 s = voiced KIT nucleus;
+    # after ~0.32 s the /d/ closure begins. Preserve the natural short duration.
+    render_clip(src,dst,KIT_START,KIT_DURATION,stretch=1.0,fade_in=.006,fade_out=.010)
+    level=level_match(dst)
+    validation=validate_export(dst,kind="kit",label="US English KIT /ɪ/ from kid")
+    return {
+        "sourceFile":"en_us_kid.ogg","sourceWord":"kid","sourceDuration":duration(src),
+        "clipStart":KIT_START,"clipDuration":KIT_DURATION,"stretchFactor":1.0,
+        "processing":"manual acoustic boundary selection + 6 ms fade-in + 10 ms fade-out + active-RMS match; no time-stretch",
+        "output":"en_us_word_reference/I.wav","outputDuration":duration(dst),
+        "levelMatch":level,"validation":validation
+    }
+
+
 def build(args):
     src=Path(args.source_dir); out=Path(args.output_dir); work=Path(args.work_dir)
     out.mkdir(parents=True,exist_ok=True); work.mkdir(parents=True,exist_ok=True)
-    report={"version":"v0.4.2","normalizationTargetActiveRmsDbfs":TARGET_ACTIVE_RMS_DBFS,"japanese":{},"ipaReference":{}}
+    report={"version":"v0.4.3","normalizationTargetActiveRmsDbfs":TARGET_ACTIVE_RMS_DBFS,"japanese":{},"ipaReference":{},"englishWordReference":{}}
     for key,fn in JP_EXPORTS.items():
         info=build_jp(src/fn,out/"jp_reference"/f"{key}.wav",work,key)
         info.update({"sourceFile":fn,"output":f"jp_reference/{key}.wav"}); report["japanese"][key]=info
@@ -200,6 +222,7 @@ def build(args):
             "sequenceIndex":idx,"segmentStart":a,"segmentEnd":b,"clipStart":start,"clipDuration":clip,
             "output":f"ipa_reference/{fn}","outputDuration":duration(dst),"levelMatch":lvl,"validation":validation
         }
+    report["englishWordReference"]["ɪ"]=build_kit(src/"en_us_kid.ogg",out/"en_us_word_reference"/"I.wav")
     (out/"build-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
     return report
 
