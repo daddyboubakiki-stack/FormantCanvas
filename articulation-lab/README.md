@@ -1,4 +1,4 @@
-# Articulation Lab — design staging area
+# Articulation Lab — v0.1 staging build
 
 Articulation Lab is a proposed sister app to Formant Canvas.
 
@@ -16,17 +16,52 @@ The first public-facing idea is a **playable 2D mouth instrument**: drag the ton
 5. Handoff-safe design: data, acoustics, articulation state, and graphics are separate modules so another model/developer can redesign the visual layer without silently changing the science.
 6. Skinning: Simple, Anatomy, and Cute renderers can visualize the same underlying articulation state.
 
-## v0.1 scope
+## v0.1 implementation status
 
-- 2D midsagittal mouth view
-- pointer/touch dragging of tongue body
-- lip rounding control
+A first playable implementation is now present in this folder.
+
+Implemented:
+
+- 2D midsagittal **Simple** skin
+- pointer/touch dragging of the tongue body
+- keyboard arrow-key alternative for the tongue handle
+- live lip-rounding control
 - F0 control
-- continuous voiced synthesis
-- vowel presets: `/i æ ɑ ə u/`
-- current F1/F2/F3 readout
-- English/Japanese dataset architecture prepared, but only source-verified values may be populated
-- responsive tablet/mobile layout
+- `VOICE ON/OFF` using a lightweight Web Audio source-filter/formant backend
+- continuously updated F1/F2/F3 estimates
+- vowel presets `/i æ ɑ ə u/`
+- responsive phone/tablet/desktop layout
+- separate state, constraint, audio, renderer, data, and app-controller files
+
+### Important evidence status
+
+The acoustic values and tongue targets in the current v0.1 are explicitly marked as a **pedagogical/demo model**. They are **not yet the source-backed English/Japanese normative dataset** planned for COMPARE/LEARN.
+
+The next scientific-data milestone is to port verified Formant Canvas vowel values into the versioned target schema while preserving population, context, source, and evidence type.
+
+## Current file layout
+
+```text
+articulation-lab/
+  index.html
+  data/
+    vowel-presets.js
+    source-registry.json
+  src/
+    state-store.js
+    constraint-mapper.js
+    audio/
+      formant-engine.js
+    renderers/
+      simple-renderer.js
+    app.js
+  styles/
+    base.css
+  contracts/
+  docs/
+```
+
+The renderer does not own the tongue position. `ArticulationState` is the source of truth. A future `CuteRenderer` or `AnatomyRenderer` should consume the same state and must not alter scientific/acoustic data merely to fit a visual design.
 
 ## Non-goals for v0.1
 
@@ -36,6 +71,7 @@ The first public-facing idea is a **playable 2D mouth instrument**: drag the ton
 - nasal coupling
 - full jaw/tongue-tip control
 - claiming a unique inverse mapping from acoustics to anatomy
+- claiming the current demo vowel values are empirical language norms
 
 ## Planned modes
 
@@ -50,4 +86,4 @@ A graphics/UI contributor should normally edit renderer/style/UI files, not scie
 
 ## Repository status
 
-This folder currently lives on the Formant Canvas repository only as a **design staging area** on branch `design/articulation-lab-v0.1`. The intended end state is a separate Articulation Lab repository, with shared data contracts between the two apps.
+This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. It is intentionally isolated from Formant Canvas `main`. The intended end state is a separate Articulation Lab repository, with shared data contracts between the two apps.
