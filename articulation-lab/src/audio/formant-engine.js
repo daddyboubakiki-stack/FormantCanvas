@@ -72,7 +72,7 @@ window.ArticulationLab = window.ArticulationLab || {};
         f1Hz: base.f1Hz * s,
         f2Hz: base.f2Hz * s,
         f3Hz: base.f3Hz * s,
-        method: 'pedagogical_state_mapping_v0.3_plus_voice_rendering',
+        method: 'pedagogical_state_mapping_v0.3.1_plus_voice_rendering',
         confidence: 'demo_only',
         voiceProfileId: profileId,
         formantScale: s
@@ -86,7 +86,6 @@ window.ArticulationLab = window.ArticulationLab || {};
       sourceLP.frequency.setTargetAtTime(profile.sourceBrightnessHz, t, .03);
       noiseGain.gain.setTargetAtTime(profile.breathiness, t, .03);
       lfoGain.gain.setTargetAtTime(profile.vibratoCents, t, .05);
-      master.gain.setTargetAtTime(profile.outputGain, t, .04);
     }
 
     function apply(state) {
@@ -187,6 +186,12 @@ window.ArticulationLab = window.ArticulationLab || {};
         running = true;
         applyProfile();
         apply(state || lastState || { tongueBodyFrontBack:.5,tongueBodyHeight:.5,lipRounding:.1,jawOpening:.5,f0Hz:profile.defaultF0 });
+        try {
+          const t = ctx.currentTime;
+          master.gain.cancelScheduledValues(t);
+          master.gain.setValueAtTime(0.0001, t);
+          master.gain.exponentialRampToValueAtTime(Math.max(0.02, profile.outputGain), t + 0.055);
+        } catch (_) {}
         return true;
       },
       stop() {
@@ -207,17 +212,29 @@ window.ArticulationLab = window.ArticulationLab || {};
           const t = ctx.currentTime;
           const g = Math.max(0.02, profile.outputGain);
           try {
-            master.gain.cancelScheduledValues(t);
-            master.gain.setValueAtTime(0.0001, t);
-            master.gain.exponentialRampToValueAtTime(g, t + 0.022);
-            master.gain.setValueAtTime(g, t + Math.max(0.04, ms / 1000 - 0.08));
+            // Vowel Buttons should sound like a steady vowel, not a consonant + vowel.
+            // Use a soft onset and reduce aspiration during the short note.
+            if (noiseGain) noiseGain.gain.setTargetAtTime(profile.breathiness * 0.35, t, 0.025);
+            if (typeof master.gain.cancelAndHoldAtTime === 'function') {
+              master.gain.cancelAndHoldAtTime(t);
+            } else {
+              const held = Math.max(0.0001, master.gain.value || 0.0001);
+              master.gain.cancelScheduledValues(t);
+              master.gain.setValueAtTime(held, t);
+            }
+            // Tiny reset ramp prevents a click when a new button is tapped during the previous note.
+            master.gain.exponentialRampToValueAtTime(0.0001, t + 0.012);
+            master.gain.exponentialRampToValueAtTime(g, t + 0.070);
+            master.gain.setValueAtTime(g, t + Math.max(0.085, ms / 1000 - 0.095));
             master.gain.exponentialRampToValueAtTime(0.0001, t + ms / 1000);
           } catch (_) {}
         }
+        // Keep the oscillator alive briefly after the note. Repeated taps reuse the same
+        // source instead of creating a new oscillator onset on every button press.
         burstTimer = setTimeout(() => {
           burstTimer = null;
           if (running) { running = false; tearDown(); }
-        }, ms + 70);
+        }, ms + 900);
         return true;
       },
       setArticulation(state) { apply(state); },
