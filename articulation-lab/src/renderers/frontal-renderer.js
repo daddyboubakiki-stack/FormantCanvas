@@ -2,7 +2,9 @@ window.ArticulationLab = window.ArticulationLab || {};
 (function (NS) {
   NS.createFrontalRenderer = function createFrontalRenderer() {
     let container = null;
+    let stage = null;
     let svg = null;
+    let facePath = null;
     let outerLip = null;
     let innerMouth = null;
     let upperTeeth = null;
@@ -38,7 +40,7 @@ window.ArticulationLab = window.ArticulationLab || {};
         <div class="mouth-stage frontal-stage">
           <svg class="mouth-svg frontal-svg" viewBox="0 0 360 350" role="img" aria-label="Frontal mouth opening teaching model">
             <rect x="1" y="1" width="358" height="348" rx="26" class="cavity-bg"/>
-            <path d="M180 40 C105 40 62 92 65 176 C68 267 117 315 180 318 C243 315 292 267 295 176 C298 92 255 40 180 40 Z" class="frontal-face"/>
+            <path id="frontalFace" d="M180 40 C105 40 62 92 65 176 C68 267 117 315 180 318 C243 315 292 267 295 176 C298 92 255 40 180 40 Z" class="frontal-face"/>
             <path d="M124 129 Q145 115 164 127" class="frontal-eye"/>
             <path d="M196 127 Q215 115 236 129" class="frontal-eye"/>
             <path d="M180 132 Q168 169 180 179 Q192 169 180 132" class="frontal-nose"/>
@@ -48,10 +50,12 @@ window.ArticulationLab = window.ArticulationLab || {};
             <path id="lowerTeeth" d="" class="frontal-teeth lower"/>
             <path id="frontalTongue" d="" class="frontal-tongue"/>
             <path id="jawGuide" d="" class="frontal-jaw-guide"/>
-            <text x="180" y="328" text-anchor="middle" class="anatomy-label">front view · same articulation state</text>
+            <text x="180" y="336" text-anchor="middle" class="anatomy-label">front view · same articulation state</text>
           </svg>
         </div>`;
+      stage = container.querySelector('.frontal-stage');
       svg = container.querySelector('svg');
+      facePath = container.querySelector('#frontalFace');
       outerLip = container.querySelector('#outerLip');
       innerMouth = container.querySelector('#innerMouth');
       upperTeeth = container.querySelector('#upperTeeth');
@@ -69,7 +73,9 @@ window.ArticulationLab = window.ArticulationLab || {};
       const outerRy = g.outerHeight / 2;
       const innerRx = g.width / 2;
       const innerRy = g.height / 2;
+      const chinDrop = g.jaw * 14;
 
+      facePath.setAttribute('d', `M180 40 C105 40 62 92 65 176 C68 267 117 ${309+chinDrop*.55} 180 ${318+chinDrop} C243 ${309+chinDrop*.55} 292 267 295 176 C298 92 255 40 180 40 Z`);
       outerLip.setAttribute('d', ellipsePath(cx, cy, outerRx, outerRy));
       innerMouth.setAttribute('d', ellipsePath(cx, cy, innerRx, innerRy));
 
@@ -100,14 +106,14 @@ window.ArticulationLab = window.ArticulationLab || {};
       const jawWidth = 92 - g.rounding * 10;
       jawGuide.setAttribute('d', `M ${cx-jawWidth} ${jawY} Q ${cx} ${jawY+38} ${cx+jawWidth} ${jawY}`);
 
-      container.dataset.rounded = g.rounding > .55 ? 'true' : 'false';
-      container.dataset.spread = g.spread > .48 ? 'true' : 'false';
+      stage.dataset.rounded = g.rounding > .55 ? 'true' : 'false';
+      stage.dataset.spread = g.spread > .48 ? 'true' : 'false';
     }
 
     function setInteractive() {}
     function destroy() {
       if (container) container.innerHTML = '';
-      container = svg = outerLip = innerMouth = upperTeeth = lowerTeeth = tongue = jawGuide = null;
+      container = stage = svg = facePath = outerLip = innerMouth = upperTeeth = lowerTeeth = tongue = jawGuide = null;
     }
 
     return { mount, render, setInteractive, destroy, mouthGeometry };
