@@ -13,9 +13,11 @@ Goal: freeze meanings before polishing visuals.
 
 Success: a second developer/model can read the repository and tell which files are science, which are UI, and which values are allowed to change.
 
-## Phase 1 — playable mouth instrument
+## Phase 1 — playable mouth instrument (implemented in staging v0.1)
 
 Build only what is needed to answer: **is this fun to touch?**
+
+Implemented now:
 
 - one Simple 2D midsagittal renderer
 - draggable tongue body
@@ -24,10 +26,11 @@ Build only what is needed to answer: **is this fun to touch?**
 - VOICE ON/OFF
 - continuous audio during drag
 - `/i æ ɑ ə u/` demonstration presets
-- F1/F2/F3 engine target/estimate readout
-- mobile/tablet support
+- F1/F2/F3 engine estimate readout
+- mobile/tablet layout
+- separated state / constraint / audio / renderer / controller modules
 
-For this phase, presets may use clearly labeled model configurations if source-backed integration is not finished. Do not call them empirical anatomy.
+For this phase, presets use a clearly labeled internal `pedagogical_model`. They are not empirical anatomy or language norms.
 
 ## Phase 2 — verified acoustic data layer
 
