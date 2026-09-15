@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Articulation Lab v0.1</title>
+  <link rel="stylesheet" href="styles/base.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div>
+        <h1>Articulation Lab <small>v0.1</small></h1>
+        <p>Play the mouth like an instrument. Drag the tongue, round the lips, and hear the vowel color change continuously.</p>
+      </div>
+      <button id="voiceButton" class="voice" type="button">VOICE ON</button>
+    </header>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="stage-head">
+          <div><div class="eyebrow">Simple skin · sagittal view</div><strong>Drag the purple tongue handle</strong></div>
+          <div id="nearest" class="badge">closest /ə/</div>
+        </div>
+        <div id="mouthMount"></div>
+        <div class="readouts">
+          <div class="readout"><span>F1 estimate</span><strong id="f1Value">—</strong></div>
+          <div class="readout"><span>F2 estimate</span><strong id="f2Value">—</strong></div>
+          <div class="readout"><span>F3 estimate</span><strong id="f3Value">—</strong></div>
+        </div>
+        <div class="model-tag">MVP acoustic mapping · pedagogical model, not empirical anatomy</div>
+      </section>
+
+      <aside class="side">
+        <section class="panel">
+          <div class="section-title">Vowel presets</div>
+          <div id="presetButtons" class="presets"></div>
+        </section>
+        <section class="panel">
+          <div class="section-title">Instrument controls</div>
+          <label class="control">
+            <span class="control-row"><span>Lip rounding</span><span>flat ↔ round</span></span>
+            <input id="lipRounding" type="range" min="0" max="1" step="0.01" value="0.1" />
+          </label>
+          <label class="control">
+            <span class="control-row"><span>F0</span><span id="f0Value">125 Hz</span></span>
+            <input id="f0" type="range" min="80" max="260" step="1" value="125" />
+          </label>
+        </section>
+        <section class="panel note">
+          <strong>Science status</strong><br />
+          This build keeps articulation state, graphics, and audio separate so Simple / Anatomy / Cute skins can share the same underlying state. The current vowel/formant mapping is an explicit demo model; source-backed English/Japanese data comes next.
+        </section>
+      </aside>
+    </div>
+    <div id="status" class="status" aria-live="polite">Press VOICE ON, then drag the tongue.</div>
+  </main>
+
+  <script src="data/vowel-presets.js"></script>
+  <script src="src/state-store.js"></script>
+  <script src="src/constraint-mapper.js"></script>
+  <script src="src/audio/formant-engine.js"></script>
+  <script src="src/renderers/simple-renderer.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
