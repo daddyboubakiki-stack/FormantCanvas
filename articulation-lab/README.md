@@ -1,4 +1,4 @@
-# Articulation Lab — v0.3 staging build
+# Articulation Lab — v0.3.1 staging build
 
 Articulation Lab is a proposed sister app to Formant Canvas.
 
@@ -22,7 +22,7 @@ This separation keeps the educational selection task and the free-play instrumen
 6. Handoff-safe design: data, acoustics, articulation state, vowel map, and mouth graphics are separate modules so another model/developer can redesign the visual layer without silently changing the science.
 7. Skinning: Simple, Anatomy, and Cute mouth renderers can visualize the same underlying articulation state.
 
-## v0.3 implementation status
+## v0.3.1 implementation status
 
 Implemented:
 
@@ -33,7 +33,10 @@ Implemented:
 - English / Japanese / Both display switching
 - English demo vowel set `/i ɪ ɛ æ ʌ ə ɑ ɔ ʊ u/`
 - Japanese demo vowel set `/i e a o ɯ/`
-- short retriggerable ~0.5 s vowel bursts in Vowel Buttons mode
+- short retriggerable ~0.5 s steady-vowel bursts in Vowel Buttons mode
+- visual tongue morphing separated from button-mode audio targets
+- softer short-note attack/release to reduce consonant-like transients
+- brief source reuse across repeated taps to reduce oscillator onset clicks
 - pointer/touch dragging of the tongue body in Mouth Synth mode
 - keyboard arrow-key alternative for the tongue handle
 - Child / Teen / Adult / Soft-airy voice-rendering presets
@@ -44,6 +47,10 @@ Implemented:
 - live F1/F2/F3 synthesis estimates
 - responsive phone/tablet/desktop layout
 - separate state, constraint, audio, mouth renderer, vowel-map renderer, data, and app-controller files
+
+### v0.3.1 button-audio fix
+
+Vowel Buttons now synthesizes the selected target vowel from note onset instead of first sounding the previous articulation and then following the visual tongue animation. The mouth may still animate into its new position for clarity, but that visual morph is not sent to the audio engine in button mode. This prevents the accidental formant transition that could make isolated vowels sound like consonant-vowel syllables such as /pa pi pu pe po/.
 
 ### Important evidence status
 
@@ -85,7 +92,8 @@ The mouth renderer does not own tongue position. `ArticulationState` is the sour
 
 - mouth handle is visually subdued and non-interactive
 - vowel buttons live on the separate vowel quadrilateral, not on top of the tongue
-- one tap selects a preset, animates the modeled articulation, and triggers ~0.5 s of sound
+- one tap selects a preset, animates the modeled articulation, and triggers ~0.5 s of steady vowel sound
+- visual tongue animation does not create an audible formant-transition path in button mode
 - rapid taps may retrigger/change the sound without requiring a separate VOICE button
 - language filter supports English, Japanese, or Both
 
@@ -96,7 +104,7 @@ The mouth renderer does not own tongue position. `ArticulationState` is the sour
 - VOICE ON/OFF controls continuous sound
 - dragging the tongue updates sound continuously
 
-## Non-goals for v0.3
+## Non-goals for v0.3.1
 
 - 3D rendering
 - microphone-based pronunciation scoring
@@ -119,4 +127,4 @@ A graphics/UI contributor should normally edit renderer/style/UI files, not scie
 
 ## Repository status
 
-This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical; the staged app itself is now v0.3. It remains intentionally isolated from Formant Canvas `main`. The intended end state is a separate Articulation Lab repository, with shared data contracts between the two apps.
+This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical; the staged app itself is now v0.3.1. It remains intentionally isolated from Formant Canvas `main`. The intended end state is a separate Articulation Lab repository, with shared data contracts between the two apps.
