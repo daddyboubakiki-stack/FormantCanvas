@@ -1,4 +1,4 @@
-name: Articulation Lab v0.4 preview
+name: Articulation Lab v0.4.1 preview
 
 on:
   workflow_dispatch:
@@ -34,24 +34,25 @@ jobs:
       - name: Build standalone HTML
         run: |
           set -euxo pipefail
-          mkdir -p /tmp/articulation-v04
+          mkdir -p /tmp/articulation-v041
           python3 articulation-lab/tools/build_standalone_preview.py \
             --app-dir articulation-lab \
-            --output /tmp/articulation-v04/ArticulationLab_v0.4.html
-          grep -q 'data:audio/x-wav;base64\|data:audio/wav;base64' /tmp/articulation-v04/ArticulationLab_v0.4.html
-          ! grep -q 'assets/audio/real/' /tmp/articulation-v04/ArticulationLab_v0.4.html
+            --output /tmp/articulation-v041/ArticulationLab_v0.4.1.html
+          grep -q 'data:audio/x-wav;base64\|data:audio/wav;base64' /tmp/articulation-v041/ArticulationLab_v0.4.1.html
+          ! grep -q 'assets/audio/real/' /tmp/articulation-v041/ArticulationLab_v0.4.1.html
+          grep -q 'Articulation Lab v0.4.1' /tmp/articulation-v041/ArticulationLab_v0.4.1.html
 
       - name: Package modular source
         run: |
           set -euxo pipefail
-          zip -qr /tmp/articulation-v04/ArticulationLab_v0.4_source.zip articulation-lab \
+          zip -qr /tmp/articulation-v041/ArticulationLab_v0.4.1_source.zip articulation-lab \
             -x 'articulation-lab/tools/__pycache__/*'
-          ls -lh /tmp/articulation-v04
+          ls -lh /tmp/articulation-v041
 
       - name: Upload distributables
         uses: actions/upload-artifact@v4
         with:
-          name: ArticulationLab-v0.4-distributables
-          path: /tmp/articulation-v04
+          name: ArticulationLab-v0.4.1-distributables
+          path: /tmp/articulation-v041
           if-no-files-found: error
           retention-days: 14
