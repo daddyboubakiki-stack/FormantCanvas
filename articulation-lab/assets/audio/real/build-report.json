@@ -1,0 +1,392 @@
+{
+  "japanese": {
+    "a": {
+      "sourceDuration": 2.484717,
+      "clipStart": 0.9673584999999999,
+      "clipDuration": 0.55,
+      "sourceFile": "jp_a.ogg",
+      "output": "jp_reference/a.wav"
+    },
+    "i": {
+      "sourceDuration": 2.728526,
+      "clipStart": 1.0892629999999999,
+      "clipDuration": 0.55,
+      "sourceFile": "jp_i.ogg",
+      "output": "jp_reference/i.wav"
+    },
+    "u": {
+      "sourceDuration": 2.658866,
+      "clipStart": 1.054433,
+      "clipDuration": 0.55,
+      "sourceFile": "jp_u.ogg",
+      "output": "jp_reference/u.wav"
+    },
+    "e": {
+      "sourceDuration": 2.693696,
+      "clipStart": 1.0718480000000001,
+      "clipDuration": 0.55,
+      "sourceFile": "jp_e.ogg",
+      "output": "jp_reference/e.wav"
+    },
+    "o": {
+      "sourceDuration": 2.519365,
+      "clipStart": 0.9846825,
+      "clipDuration": 0.55,
+      "sourceFile": "jp_o.ogg",
+      "output": "jp_reference/o.wav"
+    }
+  },
+  "ipaReference": {
+    "detection": {
+      "frameMs": 10,
+      "thresholdDbfs": -34,
+      "closedGapMs": 100,
+      "detectedCount": 37,
+      "expectedCount": 37,
+      "candidateScore": 0,
+      "segments": [
+        {
+          "index": 0,
+          "ipa": "a",
+          "start": 0.09,
+          "end": 0.52,
+          "duration": 0.43000000000000005
+        },
+        {
+          "index": 1,
+          "ipa": "æ",
+          "start": 1.1500000000000001,
+          "end": 1.57,
+          "duration": 0.41999999999999993
+        },
+        {
+          "index": 2,
+          "ipa": "ɛ",
+          "start": 2.19,
+          "end": 2.63,
+          "duration": 0.43999999999999995
+        },
+        {
+          "index": 3,
+          "ipa": "e̞",
+          "start": 3.21,
+          "end": 3.71,
+          "duration": 0.5
+        },
+        {
+          "index": 4,
+          "ipa": "e",
+          "start": 4.29,
+          "end": 4.73,
+          "duration": 0.4400000000000004
+        },
+        {
+          "index": 5,
+          "ipa": "ɪ",
+          "start": 5.59,
+          "end": 5.7700000000000005,
+          "duration": 0.1800000000000006
+        },
+        {
+          "index": 6,
+          "ipa": "i",
+          "start": 7.42,
+          "end": 7.88,
+          "duration": 0.45999999999999996
+        },
+        {
+          "index": 7,
+          "ipa": "y",
+          "start": 8.49,
+          "end": 8.65,
+          "duration": 0.16000000000000014
+        },
+        {
+          "index": 8,
+          "ipa": "ʏ",
+          "start": 9.450000000000001,
+          "end": 9.9,
+          "duration": 0.4499999999999993
+        },
+        {
+          "index": 9,
+          "ipa": "ø",
+          "start": 10.41,
+          "end": 10.93,
+          "duration": 0.5199999999999996
+        },
+        {
+          "index": 10,
+          "ipa": "ø̞",
+          "start": 11.47,
+          "end": 11.97,
+          "duration": 0.5
+        },
+        {
+          "index": 11,
+          "ipa": "œ",
+          "start": 12.46,
+          "end": 12.94,
+          "duration": 0.47999999999999865
+        },
+        {
+          "index": 12,
+          "ipa": "ɶ",
+          "start": 13.63,
+          "end": 14.1,
+          "duration": 0.46999999999999886
+        },
+        {
+          "index": 13,
+          "ipa": "ä",
+          "start": 14.67,
+          "end": 15.09,
+          "duration": 0.41999999999999993
+        },
+        {
+          "index": 14,
+          "ipa": "ɐ",
+          "start": 15.76,
+          "end": 16.2,
+          "duration": 0.4399999999999995
+        },
+        {
+          "index": 15,
+          "ipa": "ɜ",
+          "start": 16.77,
+          "end": 17.27,
+          "duration": 0.5
+        },
+        {
+          "index": 16,
+          "ipa": "ə",
+          "start": 17.73,
+          "end": 18.21,
+          "duration": 0.4800000000000004
+        },
+        {
+          "index": 17,
+          "ipa": "ɘ",
+          "start": 18.67,
+          "end": 19.18,
+          "duration": 0.509999999999998
+        },
+        {
+          "index": 18,
+          "ipa": "ɪ̈",
+          "start": 19.78,
+          "end": 20.41,
+          "duration": 0.629999999999999
+        },
+        {
+          "index": 19,
+          "ipa": "ɨ",
+          "start": 21.150000000000002,
+          "end": 21.7,
+          "duration": 0.5499999999999972
+        },
+        {
+          "index": 20,
+          "ipa": "ʉ",
+          "start": 22.26,
+          "end": 22.740000000000002,
+          "duration": 0.4800000000000004
+        },
+        {
+          "index": 21,
+          "ipa": "ʊ̈",
+          "start": 23.29,
+          "end": 23.77,
+          "duration": 0.4800000000000004
+        },
+        {
+          "index": 22,
+          "ipa": "ɵ̞",
+          "start": 24.26,
+          "end": 24.79,
+          "duration": 0.5299999999999976
+        },
+        {
+          "index": 23,
+          "ipa": "ɞ",
+          "start": 25.46,
+          "end": 25.95,
+          "duration": 0.48999999999999844
+        },
+        {
+          "index": 24,
+          "ipa": "ɞ̞",
+          "start": 26.53,
+          "end": 27.17,
+          "duration": 0.6400000000000006
+        },
+        {
+          "index": 25,
+          "ipa": "ɒ̈",
+          "start": 27.64,
+          "end": 28.22,
+          "duration": 0.5799999999999983
+        },
+        {
+          "index": 26,
+          "ipa": "ɑ",
+          "start": 28.89,
+          "end": 29.400000000000002,
+          "duration": 0.5100000000000016
+        },
+        {
+          "index": 27,
+          "ipa": "ʌ",
+          "start": 29.93,
+          "end": 30.42,
+          "duration": 0.490000000000002
+        },
+        {
+          "index": 28,
+          "ipa": "ɤ̞",
+          "start": 30.95,
+          "end": 31.44,
+          "duration": 0.490000000000002
+        },
+        {
+          "index": 29,
+          "ipa": "ɤ",
+          "start": 31.95,
+          "end": 32.47,
+          "duration": 0.5199999999999996
+        },
+        {
+          "index": 30,
+          "ipa": "ʊ",
+          "start": 33.04,
+          "end": 33.5,
+          "duration": 0.46000000000000085
+        },
+        {
+          "index": 31,
+          "ipa": "ɯ",
+          "start": 34.05,
+          "end": 34.51,
+          "duration": 0.46000000000000085
+        },
+        {
+          "index": 32,
+          "ipa": "u",
+          "start": 35.13,
+          "end": 35.57,
+          "duration": 0.4399999999999977
+        },
+        {
+          "index": 33,
+          "ipa": "o",
+          "start": 36.19,
+          "end": 36.67,
+          "duration": 0.480000000000004
+        },
+        {
+          "index": 34,
+          "ipa": "o̞",
+          "start": 37.17,
+          "end": 37.71,
+          "duration": 0.5399999999999991
+        },
+        {
+          "index": 35,
+          "ipa": "ɔ",
+          "start": 38.230000000000004,
+          "end": 38.76,
+          "duration": 0.529999999999994
+        },
+        {
+          "index": 36,
+          "ipa": "ɒ",
+          "start": 39.31,
+          "end": 39.81,
+          "duration": 0.5
+        }
+      ]
+    },
+    "exports": {
+      "i": {
+        "sequenceIndex": 6,
+        "segmentStart": 7.42,
+        "segmentEnd": 7.88,
+        "clipStart": 7.3950000000000005,
+        "clipDuration": 0.51,
+        "output": "ipa_reference/i.wav"
+      },
+      "ɪ": {
+        "sequenceIndex": 5,
+        "segmentStart": 5.59,
+        "segmentEnd": 5.7700000000000005,
+        "clipStart": 5.489999999999999,
+        "clipDuration": 0.38,
+        "output": "ipa_reference/I.wav"
+      },
+      "ɛ": {
+        "sequenceIndex": 2,
+        "segmentStart": 2.19,
+        "segmentEnd": 2.63,
+        "clipStart": 2.165,
+        "clipDuration": 0.48999999999999994,
+        "output": "ipa_reference/epsilon.wav"
+      },
+      "æ": {
+        "sequenceIndex": 1,
+        "segmentStart": 1.1500000000000001,
+        "segmentEnd": 1.57,
+        "clipStart": 1.1250000000000002,
+        "clipDuration": 0.4699999999999999,
+        "output": "ipa_reference/ae.wav"
+      },
+      "ʌ": {
+        "sequenceIndex": 27,
+        "segmentStart": 29.93,
+        "segmentEnd": 30.42,
+        "clipStart": 29.905,
+        "clipDuration": 0.540000000000002,
+        "output": "ipa_reference/turned_v.wav"
+      },
+      "ə": {
+        "sequenceIndex": 16,
+        "segmentStart": 17.73,
+        "segmentEnd": 18.21,
+        "clipStart": 17.705,
+        "clipDuration": 0.5300000000000005,
+        "output": "ipa_reference/schwa.wav"
+      },
+      "ɑ": {
+        "sequenceIndex": 26,
+        "segmentStart": 28.89,
+        "segmentEnd": 29.400000000000002,
+        "clipStart": 28.865000000000002,
+        "clipDuration": 0.5600000000000016,
+        "output": "ipa_reference/alpha.wav"
+      },
+      "ɔ": {
+        "sequenceIndex": 35,
+        "segmentStart": 38.230000000000004,
+        "segmentEnd": 38.76,
+        "clipStart": 38.205000000000005,
+        "clipDuration": 0.5799999999999941,
+        "output": "ipa_reference/open_o.wav"
+      },
+      "ʊ": {
+        "sequenceIndex": 30,
+        "segmentStart": 33.04,
+        "segmentEnd": 33.5,
+        "clipStart": 33.01499999999999,
+        "clipDuration": 0.5100000000000009,
+        "output": "ipa_reference/U.wav"
+      },
+      "u": {
+        "sequenceIndex": 32,
+        "segmentStart": 35.13,
+        "segmentEnd": 35.57,
+        "clipStart": 35.105000000000004,
+        "clipDuration": 0.4899999999999977,
+        "output": "ipa_reference/u.wav"
+      }
+    }
+  }
+}
