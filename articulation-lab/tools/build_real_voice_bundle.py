@@ -65,7 +65,7 @@ def render_clip(src,dst,start,dur,stretch=1.0):
         filters.append("atempo=0.5"); tempo/=0.5
     if abs(tempo-1.0)>1e-4: filters.append(f"atempo={tempo:.6f}")
     outdur=dur*stretch
-    filters += ["loudnorm=I=-18:TP=-2:LRA=7","afade=t=in:st=0:d=0.018",f"afade=t=out:st={max(.025,outdur-.045):.4f}:d=.04"]
+    filters += ["loudnorm=I=-18:TP=-2:LRA=7","afade=t=in:st=0:d=0.018",f"afade=t=out:st={max(.025,outdur-.045):.4f}:d=0.04"]
     subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-ss",f"{start:.4f}","-i",str(src),"-ac","1","-ar","24000","-af",",".join(filters),"-c:a","pcm_s16le",str(dst)],check=True)
 
 def level_match(path,target=-17.0):
