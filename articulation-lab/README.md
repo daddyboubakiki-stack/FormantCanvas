@@ -1,70 +1,106 @@
-# Articulation Lab — v0.3.1 staging build
+# Articulation Lab — v0.4 staging build
 
 Articulation Lab is a proposed sister app to Formant Canvas.
 
 - **Formant Canvas:** manipulate acoustic space and hear the result.
 - **Articulation Lab:** manipulate vocal-tract articulation and hear the result.
 
-The app now has two deliberately separate play experiences.
+The app deliberately separates two play experiences.
 
-1. **Vowel Buttons** — tap IPA buttons on a simplified vowel quadrilateral; each tap moves the modeled tongue/lips and plays a short ~0.5 s vowel burst.
-2. **Mouth Synth** — turn on continuous voicing and drag the tongue directly like an instrument.
+1. **Vowel Buttons** — tap IPA buttons on a simplified vowel quadrilateral. The mouth moves toward a pedagogical posture while a short **human recording** plays.
+2. **Mouth Synth** — turn on continuous synthesis and drag the tongue directly like an instrument.
 
-This separation keeps the educational selection task and the free-play instrument task from competing for the same screen space.
+This keeps “hear a real vowel example” and “freely play an articulatory model” from pretending to be the same scientific object.
 
-## Product goals
-
-1. Direct manipulation: in Mouth Synth, the tongue itself is the primary control.
-2. Immediate playful sound: in Vowel Buttons, one tap should immediately produce a short sound.
-3. Clear mode semantics: short triggered sounds and continuous synthesis are different modes, not overloaded controls.
-4. Human constraints: unlike Formant Canvas, impossible articulatory positions should be constrained.
-5. Honest science: acoustic targets and articulatory targets are separate datasets; no claim that F1/F2 uniquely determines tongue shape.
-6. Handoff-safe design: data, acoustics, articulation state, vowel map, and mouth graphics are separate modules so another model/developer can redesign the visual layer without silently changing the science.
-7. Skinning: Simple, Anatomy, and Cute mouth renderers can visualize the same underlying articulation state.
-
-## v0.3.1 implementation status
+## v0.4 implementation status
 
 Implemented:
 
 - 2D midsagittal **Simple** mouth skin
 - separate **Vowel Buttons** and **Mouth Synth** modes
-- simplified vowel quadrilateral rendered independently from the mouth
-- translucent circular IPA buttons
-- English / Japanese / Both display switching
-- English demo vowel set `/i ɪ ɛ æ ʌ ə ɑ ɔ ʊ u/`
-- Japanese demo vowel set `/i e a o ɯ/`
-- short retriggerable ~0.5 s steady-vowel bursts in Vowel Buttons mode
-- visual tongue morphing separated from button-mode audio targets
-- softer short-note attack/release to reduce consonant-like transients
-- brief source reuse across repeated taps to reduce oscillator onset clicks
-- pointer/touch dragging of the tongue body in Mouth Synth mode
-- keyboard arrow-key alternative for the tongue handle
-- Child / Teen / Adult / Soft-airy voice-rendering presets
-- Child voice as the default
-- F0 control
-- lip-rounding control in Mouth Synth mode
-- `VOICE ON/OFF` only for continuous Mouth Synth use
-- live F1/F2/F3 synthesis estimates
+- simplified vowel quadrilateral independent from the mouth drawing
+- English / Japanese / Both switching
+- English button set `/i ɪ ɛ æ ʌ ə ɑ ɔ ʊ u/`
+- Japanese button set `/i e a o ɯ/`
+- **locally bundled real-human WAV playback** for Vowel Buttons
+- preloading, decoding cache, retriggering, and short attack/release fades for stable button playback
+- synth fallback if a recording cannot be decoded
+- real-audio playback kept independent from the visual tongue morph
+- continuous source-filter synthesis retained for Mouth Synth
+- pointer/touch and keyboard tongue control in Mouth Synth
+- Child / Teen / Adult / Soft-airy **synth-rendering** profiles
+- F0 and lip-rounding controls in Mouth Synth
+- live synth F1/F2/F3 estimates shown only in Mouth Synth
 - responsive phone/tablet/desktop layout
-- separate state, constraint, audio, mouth renderer, vowel-map renderer, data, and app-controller files
+- automated real-voice bundle build and automated self-contained preview build
 
-### v0.3.1 button-audio fix
+## Real-voice sets currently bundled
 
-Vowel Buttons now synthesizes the selected target vowel from note onset instead of first sounding the previous articulation and then following the visual tongue animation. The mouth may still animate into its new position for clarity, but that visual morph is not sent to the audio engine in button mode. This prevents the accidental formant transition that could make isolated vowels sound like consonant-vowel syllables such as /pa pi pu pe po/.
+### Japanese reference voice
 
-### Important evidence status
+- five language-specific Japanese vowel recordings: あ・い・う・え・お
+- locally trimmed to short stable-vowel samples
+- source license recorded as **Public Domain (PD-self)**
+- these are examples of one recorded Japanese speaker, not a population norm
 
-The current vowel-map positions, tongue targets, and formant mapping are explicitly a **pedagogical/demo model**. They are **not yet source-backed empirical English/Japanese normative values or measured anatomy**.
+### English-labelled IPA reference
 
-The simplified vowel quadrilateral is a phonetic teaching map. It must not be described as a literal anatomical coordinate system.
+- ten vowels extracted from a human “All IPA Vowels” reference recording
+- source license recorded as **CC0 1.0**
+- this is a generic human IPA reference set, **not** a General American population norm and not a matched male/female/child corpus
 
-The next scientific-data milestone is to port verified Formant Canvas vowel values into the versioned target schema while preserving population, context, source, and evidence type.
+`assets/audio/real/real-voice-sources.json` and `build-report.json` preserve provenance/build information for the bundled samples.
+
+## Scientific boundary
+
+A human recording tells us how **that recorded person** sounded. The mouth pose drawn above it is a pedagogical model unless measured articulatory data says otherwise.
+
+Therefore v0.4 intentionally separates:
+
+- **recorded audio evidence** — human voice sample
+- **articulatory teaching target** — modeled tongue/lip posture
+- **Mouth Synth acoustics** — continuous pedagogical synthesis model
+
+The vowel quadrilateral is a phonetic teaching map, not literal measured tongue geometry. F1/F2 do not uniquely determine a tongue posture.
+
+## Interaction contract
+
+### Vowel Buttons
+
+- mouth handle is subdued and non-interactive
+- buttons live on the separate vowel quadrilateral
+- tapping a button plays a short locally bundled human recording when available
+- the mouth may animate toward the teaching posture, but this visual morph does not modify the recording
+- rapid taps retrigger without a separate VOICE switch
+- English / Japanese / Both filtering remains
+- synth formant readouts are hidden in this mode to avoid presenting model estimates as measurements of the recording
+
+### Mouth Synth
+
+- vowel quadrilateral is hidden
+- tongue handle becomes interactive
+- VOICE ON/OFF controls continuous synthesis
+- dragging the tongue changes the synthesized sound continuously
+- synth F1/F2/F3 estimates remain explicitly labeled as model output
+
+## Audio licensing policy
+
+Only recordings with sufficiently explicit permission for redistribution are bundled. “Publicly downloadable” or “usable for research” is **not** treated as equivalent to redistribution permission.
+
+For that reason, corpora such as JVPD or other research datasets are not copied into the app unless their terms explicitly permit the intended redistribution. Hillenbrand material remains scientifically useful for analysis, but recordings are not bundled merely because a mirror repository has a software license.
+
+Male / female / child language-matched recording sets remain a future addition and should be added only when both the recording license and speaker metadata are explicit.
 
 ## Current file layout
 
 ```text
 articulation-lab/
   index.html
+  assets/audio/real/
+    jp_reference/
+    ipa_reference/
+    real-voice-sources.json
+    build-report.json
   data/
     voice-profiles.js
     vowel-presets.js
@@ -74,37 +110,30 @@ articulation-lab/
     constraint-mapper.js
     audio/
       formant-engine.js
+      sample-player.js
     renderers/
       simple-renderer.js
       vowel-map.js
     app.js
   styles/
     base.css
+  tools/
+    build_real_voice_bundle.py
+    build_standalone_preview.py
   contracts/
   docs/
 ```
 
-The mouth renderer does not own tongue position. `ArticulationState` is the source of truth. The vowel map is a separate selection renderer that points to presets. A future `CuteRenderer` or `AnatomyRenderer` should consume the same state and must not alter scientific/acoustic data merely to fit a visual design.
+## Distribution build
 
-## Interaction contract
+`.github/workflows/articulation-v04-preview.yml` validates JavaScript syntax and builds:
 
-### Vowel Buttons
+- `ArticulationLab_v0.4.html` — self-contained single-file preview with CSS, JavaScript, and the vetted WAV samples embedded
+- `ArticulationLab_v0.4_source.zip` — modular source bundle
 
-- mouth handle is visually subdued and non-interactive
-- vowel buttons live on the separate vowel quadrilateral, not on top of the tongue
-- one tap selects a preset, animates the modeled articulation, and triggers ~0.5 s of steady vowel sound
-- visual tongue animation does not create an audible formant-transition path in button mode
-- rapid taps may retrigger/change the sound without requiring a separate VOICE button
-- language filter supports English, Japanese, or Both
+The self-contained build contains no local external script, stylesheet, or audio-file dependency.
 
-### Mouth Synth
-
-- vowel quadrilateral is hidden
-- tongue handle becomes fully interactive
-- VOICE ON/OFF controls continuous sound
-- dragging the tongue updates sound continuously
-
-## Non-goals for v0.3.1
+## Non-goals for v0.4
 
 - 3D rendering
 - microphone-based pronunciation scoring
@@ -112,19 +141,15 @@ The mouth renderer does not own tongue position. `ArticulationState` is the sour
 - nasal coupling
 - full jaw/tongue-tip control
 - claiming a unique inverse mapping from acoustics to anatomy
-- claiming the current demo vowel values are empirical language norms
-- treating the vowel quadrilateral as measured tongue geometry
+- claiming current teaching postures are measured anatomy
+- claiming the English IPA reference voice is a population norm
 
 ## Planned educational modes
 
-- **COMPARE** — A/B and morph comparison, especially Japanese vs English vowels
+- **COMPARE** — A/B comparison, especially Japanese vs English vowels
 - **LEARN** — move from a familiar Japanese vowel toward an English target zone
-- **PHONETICS** — show acoustic values, population, source, and evidence type
-
-## Handoff rule
-
-A graphics/UI contributor should normally edit renderer/style/UI files, not scientific data or acoustic mappings. See `docs/META_AI_HANDOFF.md` and `docs/SCIENTIFIC_CONTRACT.md`.
+- **PHONETICS** — show acoustic values, population, source, and evidence type when source-backed data exists
 
 ## Repository status
 
-This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical; the staged app itself is now v0.3.1. It remains intentionally isolated from Formant Canvas `main`. The intended end state is a separate Articulation Lab repository, with shared data contracts between the two apps.
+This folder currently lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical; the staged app itself is now v0.4. It remains intentionally isolated from Formant Canvas `main` and should not be merged merely to ship this staging folder.
