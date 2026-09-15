@@ -21,46 +21,44 @@ jobs:
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text()
-
           old_title = '<title>Formantasia — 声をえがくキャンバス (Research Preview)</title>'
-          new_head = '''<title>Formantasia（フォルマンタジア）— 声をえがくフォルマント・音声学キャンバス</title>
-<meta name="description" content="Formantasia（フォルマンタジア）は、F1・F2・F3のフォルマント軌跡を描いて音を聴き、母音や音声学を学べる教育・実験用Webアプリです。" />
-<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
-<meta name="application-name" content="Formantasia" />
-<meta property="og:locale" content="ja_JP" />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="Formantasia（フォルマンタジア）— 声をえがくキャンバス" />
-<meta property="og:description" content="F1・F2・F3を描いて聴く、子どもから大人まで楽しめるフォルマント・音声学Webアプリ。" />
-<meta name="twitter:card" content="summary" />
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Formantasia",
-  "alternateName": "フォルマンタジア",
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "Web",
-  "inLanguage": ["ja", "en"],
-  "description": "F1・F2・F3のフォルマント軌跡を描いて音を聴き、母音や音声学を学べる教育・実験用Webアプリ。"
-}
-</script>'''
+          new_head = '\n'.join([
+              '<title>Formantasia（フォルマンタジア）— 声をえがくフォルマント・音声学キャンバス</title>',
+              '<meta name="description" content="Formantasia（フォルマンタジア）は、F1・F2・F3のフォルマント軌跡を描いて音を聴き、母音や音声学を学べる教育・実験用Webアプリです。" />',
+              '<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />',
+              '<meta name="application-name" content="Formantasia" />',
+              '<meta property="og:locale" content="ja_JP" />',
+              '<meta property="og:type" content="website" />',
+              '<meta property="og:title" content="Formantasia（フォルマンタジア）— 声をえがくキャンバス" />',
+              '<meta property="og:description" content="F1・F2・F3を描いて聴く、子どもから大人まで楽しめるフォルマント・音声学Webアプリ。" />',
+              '<meta name="twitter:card" content="summary" />',
+              '<script type="application/ld+json">',
+              '{',
+              '  "@context": "https://schema.org",',
+              '  "@type": "SoftwareApplication",',
+              '  "name": "Formantasia",',
+              '  "alternateName": "フォルマンタジア",',
+              '  "applicationCategory": "EducationalApplication",',
+              '  "operatingSystem": "Web",',
+              '  "inLanguage": ["ja", "en"],',
+              '  "description": "F1・F2・F3のフォルマント軌跡を描いて音を聴き、母音や音声学を学べる教育・実験用Webアプリ。"',
+              '}',
+              '</script>'
+          ])
           if old_title not in s:
               raise SystemExit('Expected title not found')
           s = s.replace(old_title, new_head, 1)
-
           css_old = '  .title h1 { margin:0; font-size: clamp(24px,4vw,38px); letter-spacing:-.04em; }'
           css_new = css_old + '\n  .brand-reading { margin-top:2px; color:var(--muted); font-size:12px; font-weight:700; letter-spacing:.04em; }'
           if css_old not in s:
               raise SystemExit('Expected title CSS not found')
           s = s.replace(css_old, css_new, 1)
-
           h1_old = '      <h1>Formantasia</h1>\n      <div class="brand-tagline">声をえがくキャンバス · Draw Your Voice</div>'
           h1_new = '      <h1>Formantasia</h1>\n      <div class="brand-reading">フォルマンタジア</div>\n      <div class="brand-tagline">声をえがくキャンバス · Draw Your Voice</div>'
           if h1_old not in s:
               raise SystemExit('Expected Formantasia heading not found')
           s = s.replace(h1_old, h1_new, 1)
           p.write_text(s)
-
           r = Path('README.md')
           rs = r.read_text()
           rs = rs.replace('# Formantasia\n', '# Formantasia（フォルマンタジア）\n', 1)
@@ -70,7 +68,6 @@ jobs:
               raise SystemExit('Expected README tagline not found')
           rs = rs.replace(marker, addition, 1)
           r.write_text(rs)
-
           Path('robots.txt').write_text('User-agent: *\nAllow: /\n')
           PY
           git config user.name "github-actions[bot]"
