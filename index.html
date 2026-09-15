@@ -58,7 +58,7 @@
   body[data-ui-mode="casual"] .settings { grid-template-columns:repeat(3,minmax(0,1fr)); }
   body[data-ui-mode="learning"] .settings { grid-template-columns:repeat(5,minmax(0,1fr)); }
   body[data-ui-mode="casual"] .canvas-top { padding-top:9px; padding-bottom:9px; }
-  .casual-tip { margin-top:12px; padding:10px 13px; background:rgba(255,255,255,.75); border:1px dashed #d9deea; border-radius:14px; color:#697184; font-size:12px; text-align:center; }
+  .casual-tip { margin:12px auto 0; padding:0 8px; max-width:760px; color:#697184; font-size:12px; line-height:1.7; text-align:center; overflow-wrap:break-word; }
 
 
   .toolbar, .settings, .bottom { background:var(--panel); border:1px solid var(--border); border-radius:18px; box-shadow:0 10px 35px rgba(30,42,75,.06); backdrop-filter: blur(10px); }
@@ -266,7 +266,7 @@
     <div class="title">
       <h1>Formantasia</h1>
       <div class="brand-tagline">声をえがくキャンバス · Draw Your Voice</div>
-      <p class="casual-only">線を描いて、声のひびきがどう変わるか聴いてみよう。むずかしい設定は隠してあります。</p>
+      <p class="casual-only">線を描いて、声のひびきがどう変わるか聴いてみよう。</p>
       <p class="learning-only">描いて、聴いて、意味を知るモード。F1・F2・F3や帯域幅、Qを触りながら学べます。</p>
       <p class="research-only">横＝時間、縦＝Hz。F1・F2・F3を手描きし、文献値・モデル区間・帯域幅まで確認できます。</p>
     </div>
@@ -373,7 +373,7 @@
     <div class="hint research-only">※ 教育・実験用の簡易フォルマントシンセ。Empirical bandwidthではB1–B3を保持し、各時点のQをF/Bから自動計算します。WAVも同じ合成設定で48 kHz / 16-bit PCMレンダリングします。</div>
   </div>
 
-  <div class="casual-tip casual-only">✏️ F1・F2・F3を好きに曲げて、右下の丸い ▶ で聴き比べよう。学習モードにするとF1/F2/F3や音のしくみを確かめられます。</div>
+  <div class="casual-tip casual-only">✏️ F1・F2・F3を好きに曲げて、▶ で聴き比べよう。学習モードでは、F1/F2/F3や音のしくみも確かめられます。</div>
 
   <section class="learning-card learning-only" id="learningCard" aria-label="音声学ミニ解説">
     <div class="learning-head">
