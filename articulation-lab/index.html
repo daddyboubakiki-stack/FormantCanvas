@@ -4,15 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.3.1</title>
+  <title>Articulation Lab v0.4</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.3.1</small></h1>
-        <p>Tap vowels like little sound buttons, or switch to Mouth Synth and play the tongue continuously.</p>
+        <h1>Articulation Lab <small>v0.4</small></h1>
+        <p>Hear real human vowels in Vowel Buttons, or switch to Mouth Synth and play the synthetic vocal tract continuously.</p>
       </div>
       <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
     </header>
@@ -20,7 +20,7 @@
     <section class="mode-switch panel compact-panel" aria-label="Play mode">
       <div class="mode-copy">
         <strong id="modeTitle">Vowel Buttons</strong>
-        <span id="modeDescription">Tap an IPA button: the tongue moves and the vowel sounds for about 0.5 seconds.</span>
+        <span id="modeDescription">Tap an IPA button: hear a short human recording while the modeled tongue moves into position.</span>
       </div>
       <div class="segmented two mode-tabs">
         <button type="button" class="selected" data-play-mode="buttons">Vowel Buttons</button>
@@ -35,7 +35,7 @@
           <div class="legend buttons-only"><span class="dot en"></span>EN <span class="dot jp"></span>JP</div>
         </div>
         <div id="mouthMount"></div>
-        <div id="dragHint" class="drag-hint">The tongue will move when you tap a vowel button.</div>
+        <div id="dragHint" class="drag-hint">The mouth is a teaching model; the sound is a real human recording when available.</div>
 
         <section id="vowelMapSection" class="vowel-map-section buttons-only" aria-labelledby="vowelMapTitle">
           <div class="map-head">
@@ -50,20 +50,27 @@
             </div>
           </div>
           <div id="vowelMapMount"></div>
-          <p class="mini-note map-note">This quadrilateral is a simplified phonetic map, not a literal anatomical coordinate system. Button positions are pedagogical-model positions in v0.3.1.</p>
+          <p class="mini-note map-note">This quadrilateral is a simplified phonetic map, not literal measured tongue geometry. The mouth posture is pedagogical; the button audio is a separate human recording.</p>
         </section>
 
-        <div class="readouts">
+        <div class="readouts synth-only">
           <div class="readout"><span>Synth F1</span><strong id="f1Value">—</strong></div>
           <div class="readout"><span>Synth F2</span><strong id="f2Value">—</strong></div>
           <div class="readout"><span>Synth F3</span><strong id="f3Value">—</strong></div>
         </div>
-        <div class="model-tag">v0.3.1 articulation map = pedagogical model · not measured anatomy</div>
+        <div class="model-tag synth-only">Mouth Synth articulation→formant map = pedagogical model · not measured anatomy</div>
       </section>
 
       <aside class="side">
-        <section class="panel">
-          <div class="section-title">Voice character</div>
+        <section class="panel buttons-only">
+          <div class="section-title">Human recording</div>
+          <div id="recordingHint" class="mini-note">Loading local recording set…</div>
+          <p class="mini-note">Japanese buttons use one Japanese speaker’s public-domain recordings. English-labelled buttons currently use a CC0 human IPA reference set, not a General American population norm.</p>
+          <p class="mini-note">Male / female / child language-matched sets are being added only when the recording license and speaker metadata are explicit.</p>
+        </section>
+
+        <section class="panel synth-only">
+          <div class="section-title">Synth voice character</div>
           <label class="select-label" for="voiceProfile">Voice</label>
           <select id="voiceProfile" class="voice-select"></select>
           <div id="voiceHint" class="mini-note"></div>
@@ -71,29 +78,29 @@
             <span class="control-row"><span>Pitch</span><span id="f0Value">245 Hz</span></span>
             <input id="f0" type="range" min="80" max="320" step="1" value="245" />
           </label>
-          <label class="control synth-only">
+          <label class="control">
             <span class="control-row"><span>Lip rounding</span><span>flat ↔ round</span></span>
             <input id="lipRounding" type="range" min="0" max="1" step="0.01" value="0.1" />
           </label>
         </section>
 
         <section class="panel note buttons-only">
-          <strong>Vowel Buttons</strong><br />
-          Each tap triggers a short ~0.5 s steady-vowel burst. The mouth above may animate into position, but that visual morph is not synthesized as a consonant-like transition.
+          <strong>Vowel Buttons = recorded humans</strong><br />
+          Each tap retriggers a short locally bundled WAV. The tongue animation is intentionally independent of the recording, so a visual morph cannot create a fake consonant transition.
         </section>
 
         <section class="panel note synth-only">
-          <strong>Mouth Synth</strong><br />
-          Turn VOICE ON, then drag the tongue continuously. This mode is intentionally button-free so the mouth itself feels like the instrument.
+          <strong>Mouth Synth = continuous synthesis</strong><br />
+          Turn VOICE ON, then drag the tongue continuously. This remains the playful instrument mode where every in-between position needs a model-generated sound.
         </section>
 
         <section class="panel note">
-          <strong>Sound model</strong><br />
-          Lightweight harmonic glottal-style source + breath noise + formant resonators. It is more voice-like than v0.1, but still a synthesizer rather than a physical vocal-tract simulation.
+          <strong>Evidence boundary</strong><br />
+          A human recording is evidence for how that recorded person sounded. The drawn tongue pose is a teaching model unless measured articulatory data says otherwise.
         </section>
       </aside>
     </div>
-    <div id="status" class="status" aria-live="polite">Tap a vowel button to hear it.</div>
+    <div id="status" class="status" aria-live="polite">Tap a vowel button to hear a human recording.</div>
   </main>
 
   <script src="data/voice-profiles.js"></script>
@@ -101,6 +108,7 @@
   <script src="src/state-store.js"></script>
   <script src="src/constraint-mapper.js"></script>
   <script src="src/audio/formant-engine.js"></script>
+  <script src="src/audio/sample-player.js"></script>
   <script src="src/renderers/simple-renderer.js"></script>
   <script src="src/renderers/vowel-map.js"></script>
   <script src="src/app.js"></script>
