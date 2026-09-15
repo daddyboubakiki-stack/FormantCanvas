@@ -1,4 +1,4 @@
-name: Articulation Lab v0.4.2 preview
+name: Articulation Lab v0.4.3 preview
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
           import json
           from pathlib import Path
           report = json.loads(Path('articulation-lab/assets/audio/real/build-report.json').read_text())
-          assert report['version'] == 'v0.4.2', report.get('version')
+          assert report['version'] == 'v0.4.3', report.get('version')
           for key, item in report['japanese'].items():
               v = item['validation']
               assert 0.38 <= v['duration'] <= 0.62, (key, v)
@@ -46,31 +46,38 @@ jobs:
           for key, item in report['ipaReference']['exports'].items():
               v = item['validation']
               assert -19 <= v['activeRmsDbfs'] <= -14, (key, v)
-          print('Validated v0.4.2 duration/loudness report.')
+          assert 'ɪ' not in report['ipaReference']['exports'], report['ipaReference']['exports'].keys()
+          kit = report['englishWordReference']['ɪ']
+          kv = kit['validation']
+          assert kit['sourceWord'] == 'kid', kit
+          assert kit['stretchFactor'] == 1.0, kit
+          assert 0.09 <= kv['duration'] <= 0.16, kv
+          assert -19 <= kv['activeRmsDbfs'] <= -14, kv
+          print('Validated v0.4.3 duration/loudness report, including natural KIT /ɪ/.')
           PY
 
       - name: Build standalone HTML
         run: |
           set -euxo pipefail
-          mkdir -p /tmp/articulation-v042
+          mkdir -p /tmp/articulation-v043
           python3 articulation-lab/tools/build_standalone_preview.py \
             --app-dir articulation-lab \
-            --output /tmp/articulation-v042/ArticulationLab_v0.4.2.html
-          grep -q 'data:audio/x-wav;base64\|data:audio/wav;base64' /tmp/articulation-v042/ArticulationLab_v0.4.2.html
-          ! grep -q 'assets/audio/real/' /tmp/articulation-v042/ArticulationLab_v0.4.2.html
-          grep -q 'Articulation Lab v0.4.2' /tmp/articulation-v042/ArticulationLab_v0.4.2.html
+            --output /tmp/articulation-v043/ArticulationLab_v0.4.3.html
+          grep -q 'data:audio/x-wav;base64\|data:audio/wav;base64' /tmp/articulation-v043/ArticulationLab_v0.4.3.html
+          ! grep -q 'assets/audio/real/' /tmp/articulation-v043/ArticulationLab_v0.4.3.html
+          grep -q 'Articulation Lab v0.4.3' /tmp/articulation-v043/ArticulationLab_v0.4.3.html
 
       - name: Package modular source
         run: |
           set -euxo pipefail
-          zip -qr /tmp/articulation-v042/ArticulationLab_v0.4.2_source.zip articulation-lab \
+          zip -qr /tmp/articulation-v043/ArticulationLab_v0.4.3_source.zip articulation-lab \
             -x 'articulation-lab/tools/__pycache__/*'
-          ls -lh /tmp/articulation-v042
+          ls -lh /tmp/articulation-v043
 
       - name: Upload distributables
         uses: actions/upload-artifact@v4
         with:
-          name: ArticulationLab-v0.4.2-distributables
-          path: /tmp/articulation-v042
+          name: ArticulationLab-v0.4.3-distributables
+          path: /tmp/articulation-v043
           if-no-files-found: error
           retention-days: 14
