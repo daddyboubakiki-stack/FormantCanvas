@@ -13,6 +13,14 @@ Before editing, read:
 5. `contracts/vowel-target.schema.json`
 6. `data/source-registry.json`
 
+Then run the current staging build at `articulation-lab/index.html` and verify that tongue dragging, VOICE ON/OFF, lip rounding, F0, and the five vowel presets work before redesigning it.
+
+## Current v0.1 evidence status
+
+The first playable build deliberately uses an internal `pedagogical_model` for vowel-like acoustic mapping and provisional articulatory presets. These values exist to make interaction testable and fun. They are **not** source-backed English/Japanese vowel norms and must not be presented as empirical data.
+
+The next data milestone will port source-verified vowel targets from Formant Canvas into the versioned target schema while preserving population, context, source, and evidence type.
+
 ## Areas you are encouraged to redesign
 
 - visual style
@@ -49,6 +57,19 @@ Changing from `Simple` to `Cute` must not change:
 - F1/F2/F3 target/estimate
 
 The same state should merely be drawn differently.
+
+Conceptually:
+
+```text
+ArticulationState
+      ├── SimpleRenderer   (existing v0.1)
+      ├── AnatomyRenderer  (future)
+      └── CuteRenderer     (future)
+
+ArticulationState ──> AcousticEngine
+```
+
+Do not make sound depend directly on SVG pixel coordinates outside the shared renderer → intent → state pathway.
 
 ## Desired skins
 
@@ -107,6 +128,22 @@ If integrating Pink Trombone or another engine:
 - preserve required copyright/license notices
 - document what was copied, adapted, or wrapped
 - do not mix GPL code into the main implementation casually
+
+## Safe workflow for a graphics pass
+
+1. Make renderer/style/UI changes first.
+2. Do not replace scientific/data files merely to match the artwork.
+3. If new artwork needs an additional state variable, propose it explicitly rather than overloading an existing one.
+4. Test the same vowel preset before and after the skin change; the underlying state/sound should remain unchanged.
+5. Keep Pointer Events and touch interaction working on Android/tablet.
+
+## Product tone
+
+The primary experience should feel like a **playable mouth instrument**, not a configuration dashboard.
+
+The user should want to touch the tongue before reading the phonetics explanation.
+
+Education is layered on in this order: PLAY → COMPARE → LEARN → PHONETICS.
 
 ## Definition of done for a visual pass
 
