@@ -112,7 +112,10 @@ def level_match(path,target=TARGET_ACTIVE_RMS_DBFS):
     params,s,threshold,db,peak,peak_db=_level_stats(path)
     if db<=-119: return {"reason":"no_active_frames","appliedGainDb":0,"postActiveRmsDbfs":db,"postPeakDbfs":peak_db}
     wanted=10**((target-db)/20); head=(10**(-1.5/20))/max(peak,1e-9)
-    gain=max(.25,min(wanted,head,4.0))
+    # Some source vowels (notably IPA /ɪ/) are genuinely recorded at a very low level.
+    # Let them recover by up to +24 dB, while the independent peak-headroom bound
+    # remains the actual clipping guard.
+    gain=max(.25,min(wanted,head,16.0))
     for i,v in enumerate(s): s[i]=int(max(-32768,min(32767,round(v*gain))))
     if sys.byteorder!="little": s.byteswap()
     with wave.open(str(path),"wb") as wf: wf.setparams(params); wf.writeframes(s.tobytes())
