@@ -1,0 +1,68 @@
+{
+  "schema": "formantcanvas.japanese-vv-evidence.v1",
+  "purpose": "Track what Japanese vowel-sequence evidence has been recovered, what can be used directly in Formant Canvas, and what must not be presented as an empirical trajectory.",
+  "rules": {
+    "empirical_trajectory_requires_numeric_series": true,
+    "figure_digitization_is_not_empirical_source_data": true,
+    "do_not_mix_incompatible_age_or_population_groups_without_explicit_labeling": true
+  },
+  "studies": [
+    {
+      "id": "hara2016",
+      "study": "Hara (2016)",
+      "source_url": "http://hdl.handle.net/10443/3420",
+      "population": "Japanese adults; male and female values reported separately for relevant contextual conditions",
+      "sequences": ["within-word VV (pooled contextual vowel targets; not sequence-specific continuous trajectories)"],
+      "acoustic_measures": ["F1", "F2", "duration/timing summaries", "transition speed summaries"],
+      "measurement_structure": "Published numeric tables contain contextual vowel targets and timing/transition summaries rather than normalized-time F1/F2 point series for individual /VV/ sequences.",
+      "normalization": "Use the publication's reported Hz summaries as published; no synthetic normalization is introduced by this manifest.",
+      "measured_time_series_exists_in_study": false,
+      "numeric_series_publicly_recovered": false,
+      "numeric_summary_publicly_recovered": true,
+      "canvas_use_status": "endpoint_and_timing_evidence",
+      "current_canvas_use": "Adult Japanese VV presets use pooled within-word contextual F1/F2 targets and reported timing proportions; F3 is borrowed from Kasuya et al. (1968), and the continuous transition is modeled by Canvas.",
+      "blocker": "No sequence-specific normalized-time F1/F2 numeric trajectory series has been recovered from this source.",
+      "checked_locations": ["thesis/dissertation tables", "published contextual F1/F2 tables", "transition timing/speed tables"],
+      "notes": "The existing Canvas values can be traced to the published tables, but they must not be relabeled as a measured continuous trajectory."
+    },
+    {
+      "id": "zhang2022",
+      "study": "Zhang (2022), Prosodic Influences on the Acoustics of Vowel Sequences",
+      "source_url": "https://miaozhang.org/mz_dissertation.pdf",
+      "author_repository": "https://github.com/ZenMule/miaozhang",
+      "population": "Japanese speakers in a prosodic-boundary experiment; the dissertation also analyzes other languages",
+      "sequences": ["ae", "ai", "au"],
+      "conditions": ["word-final", "list-final", "IP-final"],
+      "acoustic_measures": ["F1", "F2", "duration", "formant excursion/movement"],
+      "measurement_structure": "Dynamic F1/F2 trajectories are analyzed with GAMM over the central 20%-80% portion of the tautosyllabic vowel sequence.",
+      "normalization": "As specified in the dissertation's analysis; the manifest does not reconstruct curves from model summary statistics.",
+      "measured_time_series_exists_in_study": true,
+      "numeric_series_publicly_recovered": false,
+      "numeric_summary_publicly_recovered": true,
+      "canvas_use_status": "dynamic_evidence_only",
+      "current_canvas_use": "Qualitative support only; not used as a numeric trajectory preset.",
+      "blocker": "The dissertation figures and GAM/GAMM summary tables establish dynamic trajectories, but a reusable per-timepoint Hz series or fitted-model object has not been recovered.",
+      "checked_locations": ["public dissertation PDF", "Appendix B model/smooth summaries", "author public GitHub repository", "author GitHub code search", "OSF web search", "Zenodo web search", "figshare web search"],
+      "notes": "Do not digitize plotted curves and call the resulting points source measurements. Exact fitted trajectories require the underlying numeric data/model object or an author-provided exported prediction table."
+    },
+    {
+      "id": "sun_hayashi2025",
+      "study": "Sun & Hayashi (2025), Acoustic, Auditory and Articulatory Analysis of Vowel Sequences in Japanese by Chinese Learners",
+      "doi": "10.24467/onseikenkyu.29.1_72",
+      "source_url": "https://www.jstage.jst.go.jp/article/onseikenkyu/29/1/29_72/_article/-char/en",
+      "population": "7 native Japanese speakers (4 female, 3 male) plus 19 advanced Chinese learners of Japanese",
+      "sequences": ["ai", "ae", "au", "ao"],
+      "acoustic_measures": ["F1", "F2", "ultrasound articulatory measures"],
+      "measurement_structure": "Each vowel sequence is divided into 19 equal temporal intervals, yielding 20 formant measurement points.",
+      "normalization": "Lobanov-normalized formant values are used in the reported trajectory analysis/plots.",
+      "measured_time_series_exists_in_study": true,
+      "numeric_series_publicly_recovered": false,
+      "numeric_summary_publicly_recovered": true,
+      "canvas_use_status": "dynamic_evidence_only",
+      "current_canvas_use": "Qualitative validation only; not used as a group numeric trajectory preset.",
+      "blocker": "The article reports the 20-point measurement procedure but the plotted example trajectories are not a reusable native-speaker group numeric table; no public supplementary CSV was recovered in the checked locations.",
+      "checked_locations": ["J-STAGE article page", "J-STAGE PDF", "CiNii metadata", "Kobe University researcher page", "web searches for supplementary data"],
+      "notes": "A single plotted native speaker (JM1) can be described as a single-speaker illustration, but should not be promoted to a normative adult Japanese group trajectory."
+    }
+  ]
+}
