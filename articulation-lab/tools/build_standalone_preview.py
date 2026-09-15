@@ -10,6 +10,7 @@ from pathlib import Path
 STYLE_RE = re.compile(r'<link\s+rel="stylesheet"\s+href="([^"]+)"\s*/?>')
 SCRIPT_RE = re.compile(r'<script\s+src="([^"]+)"></script>')
 AUDIO_RE = re.compile(r'(?P<q>[\'\"])(assets/audio/real/[^\'\"]+\.wav)(?P=q)')
+TITLE_RE = re.compile(r'<title>([^<]+)</title>')
 
 
 def encode_audio(app_dir: Path, js: str) -> str:
@@ -66,7 +67,9 @@ def build(app_dir: Path, output: Path) -> None:
     if 'assets/audio/real/' in html:
         raise RuntimeError('Standalone build still contains unembedded real-audio paths')
 
-    banner = '<!-- Articulation Lab v0.4.2 standalone build: local CSS/JS and vetted real-voice WAVs are embedded. -->\n'
+    title_match = TITLE_RE.search(html)
+    title = title_match.group(1) if title_match else 'Articulation Lab standalone build'
+    banner = f'<!-- {title}: local CSS/JS and vetted real-voice WAVs are embedded. -->\n'
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(banner + html, encoding='utf-8')
     print(f'Wrote {output} ({output.stat().st_size} bytes)')
