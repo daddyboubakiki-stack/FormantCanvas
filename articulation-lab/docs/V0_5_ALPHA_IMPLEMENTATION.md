@@ -20,7 +20,7 @@ The first visual acceptance pair is English /æ/ versus /ɑ/.
    - lower teeth/lip follow the jaw
    - tongue root responds independently
    - lip spread and rounding are separate
-   - oral/pharyngeal cavity fill makes available air space visible
+   - schematic cavity fill makes available air space visible
 5. Add a frontal Simple renderer driven by the same state:
    - vertical opening
    - horizontal opening
@@ -30,6 +30,18 @@ The first visual acceptance pair is English /æ/ versus /ɑ/.
 7. Add synth sliders for jaw opening and lip spread so Mouth Synth can explore the new axes.
 8. Validate /æ/ versus /ɑ/ visually before adding Anatomy/Cute skins.
 9. Keep renderer contracts ready for future `Simple`, `Anatomy`, and `Cute` skins.
+
+## Scientific / educational precedents
+
+The visual architecture is intentionally inspired by established articulatory teaching/modeling approaches without copying their artwork or code.
+
+- **Seeing Speech / STAR** documents a 2-D head rig based on midsagittal imaging. Its animation workflow gives the jaw both translation and rotation and controls the tongue with multiple regions/control points (including root, dorsum, front, blade and tip). This supports the v0.5 decision to stop treating the tongue as one point and the jaw as a value derived from tongue height.
+  - https://seeingspeech.ac.uk/creating-the-animations/
+  - https://seeingspeech.ac.uk/ipa-charts/
+- **VocalTractLab** separates higher-level phonetic controls such as tongue height, tongue frontness and lip rounding while its full articulatory model uses a much richer parameter set and derives an acoustic area function from vocal-tract geometry. Articulation Lab uses the higher-level-control idea for education, but does not copy VTL's implementation or claim VTL-level physical accuracy.
+  - https://www.vocaltractlab.de/
+
+For the current alpha, the cavity shading is only a visual hint of available airway space. It is **not** a computed cross-sectional area function.
 
 ## Shared state axes (v0.5)
 
@@ -58,7 +70,7 @@ These are visual teaching targets, not measured anatomy.
 - lip rounding: 0.02
 - lip spread: 0.62
 
-Expected appearance: low/front tongue, strongly open jaw, laterally spread mouth; front oral space is visually prominent.
+Expected appearance: low/front tongue, strongly open jaw, laterally spread mouth; the front oral cavity looks broad and shallow relative to /ɑ/.
 
 ### English /ɑ/ PALM
 
@@ -69,7 +81,7 @@ Expected appearance: low/front tongue, strongly open jaw, laterally spread mouth
 - lip rounding: 0.04
 - lip spread: 0.15
 
-Expected appearance: low/back tongue, slightly larger vertical jaw opening, less lateral spreading, visibly larger posterior/pharyngeal space.
+Expected appearance: low/back tongue, slightly larger vertical jaw opening, less lateral spreading, and a more posterior tongue/root configuration. Tongue-root retraction may narrow/reshape parts of the pharyngeal airway, so the model must **not** equate “back vowel” with “uniformly larger pharyngeal space.”
 
 ## Renderer contract
 
@@ -93,6 +105,10 @@ The sagittal and frontal views must use the same articulation state. Switching s
 - Existing Mouth Synth still works, with new jaw and lip-spread controls.
 - JavaScript syntax validation and standalone packaging pass.
 - No merge to Formant Canvas `main`; this remains staging work.
+
+## Acoustic boundary for new visual axes
+
+The existing Mouth Synth already includes `jawOpening` in its pedagogical F1 estimate. The newly exposed `lipSpread` and `tongueRootRetraction` axes are currently primarily visual/model-state axes. The alpha deliberately does not invent strong acoustic coefficients for them without a better tract model. A later acoustics upgrade should prefer a geometry/area-function approach rather than pretending every articulatory parameter maps independently to one formant.
 
 ## Future-compatible hooks
 
