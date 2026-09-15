@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""Build redistribution-safe vowel samples for Articulation Lab v0.4.1.
+"""Build redistribution-safe vowel samples for Articulation Lab v0.4.2.
 
 Japanese source files contain several very short kana repetitions separated by silence,
-so midpoint cropping is unsafe. This build detects one voiced token, duration-equalizes
-it to ~0.46 s (pitch-preserving atempo, max 3x), and active-RMS matches all outputs.
+so midpoint cropping is unsafe. This build detects a genuinely voiced token, keeps a
+small onset/offset margin, duration-equalizes it toward ~0.50 s with pitch-preserving
+`atempo`, and active-RMS matches every exported button sample.
+
+The build also fails closed: a Japanese sample that is still too short / too quiet, or
+an English reference vowel whose post-normalization level is far outside the comparison
+window, makes CI fail instead of silently shipping a bad teaching sample.
 """
 from __future__ import annotations
 import argparse, array, audioop, json, math, subprocess, sys, wave
@@ -12,15 +17,21 @@ from pathlib import Path
 IPA_SEQUENCE = ["a","æ","ɛ","e̞","e","ɪ","i","y","ʏ","ø","ø̞","œ","ɶ","ä","ɐ","ɜ","ə","ɘ","ɪ̈","ɨ","ʉ","ʊ̈","ɵ̞","ɞ","ɞ̞","ɒ̈","ɑ","ʌ","ɤ̞","ɤ","ʊ","ɯ","u","o","o̞","ɔ","ɒ"]
 IPA_EXPORTS = {6:"i.wav",5:"I.wav",2:"epsilon.wav",1:"ae.wav",27:"turned_v.wav",16:"schwa.wav",26:"alpha.wav",35:"open_o.wav",30:"U.wav",32:"u.wav"}
 JP_EXPORTS = {"a":"jp_a.ogg","i":"jp_i.ogg","u":"jp_u.ogg","e":"jp_e.ogg","o":"jp_o.ogg"}
+TARGET_ACTIVE_RMS_DBFS = -16.5
+JP_TARGET_DURATION = 0.50
+
 
 def run(*args):
     return subprocess.run(args, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.strip()
 
+
 def duration(path):
     return float(run("ffprobe","-v","error","-show_entries","format=duration","-of","default=nw=1:nk=1",str(path)))
 
+
 def decode_analysis(src, dst):
     subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-i",str(src),"-ac","1","-ar","16000","-c:a","pcm_s16le",str(dst)], check=True)
+
 
 def pcm_frames(path, frame_ms=10):
     with wave.open(str(path),"rb") as wf:
@@ -34,6 +45,7 @@ def pcm_frames(path, frame_ms=10):
         out.append(-120.0 if r<=0 else 20*math.log10(r/32768.0))
     return out
 
+
 def close_gaps(active, max_gap):
     out=active[:]; i=0
     while i<len(out):
@@ -45,6 +57,7 @@ def close_gaps(active, max_gap):
         i=j
     return out
 
+
 def segments(active, min_frames):
     out=[]; i=0
     while i<len(active):
@@ -55,20 +68,23 @@ def segments(active, min_frames):
         i=j
     return out
 
+
 def render_clip(src,dst,start,dur,stretch=1.0):
     """Trim before tempo processing so stretched audio is not truncated."""
     dst.parent.mkdir(parents=True,exist_ok=True)
     total=duration(src); start=max(0.0,start); dur=min(dur,max(0.08,total-start))
-    stretch=max(0.5,min(3.0,float(stretch))); tempo=1.0/stretch
+    stretch=max(0.5,min(4.0,float(stretch))); tempo=1.0/stretch
     filters=[f"atrim=duration={dur:.6f}","asetpts=PTS-STARTPTS"]
+    # ffmpeg atempo accepts 0.5..100. Chain stages for slower-than-0.5 playback.
     while tempo<0.5:
         filters.append("atempo=0.5"); tempo/=0.5
     if abs(tempo-1.0)>1e-4: filters.append(f"atempo={tempo:.6f}")
-    outdur=dur*stretch
-    filters += ["loudnorm=I=-18:TP=-2:LRA=7","afade=t=in:st=0:d=0.018",f"afade=t=out:st={max(.025,outdur-.045):.4f}:d=0.04"]
+    expected=max(0.08,dur*stretch)
+    filters += ["afade=t=in:st=0:d=0.018",f"afade=t=out:st={max(.025,expected-.045):.4f}:d=0.04"]
     subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-ss",f"{start:.4f}","-i",str(src),"-ac","1","-ar","24000","-af",",".join(filters),"-c:a","pcm_s16le",str(dst)],check=True)
 
-def level_match(path,target=-17.0):
+
+def _level_stats(path):
     with wave.open(str(path),"rb") as wf:
         params=wf.getparams(); raw=wf.readframes(wf.getnframes())
     s=array.array("h"); s.frombytes(raw)
@@ -82,18 +98,44 @@ def level_match(path,target=-17.0):
         frames.append((i,min(len(s),i+fl),db))
     maxdb=max((x[2] for x in frames),default=-120); threshold=max(-45,maxdb-24)
     active=[x for x in frames if x[2]>threshold]
-    if not active: return {"reason":"no_active_frames","appliedGainDb":0}
     ss=0.0; n=0
     for a,b,_ in active:
         for v in s[a:b]: ss+=float(v)*v; n+=1
-    rms=math.sqrt(ss/max(1,n)); db=-120 if rms<=0 else 20*math.log10(rms/32768)
+    rms=math.sqrt(ss/max(1,n)) if n else 0.0
+    active_db=-120 if rms<=0 else 20*math.log10(rms/32768)
     peak=max((abs(v) for v in s),default=0)/32768
+    peak_db=-120 if peak<=0 else 20*math.log10(peak)
+    return params,s,threshold,active_db,peak,peak_db
+
+
+def level_match(path,target=TARGET_ACTIVE_RMS_DBFS):
+    params,s,threshold,db,peak,peak_db=_level_stats(path)
+    if db<=-119: return {"reason":"no_active_frames","appliedGainDb":0,"postActiveRmsDbfs":db,"postPeakDbfs":peak_db}
     wanted=10**((target-db)/20); head=(10**(-1.5/20))/max(peak,1e-9)
     gain=max(.25,min(wanted,head,4.0))
     for i,v in enumerate(s): s[i]=int(max(-32768,min(32767,round(v*gain))))
     if sys.byteorder!="little": s.byteswap()
     with wave.open(str(path),"wb") as wf: wf.setparams(params); wf.writeframes(s.tobytes())
-    return {"activeRmsBeforeDbfs":db,"targetActiveRmsDbfs":target,"thresholdDbfs":threshold,"appliedGainDb":20*math.log10(gain),"peakBeforeDbfs":(-120 if peak<=0 else 20*math.log10(peak))}
+    _,_,post_threshold,post_db,_,post_peak_db=_level_stats(path)
+    return {
+        "activeRmsBeforeDbfs":db,"targetActiveRmsDbfs":target,"thresholdDbfs":threshold,
+        "appliedGainDb":20*math.log10(gain),"peakBeforeDbfs":peak_db,
+        "postThresholdDbfs":post_threshold,"postActiveRmsDbfs":post_db,"postPeakDbfs":post_peak_db
+    }
+
+
+def validate_export(path, *, kind, label):
+    d=duration(path); _,_,_,active_db,_,peak_db=_level_stats(path)
+    if kind=="japanese" and not (0.38 <= d <= 0.62):
+        raise RuntimeError(f"{label}: Japanese button duration {d:.3f}s outside 0.38..0.62s")
+    if active_db < -19.0:
+        raise RuntimeError(f"{label}: post-normalization active RMS too quiet ({active_db:.2f} dBFS)")
+    if active_db > -14.0:
+        raise RuntimeError(f"{label}: post-normalization active RMS too loud ({active_db:.2f} dBFS)")
+    if peak_db < -15.0:
+        raise RuntimeError(f"{label}: suspiciously low peak ({peak_db:.2f} dBFS)")
+    return {"duration":d,"activeRmsDbfs":active_db,"peakDbfs":peak_db}
+
 
 def detect_jp(src,work,key):
     wav=work/f"jp_{key}_analysis.wav"; decode_analysis(src,wav); dbs=pcm_frames(wav)
@@ -109,12 +151,22 @@ def detect_jp(src,work,key):
     score,th,gap,a,b,segs=max(choices,key=lambda x:x[0])
     return (a*.01,b*.01),{"frameMs":10,"peakDbfs":peak,"thresholdDbfs":th,"closedGapMs":gap*10,"selectedStart":a*.01,"selectedEnd":b*.01,"selectedDuration":(b-a)*.01,"detectedSegments":[{"start":x*.01,"end":y*.01,"duration":(y-x)*.01} for x,y in segs],"selectionScore":score}
 
+
 def build_jp(src,dst,work,key):
     total=duration(src); (a,b),det=detect_jp(src,work,key); token=b-a
-    start=max(0,a-.025); end=min(total,b+.025); raw=end-start
-    stretch=min(3.0,max(1.0,.46/max(.08,raw)))
-    render_clip(src,dst,start,raw,stretch); level=level_match(dst)
-    return {"sourceDuration":total,"clipStart":start,"clipDurationBeforeStretch":raw,"selectedVoicedDuration":token,"stretchFactor":stretch,"outputDuration":duration(dst),"detection":det,"levelMatch":level}
+    # Keep enough real onset/offset around the detected nucleus to avoid a synthetic hard edge.
+    start=max(0,a-.035); end=min(total,b+.035); raw=end-start
+    stretch=min(4.0,max(1.0,JP_TARGET_DURATION/max(.08,raw)))
+    render_clip(src,dst,start,raw,stretch)
+    level=level_match(dst)
+    validation=validate_export(dst,kind="japanese",label=f"JP /{key}/")
+    return {
+        "sourceDuration":total,"clipStart":start,"clipDurationBeforeStretch":raw,
+        "selectedVoicedDuration":token,"targetDuration":JP_TARGET_DURATION,"stretchFactor":stretch,
+        "outputDuration":duration(dst),"processing":"voiced-token-detection + pitch-preserving atempo + active-RMS match",
+        "detection":det,"levelMatch":level,"validation":validation
+    }
+
 
 def detect_ipa(src,work):
     wav=work/"all_ipa_analysis.wav"; decode_analysis(src,wav); dbs=pcm_frames(wav); choices=[]
@@ -127,10 +179,11 @@ def detect_ipa(src,work):
     sec=[(a*.01,b*.01) for a,b in segs]
     return sec,{"frameMs":10,"thresholdDbfs":th,"closedGapMs":gap*10,"detectedCount":len(segs),"expectedCount":37,"candidateScore":score,"segments":[{"index":i,"ipa":IPA_SEQUENCE[i],"start":a,"end":b,"duration":b-a} for i,(a,b) in enumerate(sec)]}
 
+
 def build(args):
     src=Path(args.source_dir); out=Path(args.output_dir); work=Path(args.work_dir)
     out.mkdir(parents=True,exist_ok=True); work.mkdir(parents=True,exist_ok=True)
-    report={"version":"v0.4.1","japanese":{},"ipaReference":{}}
+    report={"version":"v0.4.2","normalizationTargetActiveRmsDbfs":TARGET_ACTIVE_RMS_DBFS,"japanese":{},"ipaReference":{}}
     for key,fn in JP_EXPORTS.items():
         info=build_jp(src/fn,out/"jp_reference"/f"{key}.wav",work,key)
         info.update({"sourceFile":fn,"output":f"jp_reference/{key}.wav"}); report["japanese"][key]=info
@@ -139,12 +192,18 @@ def build(args):
     for idx,fn in IPA_EXPORTS.items():
         a,b=segs[idx]; clip=min(.60,max(.38,(b-a)+.05)); center=(a+b)/2; start=max(0,min(total-clip,center-clip/2))
         dst=out/"ipa_reference"/fn; render_clip(ipa,dst,start,clip); lvl=level_match(dst)
-        report["ipaReference"]["exports"][IPA_SEQUENCE[idx]]={"sequenceIndex":idx,"segmentStart":a,"segmentEnd":b,"clipStart":start,"clipDuration":clip,"output":f"ipa_reference/{fn}","outputDuration":duration(dst),"levelMatch":lvl}
+        validation=validate_export(dst,kind="english",label=f"IPA /{IPA_SEQUENCE[idx]}/")
+        report["ipaReference"]["exports"][IPA_SEQUENCE[idx]]={
+            "sequenceIndex":idx,"segmentStart":a,"segmentEnd":b,"clipStart":start,"clipDuration":clip,
+            "output":f"ipa_reference/{fn}","outputDuration":duration(dst),"levelMatch":lvl,"validation":validation
+        }
     (out/"build-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
     return report
+
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument("--source-dir",required=True); p.add_argument("--output-dir",required=True); p.add_argument("--work-dir",required=True)
     print(json.dumps(build(p.parse_args()),ensure_ascii=False,indent=2))
+
 
 if __name__=="__main__": main()
