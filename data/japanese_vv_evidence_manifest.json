@@ -41,9 +41,28 @@
       "numeric_summary_publicly_recovered": true,
       "canvas_use_status": "dynamic_evidence_only",
       "current_canvas_use": "Qualitative support only; not used as a numeric trajectory preset.",
-      "blocker": "The dissertation figures and GAM/GAMM summary tables establish dynamic trajectories, but a reusable per-timepoint Hz series or fitted-model object has not been recovered.",
-      "checked_locations": ["public dissertation PDF", "Appendix B model/smooth summaries", "author public GitHub repository", "author GitHub code search", "OSF web search", "Zenodo web search", "figshare web search"],
-      "notes": "Do not digitize plotted curves and call the resulting points source measurements. Exact fitted trajectories require the underlying numeric data/model object or an author-provided exported prediction table."
+      "blocker": "The dissertation figures and GAM/GAMM summary tables establish dynamic trajectories, but a reusable per-timepoint Hz series or fitted-model object from the dissertation experiment has not been recovered.",
+      "checked_locations": ["public dissertation PDF", "Appendix B model/smooth summaries", "author public GitHub website repository", "author GitHub repository inventory", "Time_series_data_tutorial repository", "dynamic_seeding_formant_extraction repository", "author GitHub code search", "OSF web search", "Zenodo web search", "figshare web search"],
+      "notes": "The author's Time_series_data_tutorial does contain genuine pointwise F1/F2/F3 files, but its single tutorial recording with ai/au/ou and t1-t4 labels does not match the dissertation's Japanese ae/ai/au x word/list/IP-final multi-speaker design. Do not substitute that tutorial dataset for the dissertation experiment. Do not digitize plotted dissertation curves and call the resulting points source measurements."
+    },
+    {
+      "id": "zhang_timeseries_tutorial",
+      "study": "Zhang, TimeSeries_data_tutorial (public GitHub teaching dataset)",
+      "source_url": "https://github.com/ZenMule/Time_series_data_tutorial",
+      "population": "A public tutorial recording; speaker population is not documented as the dissertation Japanese cohort",
+      "sequences": ["ai", "au", "ou"],
+      "conditions": ["tutorial labels t1", "tutorial labels t2", "tutorial labels t3", "tutorial labels t4"],
+      "acoustic_measures": ["F1", "F2", "F3", "F4", "spectral measures"],
+      "measurement_structure": "Pointwise time-series formant files are publicly available; vowels_ait.txt, vowels_aut.txt and vowels_out.txt contain measured-time columns and 30 indexed samples per labeled token in the inspected ai file.",
+      "normalization": "Raw Hz formant values are present in the tutorial text files; the tutorial demonstrates subsequent analysis/plotting in R.",
+      "measured_time_series_exists_in_study": true,
+      "numeric_series_publicly_recovered": true,
+      "numeric_summary_publicly_recovered": true,
+      "canvas_use_status": "not_usable",
+      "current_canvas_use": "None. Retained only as a public example of Zhang's time-series extraction/data format.",
+      "blocker": "The tutorial recording/design does not match the dissertation Japanese experiment: it uses ai/au/ou in one public vowels.wav/TextGrid with t1-t4 labels rather than ae/ai/au across word-final/list-final/IP-final conditions and a documented Japanese speaker cohort.",
+      "checked_locations": ["repository README", "tutorial.Rmd", "data/vowel/vowels_ait.txt", "data/vowel directory", "recordings/vowels/vowels.TextGrid", "repository GPL-3.0 license text"],
+      "notes": "This is useful for reproducible extraction-format research but must not be promoted as a normative Japanese VV trajectory or as Zhang (2022) dissertation data without independent provenance establishing that identity."
     },
     {
       "id": "sun_hayashi2025",
