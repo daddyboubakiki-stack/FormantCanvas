@@ -1,24 +1,15 @@
 window.ArticulationLab = window.ArticulationLab || {};
 (function (NS) {
   function $(sel) { return document.querySelector(sel); }
-  const store = NS.createStateStore();
+  const store = NS.createStateStore({ f0Hz: NS.VOICE_PROFILES.child.defaultF0 });
   const engine = NS.createFormantEngine();
-  const renderer = NS.createSimpleRenderer();
-  const presets = NS.VOWEL_PRESETS.presets;
-
-  function nearestPreset(state) {
-    let best = null;
-    for (const [id, p] of Object.entries(presets)) {
-      const a = p.articulation;
-      const d = Math.hypot(
-        (state.tongueBodyFrontBack - a.tongueBodyFrontBack) * 1.05,
-        state.tongueBodyHeight - a.tongueBodyHeight,
-        (state.lipRounding - a.lipRounding) * 0.55
-      );
-      if (!best || d < best.distance) best = { id, distance: d, preset: p };
-    }
-    return best;
-  }
+  const mouthRenderer = NS.createSimpleRenderer();
+  const vowelMap = NS.createVowelMap();
+  const langs = NS.VOWEL_PRESETS.languages;
+  let playMode = 'buttons';
+  let languageMode = 'both';
+  let voiceProfileId = 'child';
+  let morphFrame = null;
 
   function updateState(partial) {
     const clean = NS.ConstraintMapper.sanitize(partial);
@@ -26,43 +17,123 @@ window.ArticulationLab = window.ArticulationLab || {};
     store.setState(next);
   }
 
-  function activatePreset(id) {
-    const preset = presets[id];
-    if (!preset) return;
-    updateState(preset.articulation);
+  function animateTo(articulation, duration = 230) {
+    if (morphFrame) cancelAnimationFrame(morphFrame);
+    const from = store.getState();
+    const target = NS.ConstraintMapper.derive({ ...from, ...NS.ConstraintMapper.sanitize(articulation) });
+    const keys = ['tongueBodyFrontBack','tongueBodyHeight','lipRounding','jawOpening'];
+    const start = performance.now();
+    function tick(now) {
+      const raw = Math.min(1, (now - start) / duration);
+      const t = 1 - Math.pow(1 - raw, 3);
+      const patch = {};
+      keys.forEach(k => patch[k] = from[k] + (target[k] - from[k]) * t);
+      updateState(patch);
+      if (raw < 1) morphFrame = requestAnimationFrame(tick);
+      else morphFrame = null;
+    }
+    morphFrame = requestAnimationFrame(tick);
   }
 
-  function init() {
-    renderer.mount($('#mouthMount'), updateState);
+  function playPreset(langId, id, preset) {
+    if (playMode !== 'buttons') return;
+    const current = store.getState();
+    vowelMap.setSelected(langId, id);
+    vowelMap.pulse(langId, id);
+    $('#selectedVowel').textContent = `${langs[langId].label} ${preset.label} · ${preset.name}`;
+    animateTo(preset.articulation, 220);
+    engine.setVoiceProfile(voiceProfileId);
+    const ok = engine.playBurst(current, 500);
+    if (!ok) $('#status').textContent = 'Web Audio API is unavailable here; the tongue animation still works.';
+    else $('#status').textContent = `${langs[langId].label} ${preset.label} — short vowel burst.`;
+  }
 
-    const presetArea = $('#presetButtons');
-    Object.entries(presets).forEach(([id, p]) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'vowel-btn';
-      btn.dataset.preset = id;
-      btn.innerHTML = `<span>${p.label}</span><small>${p.name}</small>`;
-      btn.addEventListener('click', () => activatePreset(id));
-      presetArea.appendChild(btn);
+  function applyMode(mode) {
+    playMode = mode === 'synth' ? 'synth' : 'buttons';
+    if (playMode === 'buttons') {
+      engine.stop();
+      updateState({ voicing: false });
+      mouthRenderer.setInteractive(false);
+      $('#modeTitle').textContent = 'Vowel Buttons';
+      $('#modeDescription').textContent = 'Tap an IPA button: the tongue moves and the vowel sounds for about 0.5 seconds.';
+      $('#dragHint').textContent = 'The tongue will move when you tap a vowel button.';
+      $('#status').textContent = 'Tap a vowel button to hear it.';
+      if ($('#selectedVowel').textContent === 'Free articulation') $('#selectedVowel').textContent = 'Choose a vowel below';
+    } else {
+      engine.stop();
+      updateState({ voicing: false });
+      mouthRenderer.setInteractive(true);
+      vowelMap.setSelected(null, null);
+      $('#selectedVowel').textContent = 'Free articulation';
+      $('#modeTitle').textContent = 'Mouth Synth';
+      $('#modeDescription').textContent = 'Turn the voice on and drag the tongue continuously like an instrument.';
+      $('#dragHint').textContent = 'VOICE ON → drag the purple tongue handle continuously.';
+      $('#status').textContent = 'Press VOICE ON, then play the mouth.';
+    }
+    document.body.dataset.playMode = playMode;
+    document.querySelectorAll('[data-play-mode]').forEach(b => b.classList.toggle('selected', b.dataset.playMode === playMode));
+  }
+
+  function initVoiceOptions() {
+    const select = $('#voiceProfile');
+    Object.values(NS.VOICE_PROFILES).forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${p.emoji} ${p.label}`;
+      select.appendChild(opt);
     });
+    select.value = voiceProfileId;
+    select.addEventListener('change', () => {
+      voiceProfileId = select.value;
+      const p = NS.VOICE_PROFILES[voiceProfileId];
+      engine.setVoiceProfile(voiceProfileId);
+      updateState({ f0Hz: p.defaultF0 });
+      $('#voiceHint').textContent = `${p.label}: ${p.defaultF0} Hz base · voice-rendering preset`;
+    });
+  }
+
+  function initControls() {
+    document.querySelectorAll('[data-play-mode]').forEach(btn => btn.addEventListener('click', () => applyMode(btn.dataset.playMode)));
+    document.querySelectorAll('[data-language-mode]').forEach(btn => btn.addEventListener('click', () => {
+      languageMode = btn.dataset.languageMode;
+      vowelMap.setLanguageMode(languageMode);
+      document.querySelectorAll('[data-language-mode]').forEach(b => b.classList.toggle('selected', b === btn));
+    }));
 
     $('#voiceButton').addEventListener('click', () => {
+      if (playMode !== 'synth') return;
       const state = store.getState();
       if (engine.isRunning()) {
         engine.stop();
         updateState({ voicing: false });
       } else {
+        engine.setVoiceProfile(voiceProfileId);
         const ok = engine.start(state);
         if (ok) updateState({ voicing: true });
         else $('#status').textContent = 'Web Audio API is unavailable here; visual controls still work.';
       }
     });
 
-    $('#lipRounding').addEventListener('input', ev => updateState({ lipRounding: Number(ev.target.value) }));
+    $('#lipRounding').addEventListener('input', ev => {
+      if (playMode !== 'synth') return;
+      updateState({ lipRounding: Number(ev.target.value) });
+    });
     $('#f0').addEventListener('input', ev => updateState({ f0Hz: Number(ev.target.value) }));
+  }
+
+  function init() {
+    mouthRenderer.mount($('#mouthMount'), partial => {
+      if (playMode !== 'synth') return;
+      updateState(partial);
+      $('#selectedVowel').textContent = 'Free articulation';
+    });
+    vowelMap.mount($('#vowelMapMount'), playPreset);
+    vowelMap.setLanguageMode(languageMode);
+    initVoiceOptions();
+    initControls();
 
     store.subscribe(state => {
-      renderer.render(state);
+      mouthRenderer.render(state);
       engine.setArticulation(state);
       const est = engine.getAcousticEstimate(state);
       $('#f1Value').textContent = `${Math.round(est.f1Hz)} Hz`;
@@ -73,16 +144,16 @@ window.ArticulationLab = window.ArticulationLab || {};
       $('#f0').value = state.f0Hz;
       $('#voiceButton').textContent = state.voicing ? 'VOICE OFF' : 'VOICE ON';
       $('#voiceButton').classList.toggle('active', state.voicing);
-      const near = nearestPreset(state);
-      $('#nearest').textContent = `closest ${near.preset.label}`;
-      $('#status').textContent = state.voicing
-        ? 'Voicing on — drag the tongue and listen to the vowel color change.'
-        : 'Press VOICE ON, then drag the tongue.';
-      document.querySelectorAll('.vowel-btn').forEach(btn => btn.classList.toggle('selected', btn.dataset.preset === near.id && near.distance < 0.13));
+      if (playMode === 'synth') {
+        $('#status').textContent = state.voicing
+          ? `${NS.VOICE_PROFILES[voiceProfileId].label} voice on — drag the tongue continuously.`
+          : 'Press VOICE ON, then play the mouth.';
+      }
     });
 
+    $('#voiceHint').textContent = `Child: ${NS.VOICE_PROFILES.child.defaultF0} Hz base · voice-rendering preset`;
+    applyMode('buttons');
     window.addEventListener('pagehide', () => engine.stop(), { once: true });
-    activatePreset('schwa');
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
