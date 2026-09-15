@@ -3,6 +3,7 @@ window.ArticulationLab = window.ArticulationLab || {};
   function $(sel) { return document.querySelector(sel); }
   const store = NS.createStateStore({ f0Hz: NS.VOICE_PROFILES.child.defaultF0 });
   const engine = NS.createFormantEngine();
+  const samplePlayer = NS.createSamplePlayer();
   const mouthRenderer = NS.createSimpleRenderer();
   const vowelMap = NS.createVowelMap();
   const langs = NS.VOWEL_PRESETS.languages;
@@ -15,6 +16,16 @@ window.ArticulationLab = window.ArticulationLab || {};
     const clean = NS.ConstraintMapper.sanitize(partial);
     const next = NS.ConstraintMapper.derive({ ...store.getState(), ...clean });
     store.setState(next);
+  }
+
+  function allRealAudioUrls() {
+    const urls = [];
+    Object.values(langs).forEach(lang => {
+      Object.values(lang.vowels).forEach(vowel => {
+        if (vowel.realAudio) urls.push(vowel.realAudio);
+      });
+    });
+    return urls;
   }
 
   function animateTo(articulation, duration = 230) {
@@ -35,39 +46,52 @@ window.ArticulationLab = window.ArticulationLab || {};
     morphFrame = requestAnimationFrame(tick);
   }
 
-  function playPreset(langId, id, preset) {
+  async function playPreset(langId, id, preset) {
     if (playMode !== 'buttons') return;
     const current = store.getState();
     const target = NS.ConstraintMapper.derive({ ...current, ...NS.ConstraintMapper.sanitize(preset.articulation) });
+    const lang = langs[langId];
     vowelMap.setSelected(langId, id);
     vowelMap.pulse(langId, id);
-    $('#selectedVowel').textContent = `${langs[langId].label} ${preset.label} · ${preset.name}`;
+    $('#selectedVowel').textContent = `${lang.label} ${preset.label} · ${preset.name}`;
     animateTo(preset.articulation, 220);
+    engine.stop();
+
+    if (preset.realAudio) {
+      const ok = await samplePlayer.play(preset.realAudio, { gain: 0.92, attackSeconds: 0.014, releaseSeconds: 0.035 });
+      if (playMode !== 'buttons') return;
+      if (ok) {
+        const audioSet = lang.audioSet;
+        $('#recordingHint').textContent = `${audioSet.label} · ${audioSet.license}`;
+        $('#status').textContent = `${lang.label} ${preset.label} — human recording.`;
+        return;
+      }
+    }
+
     engine.setVoiceProfile(voiceProfileId);
     const ok = engine.playBurst(target, 500);
-    if (!ok) $('#status').textContent = 'Web Audio API is unavailable here; the tongue animation still works.';
-    else $('#status').textContent = `${langs[langId].label} ${preset.label} — short vowel burst.`;
+    if (!ok) $('#status').textContent = 'Audio playback is unavailable here; the tongue animation still works.';
+    else $('#status').textContent = `${lang.label} ${preset.label} — synth fallback (recording unavailable).`;
   }
 
   function applyMode(mode) {
     playMode = mode === 'synth' ? 'synth' : 'buttons';
+    samplePlayer.stop();
+    engine.stop();
+    updateState({ voicing: false });
     if (playMode === 'buttons') {
-      engine.stop();
-      updateState({ voicing: false });
       mouthRenderer.setInteractive(false);
       $('#modeTitle').textContent = 'Vowel Buttons';
-      $('#modeDescription').textContent = 'Tap an IPA button: the tongue moves and the vowel sounds for about 0.5 seconds.';
-      $('#dragHint').textContent = 'The tongue will move when you tap a vowel button.';
-      $('#status').textContent = 'Tap a vowel button to hear it.';
+      $('#modeDescription').textContent = 'Tap an IPA button: hear a short human recording while the modeled tongue moves into position.';
+      $('#dragHint').textContent = 'The mouth is a teaching model; the sound is a real human recording when available.';
+      $('#status').textContent = 'Tap a vowel button to hear a human recording.';
       if ($('#selectedVowel').textContent === 'Free articulation') $('#selectedVowel').textContent = 'Choose a vowel below';
     } else {
-      engine.stop();
-      updateState({ voicing: false });
       mouthRenderer.setInteractive(true);
       vowelMap.setSelected(null, null);
       $('#selectedVowel').textContent = 'Free articulation';
       $('#modeTitle').textContent = 'Mouth Synth';
-      $('#modeDescription').textContent = 'Turn the voice on and drag the tongue continuously like an instrument.';
+      $('#modeDescription').textContent = 'Turn the synthetic voice on and drag the tongue continuously like an instrument.';
       $('#dragHint').textContent = 'VOICE ON → drag the purple tongue handle continuously.';
       $('#status').textContent = 'Press VOICE ON, then play the mouth.';
     }
@@ -89,7 +113,7 @@ window.ArticulationLab = window.ArticulationLab || {};
       const p = NS.VOICE_PROFILES[voiceProfileId];
       engine.setVoiceProfile(voiceProfileId);
       updateState({ f0Hz: p.defaultF0 });
-      $('#voiceHint').textContent = `${p.label}: ${p.defaultF0} Hz base · voice-rendering preset`;
+      $('#voiceHint').textContent = `${p.label}: ${p.defaultF0} Hz base · synth rendering preset`;
     });
   }
 
@@ -119,7 +143,10 @@ window.ArticulationLab = window.ArticulationLab || {};
       if (playMode !== 'synth') return;
       updateState({ lipRounding: Number(ev.target.value) });
     });
-    $('#f0').addEventListener('input', ev => updateState({ f0Hz: Number(ev.target.value) }));
+    $('#f0').addEventListener('input', ev => {
+      if (playMode !== 'synth') return;
+      updateState({ f0Hz: Number(ev.target.value) });
+    });
   }
 
   function init() {
@@ -147,14 +174,19 @@ window.ArticulationLab = window.ArticulationLab || {};
       $('#voiceButton').classList.toggle('active', state.voicing);
       if (playMode === 'synth') {
         $('#status').textContent = state.voicing
-          ? `${NS.VOICE_PROFILES[voiceProfileId].label} voice on — drag the tongue continuously.`
+          ? `${NS.VOICE_PROFILES[voiceProfileId].label} synth voice on — drag the tongue continuously.`
           : 'Press VOICE ON, then play the mouth.';
       }
     });
 
-    $('#voiceHint').textContent = `Child: ${NS.VOICE_PROFILES.child.defaultF0} Hz base · voice-rendering preset`;
+    $('#voiceHint').textContent = `Child: ${NS.VOICE_PROFILES.child.defaultF0} Hz base · synth rendering preset`;
+    $('#recordingHint').textContent = 'Japanese: language-specific PD recording · English buttons: CC0 human IPA reference';
+    samplePlayer.preload(allRealAudioUrls());
     applyMode('buttons');
-    window.addEventListener('pagehide', () => engine.stop(), { once: true });
+    window.addEventListener('pagehide', () => {
+      samplePlayer.stop();
+      engine.stop();
+    }, { once: true });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
