@@ -1,10 +1,19 @@
 window.ArticulationLab = window.ArticulationLab || {};
 (function (NS) {
+  // Internal build compatibility label: Articulation Lab v0.5-alpha.19.
   NS.createVowelMap = function createVowelMap() {
     let container = null;
     let languageMode = 'both';
     let selectedKey = null;
     let onPreset = null;
+
+    function setButtonSelection(layer, key) {
+      layer.querySelectorAll('.vowel-map-btn').forEach(btn => {
+        const isSelected = btn.dataset.key === key;
+        btn.classList.toggle('selected', isSelected);
+        btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+      });
+    }
 
     function targetForPreset(preset) {
       const id = preset.articulationTargetId;
@@ -55,6 +64,7 @@ window.ArticulationLab = window.ArticulationLab || {};
           btn.className = `vowel-map-btn map-${langId}`;
           btn.dataset.key = key;
           btn.setAttribute('aria-label', `${lang.label} ${preset.label} ${preset.name}`);
+          btn.setAttribute('aria-pressed', key === selectedKey ? 'true' : 'false');
           const nudge = languageMode === 'both' ? (langId === 'english' ? -8 : 8) : 0;
           btn.style.left = `${((p.x + nudge) / 460) * 100}%`;
           btn.style.top = `${(p.y / 300) * 100}%`;
@@ -62,7 +72,7 @@ window.ArticulationLab = window.ArticulationLab || {};
           btn.classList.toggle('selected', key === selectedKey);
           btn.addEventListener('click', () => {
             selectedKey = key;
-            layer.querySelectorAll('.vowel-map-btn').forEach(b => b.classList.toggle('selected', b.dataset.key === key));
+            setButtonSelection(layer, key);
             if (onPreset) onPreset(langId, id, preset, btn);
           });
           layer.appendChild(btn);
@@ -81,7 +91,10 @@ window.ArticulationLab = window.ArticulationLab || {};
     }
     function setSelected(langId, id) {
       selectedKey = langId && id ? `${langId}:${id}` : null;
-      if (container) container.querySelectorAll('.vowel-map-btn').forEach(b => b.classList.toggle('selected', b.dataset.key === selectedKey));
+      if (container) {
+        const layer = container.querySelector('.vowel-button-layer');
+        if (layer) setButtonSelection(layer, selectedKey);
+      }
     }
     function pulse(langId, id) {
       if (!container) return;
