@@ -1,0 +1,114 @@
+name: Refine glossary citations
+
+on:
+  push:
+    branches: [feat/beginner-vowel-compare-ui]
+    paths:
+      - 'tools/refine_glossary_citations.py'
+      - '.github/workflows/refine-glossary-citations.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply citation formatting
+        run: python tools/refine_glossary_citations.py
+
+      - name: Validate JavaScript and citation structure
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path('index.html').read_text(encoding='utf-8')
+          assert 'GLOSSARY_SOURCE_DETAILS' in html
+          assert 'renderLearningReferences' in html
+          assert 'renderLearningSourceShort' in html
+          assert '出典・参考文献' in html
+          assert 'Kenstowicz, M. (2010).' in html
+          assert 'Tokuda, I. (2021).' in html
+          assert 'Boersma, P., Weenink, D., & Shchupak, A. (2026).' in html
+          assert 'Ling, S. J., Moebs, W., & Sanny, J. (2016).' in html
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,flags=re.S)
+          Path('/tmp/formantasia.js').write_text(scripts[-1],encoding='utf-8')
+          PY
+          node --check /tmp/formantasia.js
+
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+
+      - name: Browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1280,1000')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          driver=webdriver.Chrome(options=opts)
+          wait=WebDriverWait(driver,20)
+          try:
+              driver.get('http://127.0.0.1:8000/')
+              driver.find_element('id','learningModeBtn').click()
+
+              # Lower Q&A/learning card uses full bibliographic citations.
+              driver.find_element('css selector','[data-learn-topic="f1"]').click()
+              wait.until(lambda d: 'Kenstowicz, M. (2010).' in d.find_element('id','learningExplainSources').get_attribute('textContent'))
+              lower=driver.find_element('id','learningExplainSources')
+              lower_text=lower.get_attribute('textContent')
+              lower_links=lower.find_elements('css selector','a')
+              print('LOWER_REFERENCES',lower_text)
+              assert '出典・参考文献' in lower_text
+              assert 'MIT OpenCourseWare' in lower_text
+              assert len(lower_links)==2
+              assert all(x.get_attribute('href').startswith('http') for x in lower_links)
+
+              # Round info-button popover stays compact.
+              info=driver.find_element('css selector','.info-dot[data-learn-topic="f0"]')
+              info.click()
+              pop=driver.find_element('id','learningInfoPopover')
+              wait.until(lambda d: 'visible' in pop.get_attribute('class'))
+              pop_source=driver.find_element('css selector','#learningInfoPopover .learning-popover-source')
+              pop_text=pop_source.get_attribute('textContent')
+              print('POPOVER_SOURCES',pop_text)
+              assert 'Praat Manual' in pop_text
+              assert 'Tokuda (2021)' in pop_text
+              assert 'Oxford Research Encyclopedia of Linguistics' not in pop_text
+              assert len(pop_source.find_elements('css selector','a'))==2
+
+              # Praat glossary entry carries a full official-style software citation below.
+              driver.find_element('css selector','[data-learn-topic="praat"]').click()
+              wait.until(lambda d: 'Boersma, P., Weenink, D., & Shchupak, A. (2026).' in d.find_element('id','learningExplainSources').get_attribute('textContent'))
+
+              severe=[x for x in driver.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              print('FINAL_SEVERE_BROWSER_LOGS',severe)
+              assert not severe, severe
+              print('TWO_LEVEL_GLOSSARY_CITATIONS_OK')
+          finally:
+              driver.quit()
+          PY
+          cat /tmp/formantasia-server.log
+
+      - name: Commit generated index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No generated index changes.'
+          else
+            git commit -m 'Separate compact and full glossary citations'
+            git push
+          fi

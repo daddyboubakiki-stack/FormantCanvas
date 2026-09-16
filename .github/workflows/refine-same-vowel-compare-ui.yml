@@ -1,0 +1,108 @@
+name: Refine same-vowel compare UI
+
+on:
+  push:
+    branches: [feat/beginner-vowel-compare-ui]
+    paths:
+      - 'tools/refine_same_vowel_compare_ui.py'
+      - '.github/workflows/refine-same-vowel-compare-ui.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch unified comparison UI
+        run: python tools/refine_same_vowel_compare_ui.py
+      - name: Validate JavaScript syntax and structure
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path('index.html').read_text(encoding='utf-8')
+          assert 'Unified same-vowel condition row' in html
+          assert "compareChoiceCard(v,'持続'" in html
+          for label in ['単独語・短','単独語・長','文中・短','文中・長']:
+              assert label in html
+          assert 'Yazawa-Kondo same-vowel conditions live in the comparison row' in html
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,flags=re.S)
+          Path('/tmp/formantasia.js').write_text(scripts[-1],encoding='utf-8')
+          PY
+          node --check /tmp/formantasia.js
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+      - name: Browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          import math
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait, Select
+
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1280,1000')
+          opts.add_argument('--autoplay-policy=no-user-gesture-required')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          driver=webdriver.Chrome(options=opts)
+          wait=WebDriverWait(driver,20)
+          try:
+              driver.get('http://127.0.0.1:8000/')
+              wait.until(lambda d: len(d.find_elements('css selector','#vowelPreset option'))==5)
+              assert driver.find_element('id','beginnerCompareWrap').get_attribute('hidden') is not None
+
+              driver.find_element('id','learningModeBtn').click()
+              wait.until(lambda d: len(d.find_elements('css selector','#compareChoices .compare-choice'))==5)
+              assert not driver.find_element('id','beginnerCompareWrap').get_attribute('hidden')
+              labels=[x.text.split('\n')[0] for x in driver.find_elements('css selector','#compareChoices .compare-choice')]
+              print('LEARNING_CONDITION_LABELS',labels)
+              assert labels==['持続','単独語・短','単独語・長','文中・短','文中・長'], labels
+
+              Select(driver.find_element('id','vowelPreset')).select_by_value('a')
+              driver.execute_script("document.querySelector('#vowelPreset').dispatchEvent(new Event('change',{bubbles:true}))")
+              wait.until(lambda d: '「あ」' in d.execute_script("return document.querySelector('#compareTitle').textContent"))
+              sentence_long=driver.find_element('css selector','#compareChoices [data-compare-key="ja_yk2019_male_embedded_long_a"]')
+              sentence_long.click()
+              wait.until(lambda d: math.isclose(float(d.find_element('id','duration').get_attribute('value')),0.158,abs_tol=0.001))
+              print('SENTENCE_LONG_A_DURATION',driver.find_element('id','duration').get_attribute('value'))
+
+              driver.find_element('id','researchModeBtn').click()
+              wait.until(lambda d: len(d.find_elements('css selector','#vowelPreset option'))==13)
+              assert len(driver.find_elements('css selector','#vowelPreset option[value^="ja_yk2019_"]'))==0
+              assert len(driver.find_elements('css selector','#compareChoices .compare-choice'))==5
+              assert not driver.find_element('id','beginnerCompareWrap').get_attribute('hidden')
+
+              values=[o.get_attribute('value') for o in driver.find_elements('css selector','#vowelPreset option')]
+              for vv in ['ai','ae','au','ao','oi','ui','ei','ou']:
+                  assert vv in values
+
+              driver.find_element('id','casualModeBtn').click()
+              wait.until(lambda d: d.find_element('id','beginnerCompareWrap').get_attribute('hidden') is not None)
+
+              severe=[x for x in driver.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              print('FINAL_SEVERE_BROWSER_LOGS',severe)
+              assert not severe, severe
+              print('UNIFIED_COMPARE_SMOKE_OK')
+          finally:
+              driver.quit()
+          PY
+          cat /tmp/formantasia-server.log
+      - name: Commit generated index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No generated index changes.'
+          else
+            git commit -m 'Unify same-vowel comparisons across learning and research modes'
+            git push
+          fi

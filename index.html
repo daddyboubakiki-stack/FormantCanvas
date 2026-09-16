@@ -186,11 +186,64 @@
   .learning-explain h3 { margin:0 0 5px; font-size:14px; }
   .learning-explain p { margin:0; color:#4c5567; font-size:12px; line-height:1.65; }
   .learning-example { margin-top:7px!important; padding-top:7px; border-top:1px dashed #ccd4e0; color:#667085!important; }
-  .info-dot {
-    display:inline-grid; place-items:center; width:17px; height:17px; margin-left:4px; border-radius:50%;
-    border:1px solid #bdc7d7; color:#5a6780; background:#fff; font-size:10px; font-weight:900; cursor:pointer; vertical-align:middle;
+  /* Layered learning explanation v1 */
+  .learning-explain-block { margin-top:9px; }
+  .learning-explain-block:first-of-type { margin-top:7px; }
+  .learning-explain-label {
+    display:inline-flex; align-items:center; margin-bottom:4px; padding:3px 7px;
+    border-radius:999px; background:#e9eef8; color:#43516a; font-size:9.5px; font-weight:900;
   }
-  .info-dot:hover { background:#eef3fa; }
+  .learning-explain-block.try .learning-explain-label { background:#edf8f3; color:#35624e; }
+  .learning-explain-block.precise .learning-explain-label { background:#f3f0fa; color:#5b4d75; }
+  .learning-explain-block.try { padding:9px 10px; border-radius:11px; background:#fbfdfc; border:1px solid #e1eee7; }
+  .learning-explain-block.precise { padding-top:9px; border-top:1px dashed #ccd4e0; }
+  .learning-explain-block.precise p { color:#5a6475; }
+  .learning-popover-kicker {
+    display:inline-block; margin:7px 0 3px; padding:2px 6px; border-radius:999px;
+    background:#eef2f8; color:#657087; font-size:9px; font-weight:900;
+  }
+  .learning-popover-title + .learning-popover-kicker { margin-top:2px; }
+  .learning-popover-example { margin-top:0!important; padding-top:0!important; border-top:0!important; }
+
+  /* Sourced learning glossary v1 */
+  .learning-source { margin-top:10px; padding-top:9px; border-top:1px solid #e1e6ef; color:#667085; font-size:10.5px; line-height:1.58; }
+  .learning-source-heading { display:block; margin-bottom:5px; color:#4d576b; font-size:10.5px; font-weight:900; }
+  .learning-source-list { margin:0; padding-left:18px; }
+  .learning-source-list li { margin:4px 0; padding-left:1px; }
+  .learning-source a, .learning-popover-source a { color:#315fc4; text-decoration:none; font-weight:700; }
+  .learning-source a:hover, .learning-popover-source a:hover { text-decoration:underline; }
+  .learning-source-sep { margin:0 4px; color:#a0a7b4; }
+  .learning-citation-note { margin-top:5px!important; color:#9299a7!important; font-size:9.5px!important; line-height:1.45!important; }
+  .info-dot {
+    display:inline-grid; place-items:center; width:27px; height:27px; min-width:27px; min-height:27px;
+    margin:-5px 0 -5px 5px; padding:0; border-radius:50%; border:1px solid #aebbd0;
+    color:#465673; background:#fff; font-size:13px; line-height:1; font-weight:900; cursor:pointer;
+    vertical-align:middle; box-shadow:0 2px 7px rgba(36,54,88,.10); transform:none!important;
+  }
+  .info-dot:hover { background:#eef3fa; border-color:#8fa1be; box-shadow:0 4px 10px rgba(36,54,88,.14); }
+  .info-dot:focus-visible { outline:3px solid rgba(79,140,255,.28); outline-offset:2px; }
+  .info-dot[aria-expanded="true"] { background:#e7eefb; border-color:#7f94b8; color:#253b61; }
+
+  .learning-popover {
+    position:fixed; z-index:120; width:min(320px,calc(100vw - 24px)); padding:12px 14px;
+    border:1px solid #d5ddeb; border-radius:15px; background:rgba(255,255,255,.98);
+    box-shadow:0 16px 42px rgba(28,42,71,.18); backdrop-filter:blur(12px);
+    opacity:0; transform:translateY(5px) scale(.985); pointer-events:none;
+    transition:opacity .22s ease, transform .22s ease; color:var(--text);
+  }
+  .learning-popover.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .learning-popover-title { display:block; margin:0 0 5px; font-size:13px; }
+  .learning-popover-text, .learning-popover-example { margin:0; font-size:11.5px; line-height:1.6; color:#515c70; }
+  .learning-popover-example { margin-top:7px; padding-top:7px; border-top:1px dashed #d2d9e5; color:#687489; }
+  .learning-popover-source { margin-top:8px; padding-top:7px; border-top:1px solid #e1e6ef; color:#7b8495; font-size:9.8px; line-height:1.5; }
+  .learning-popover-deep {
+    margin-top:9px; padding:6px 9px; border-radius:10px; border:1px solid #d8e0ed;
+    background:#f7f9fc; color:#44516a; font-size:10.5px; font-weight:800; box-shadow:none;
+  }
+  .learning-popover-deep:hover { background:#eef3fa; transform:none; box-shadow:none; }
+  @media (prefers-reduced-motion: reduce) {
+    .learning-popover { transition:none; }
+  }
 
   .provenance-card { margin:12px 0; padding:14px 16px; background:#fff; border:1px solid var(--border); border-radius:18px; box-shadow:0 10px 35px rgba(30,42,75,.05); }
   .prov-head { display:flex; align-items:center; flex-wrap:wrap; gap:9px; margin-bottom:8px; }
@@ -245,6 +298,46 @@
     .evidence-table th:nth-child(2), .evidence-table td:nth-child(2) { width:auto; }
     .evidence-table th, .evidence-table td { padding:7px 8px; }
     .evidence-table td:first-child { width:28%; }
+  }
+
+  /* Beginner vowel comparison experiment */
+  /* Unified same-vowel condition row */
+  .beginner-compare { margin:10px 0 14px; }
+  .compare-launch { display:none; }
+  .compare-toggle {
+    border:1px solid #d8dff0; background:#fff; color:var(--text); border-radius:999px;
+    padding:9px 15px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(34,53,94,.08);
+  }
+  .compare-toggle:hover { transform:translateY(-1px); }
+  .compare-panel {
+    margin-top:9px; border:1px solid #dfe5f2; background:linear-gradient(180deg,#fff,#f8faff);
+    border-radius:18px; padding:14px; box-shadow:0 8px 24px rgba(34,53,94,.08);
+  }
+  .compare-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:10px; }
+  .compare-head strong { font-size:15px; }
+  .compare-head p { margin:3px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+  .compare-tabs { display:none; }
+  .compare-tab { border:1px solid #d8dff0; background:#fff; border-radius:999px; padding:7px 11px; font-weight:800; cursor:pointer; }
+  .compare-tab.active { background:#202b45; border-color:#202b45; color:#fff; }
+  .compare-intro { margin:0 0 10px; font-size:12px; line-height:1.65; color:#505b72; }
+  .compare-choices { display:grid; grid-template-columns:repeat(5,minmax(118px,1fr)); gap:8px; overflow-x:auto; padding-bottom:3px; }
+  .compare-choice {
+    text-align:left; border:1px solid #dce3f1; background:#fff; border-radius:14px; padding:11px;
+    cursor:pointer; min-height:82px; display:flex; flex-direction:column; gap:6px; justify-content:center;
+  }
+  .compare-choice:hover { border-color:#aebbd8; transform:translateY(-1px); }
+  .compare-choice.active { outline:2px solid #6a7fae; border-color:#6a7fae; background:#f6f8ff; }
+  .compare-choice .kicker { font-size:10px; font-weight:900; color:#778198; letter-spacing:.03em; }
+  .compare-choice strong { font-size:14px; }
+  .compare-choice .desc { display:none; }
+  .compare-choice .metric { font-size:11px; font-weight:800; color:#34415f; }
+  .compare-choice .listen { font-size:11px; font-weight:900; color:#536b9e; }
+  .compare-note { margin:9px 0 0; font-size:10.5px; line-height:1.55; color:#7a8497; }
+  body[data-ui-mode="research"] .beginner-compare { display:block; }
+
+  @media (max-width: 720px) {
+    .compare-choices { grid-template-columns:repeat(5,minmax(118px,1fr)); }
+    .compare-choice { min-height:76px; }
   }
 
   @media (max-width: 820px) {
@@ -335,6 +428,27 @@
     </div>
   </div>
 
+  <section class="beginner-compare" id="beginnerCompareWrap" hidden aria-label="同じ母音のくらべ聴き">
+    <div class="compare-launch">
+      <button class="compare-toggle" id="compareToggleBtn" type="button" aria-expanded="false">🔬 同じ母音をくらべてみる</button>
+    </div>
+    <div class="compare-panel" id="comparePanel" hidden>
+      <div class="compare-head">
+        <div>
+          <strong id="compareTitle">同じ母音をくらべてみよう</strong>
+          <p>同じ母音を、条件だけ変えてワンタップで比較できます。</p>
+        </div>
+      </div>
+      <div class="compare-tabs" role="group" aria-label="比較テーマ">
+        <button class="compare-tab active" type="button" data-compare-theme="context">どこで言う？</button>
+        <button class="compare-tab" type="button" data-compare-theme="length">短い？長い？</button>
+      </div>
+      <p class="compare-intro" id="compareIntro"></p>
+      <div class="compare-choices" id="compareChoices"></div>
+      <p class="compare-note">※ 小さい差は耳だけでは分かりにくいことがあります。必要ならグラフと実測durationも一緒に確認できます。</p>
+    </div>
+  </section>
+
   <div class="canvas-card">
     <div class="canvas-top">
       <div class="legend" aria-label="Formant and evidence legend">
@@ -361,7 +475,7 @@
       <input id="duration" type="range" min="0.04" max="8" step="0.001" value="0.600" />
     </div>
     <div class="setting">
-      <label><span><span class="casual-only">声の高さ</span><span class="learning-plus">基本周波数 F0 <span class="info-dot learning-only" tabindex="0" role="button" data-learn-topic="f0" aria-label="F0の説明">i</span></span></span><strong id="f0Value">140 Hz</strong></label>
+      <label><span><span class="casual-only">声の高さ</span><span class="learning-plus">基本周波数 F0 <button class="info-dot learning-only" type="button" data-learn-topic="f0" aria-label="F0を変えるとどうなる？" aria-expanded="false">i</button></span></span><strong id="f0Value">140 Hz</strong></label>
       <input id="f0" type="range" min="70" max="500" step="1" value="140" />
     </div>
     <div class="setting research-only">
@@ -369,7 +483,7 @@
       <input id="maxHz" type="range" min="2500" max="6000" step="250" value="4000" />
     </div>
     <div class="setting learning-plus">
-      <label><span>帯域幅モード <span class="info-dot learning-only" tabindex="0" role="button" data-learn-topic="bandwidth" aria-label="帯域幅の説明">i</span></span><strong id="bandwidthModeValue">Empirical</strong></label>
+      <label><span>帯域幅モード <button class="info-dot learning-only" type="button" data-learn-topic="bandwidth" aria-label="帯域幅モードを変えるとどうなる？" aria-expanded="false">i</button></span><strong id="bandwidthModeValue">Empirical</strong></label>
       <select id="bandwidthMode">
         <option value="empirical">Empirical bandwidth</option>
         <option value="manual">Manual Q</option>
@@ -377,7 +491,7 @@
       <div class="setting-note" id="bandwidthInfo">日本語成人男性ではMokhtari–Tanaka (2000) のB1–B3平均を使用。</div>
     </div>
     <div class="setting learning-plus">
-      <label><span>Manual Q <span class="info-dot learning-only" tabindex="0" role="button" data-learn-topic="q" aria-label="Qの説明">i</span></span><strong id="qValue">Q 10</strong></label>
+      <label><span>Manual Q <button class="info-dot learning-only" type="button" data-learn-topic="q" aria-label="Qを変えるとどうなる？" aria-expanded="false">i</button></span><strong id="qValue">Q 10</strong></label>
       <input id="q" type="range" min="2" max="25" step="1" value="10" />
       <div class="setting-note">Empirical bandwidth時は無効。Qは各時点で F/B から自動計算。</div>
     </div>
@@ -404,7 +518,7 @@
     <div class="learning-head">
       <div>
         <strong>📘 触ってわかる音声学</strong>
-        <p>用語を選ぶと短い説明が出ます。大きなQ&amp;Aは仕様が固まってから追加予定。</p>
+        <p>まずひとことでつかんで、触って確かめて、必要なら少し正確に。</p>
       </div>
       <span class="learning-preset-badge" id="learningPresetBadge">文献値を読み込み中…</span>
     </div>
@@ -413,14 +527,33 @@
       <button class="learning-topic active" type="button" data-learn-topic="f1">F1</button>
       <button class="learning-topic" type="button" data-learn-topic="f2">F2</button>
       <button class="learning-topic" type="button" data-learn-topic="f3">F3</button>
+      <button class="learning-topic" type="button" data-learn-topic="formant">フォルマント</button>
+      <button class="learning-topic" type="button" data-learn-topic="resonance">共鳴</button>
+      <button class="learning-topic" type="button" data-learn-topic="hz">Hz</button>
+      <button class="learning-topic" type="button" data-learn-topic="spectrogram">スペクトログラム</button>
+      <button class="learning-topic" type="button" data-learn-topic="sourcefilter">音源–フィルタ</button>
+      <button class="learning-topic" type="button" data-learn-topic="praat">Praat</button>
       <button class="learning-topic" type="button" data-learn-topic="bandwidth">Bandwidth</button>
       <button class="learning-topic" type="button" data-learn-topic="q">Q</button>
+      <button class="learning-topic" type="button" data-learn-topic="empirical">Empirical</button>
       <button class="learning-topic" type="button" data-learn-topic="evidence">● △ ┄</button>
     </div>
     <div class="learning-explain" aria-live="polite">
       <h3 id="learningExplainTitle">F1（第1フォルマント）</h3>
-      <p id="learningExplainText">声道の1番目の大きな共鳴です。</p>
-      <p class="learning-example" id="learningExplainExample">線を上下に動かして、音の変化を聴いてみよう。</p>
+      <div class="learning-explain-block one">
+        <span class="learning-explain-label">ひとことで</span>
+        <p id="learningExplainText">母音の「口の開き」に強く関わる、いちばん低いフォルマントです。</p>
+      </div>
+      <div class="learning-explain-block try">
+        <span class="learning-explain-label">触ってみよう</span>
+        <p id="learningExplainExample">F1の線だけ上下に動かして、聞こえ方を比べてみよう。</p>
+      </div>
+      <div class="learning-explain-block precise">
+        <span class="learning-explain-label">もう少し正確に</span>
+        <p id="learningExplainPrecise">F1は第1フォルマントの中心周波数です。母音の高さと強く関係しますが、舌の位置だけで一対一に決まる値ではありません。</p>
+      </div>
+      <div class="learning-source" id="learningExplainSources" aria-label="この用語の出典"></div>
+      <p class="learning-citation-note">本文は出典を踏まえたFormantasiaによる要約です。原文の直接引用ではありません。</p>
     </div>
   </section>
 
@@ -565,13 +698,24 @@
   const casualModeBtn = document.getElementById('casualModeBtn');
   const learningModeBtn = document.getElementById('learningModeBtn');
   const researchModeBtn = document.getElementById('researchModeBtn');
+  const beginnerCompareWrap = document.getElementById('beginnerCompareWrap');
+  const compareToggleBtn = document.getElementById('compareToggleBtn');
+  const comparePanel = document.getElementById('comparePanel');
+  const compareTitle = document.getElementById('compareTitle');
+  const compareIntro = document.getElementById('compareIntro');
+  const compareChoices = document.getElementById('compareChoices');
   const learningCard = document.getElementById('learningCard');
   const learningPresetBadge = document.getElementById('learningPresetBadge');
   const learningExplainTitle = document.getElementById('learningExplainTitle');
   const learningExplainText = document.getElementById('learningExplainText');
   const learningExplainExample = document.getElementById('learningExplainExample');
+  const learningExplainPrecise = document.getElementById('learningExplainPrecise');
   let learningTopic = 'f1';
   let uiMode = 'casual';
+  let compareTheme = 'context';
+  let compareOpen = false;
+  let compareBaseVowel = 'a';
+  let compareCurrentKey = null;
 
   function duration() { return Number(durationEl.value); }
   function maxHz() { return Number(maxHzEl.value); }
@@ -831,6 +975,7 @@
       YK2019_DATA=data;
       YK2019_PRESETS=new Map(data.presets.map(p=>[p.id,p]));
       if(presetLanguageEl.value==='ja') buildPresetOptions(vowelPresetEl.value);
+      updateBeginnerCompareVisibility();
     }catch(err){
       console.warn('Yazawa–Kondo presets could not be loaded:',err);
     }
@@ -860,35 +1005,89 @@
       const translated=ykMatchingPreset(oldYk,voiceTypeEl.value);
       if(translated) desired=translated.id;
     }
+    if(lang==='ja' && oldYk) desired=oldYk.vowel;
     vowelPresetEl.innerHTML='';
     const mono=document.createElement('optgroup');
     mono.label=lang==='ja'?'持続母音（Kasuya 1968）':'単母音';
     data.mono.forEach(([value,label])=>{ const o=document.createElement('option'); o.value=value; o.textContent=label; mono.appendChild(o); });
     const diph=document.createElement('optgroup'); diph.label=lang==='ja'?'母音連続 (VV)':'二重母音';
     data.diph.forEach(([value,label])=>{ const o=document.createElement('option'); o.value=value; o.textContent=label; diph.appendChild(o); });
-    vowelPresetEl.append(mono,diph);
-    const all=[...data.mono,...data.diph].map(x=>x[0]);
+    const researchJapanese=lang==='ja' && uiMode==='research';
+    if(lang==='ja' && !researchJapanese) vowelPresetEl.append(mono);
+    else vowelPresetEl.append(mono,diph);
+    const all=(lang==='ja' && !researchJapanese ? data.mono : [...data.mono,...data.diph]).map(x=>x[0]);
 
-    if(lang==='ja' && YK2019_DATA && ['male','female'].includes(voiceTypeEl.value)){
-      const groupSpecs=[
-        ['isolated_word','short','単独語・短（Yazawa–Kondo）'],
-        ['isolated_word','long','単独語・長（Yazawa–Kondo）'],
-        ['carrier_sentence','short','文中・短（Yazawa–Kondo）'],
-        ['carrier_sentence','long','文中・長（Yazawa–Kondo）']
-      ];
-      const vowelOrder={i:0,e:1,a:2,o:3,u:4};
-      for(const [context,length,label] of groupSpecs){
-        const group=document.createElement('optgroup'); group.label=label;
-        const presets=YK2019_DATA.presets
-          .filter(p=>p.sex===voiceTypeEl.value && p.context_label===context && p.length===length)
-          .sort((a,b)=>vowelOrder[a.vowel]-vowelOrder[b.vowel]);
-        presets.forEach(p=>{
-          const o=document.createElement('option'); o.value=p.id; o.textContent=ykOptionLabel(p); group.appendChild(o); all.push(p.id);
-        });
-        vowelPresetEl.appendChild(group);
-      }
-    }
+    // Yazawa-Kondo same-vowel conditions live in the comparison row, not the dropdown.
     vowelPresetEl.value=all.includes(desired)?desired:data.mono[0][0];
+  }
+
+  const BASIC_JA_VOWELS=['i','e','a','o','u'];
+  const BASIC_JA_KANA={i:'い',e:'え',a:'あ',o:'お',u:'う'};
+
+  function compareYkPreset(vowel,context,length){
+    if(!YK2019_DATA) return null;
+    return YK2019_DATA.presets.find(p=>p.sex===voiceTypeEl.value && p.vowel===vowel && p.context_label===context && p.length===length) || null;
+  }
+
+  function currentCompareVowel(){
+    const selected=vowelPresetEl.value;
+    if(BASIC_JA_VOWELS.includes(selected)) return selected;
+    const yk=YK2019_PRESETS.get(selected);
+    if(yk) return yk.vowel;
+    return BASIC_JA_VOWELS.includes(compareBaseVowel)?compareBaseVowel:'a';
+  }
+
+  function compareDurationLabel(preset){
+    return preset ? `${Math.round(preset.duration_ms.mean)} ms` : '—';
+  }
+
+  function compareChoiceCard(key,title,metric){
+    const active=compareCurrentKey===key ? ' active' : '';
+    return `<button class="compare-choice${active}" type="button" data-compare-key="${key}"><strong>${title}</strong><span class="metric">${metric}</span><span class="listen">▶ 聴く</span></button>`;
+  }
+
+  function renderBeginnerCompare(){
+    if(!beginnerCompareWrap || beginnerCompareWrap.hidden || !YK2019_DATA) return;
+    compareBaseVowel=currentCompareVowel();
+    const v=compareBaseVowel, kana=BASIC_JA_KANA[v];
+    compareTitle.textContent=`「${kana}」の条件を聴き比べ`;
+    compareIntro.textContent='同じ母音のまま、発話条件だけを切り替えます。カードを押すとその条件をすぐ再生します。';
+
+    const isolatedShort=compareYkPreset(v,'isolated_word','short');
+    const isolatedLong=compareYkPreset(v,'isolated_word','long');
+    const sentenceShort=compareYkPreset(v,'carrier_sentence','short');
+    const sentenceLong=compareYkPreset(v,'carrier_sentence','long');
+    compareChoices.innerHTML=[
+      compareChoiceCard(v,'持続','Kasuya 1968 · 静的平均'),
+      isolatedShort ? compareChoiceCard(isolatedShort.id,'単独語・短',compareDurationLabel(isolatedShort)) : '',
+      isolatedLong ? compareChoiceCard(isolatedLong.id,'単独語・長',compareDurationLabel(isolatedLong)) : '',
+      sentenceShort ? compareChoiceCard(sentenceShort.id,'文中・短',compareDurationLabel(sentenceShort)) : '',
+      sentenceLong ? compareChoiceCard(sentenceLong.id,'文中・長',compareDurationLabel(sentenceLong)) : ''
+    ].join('');
+
+    compareChoices.querySelectorAll('[data-compare-key]').forEach(btn=>btn.addEventListener('click',()=>{
+      const key=btn.dataset.compareKey;
+      compareCurrentKey=key;
+      stop();
+      applyPreset('ja',key);
+      renderBeginnerCompare();
+      transportBtn.click();
+    }));
+  }
+
+  function updateBeginnerCompareVisibility(){
+    if(!beginnerCompareWrap) return;
+    const applicable=uiMode!=='casual' && presetLanguageEl.value==='ja' && ['male','female'].includes(voiceTypeEl.value) && Boolean(YK2019_DATA);
+    beginnerCompareWrap.hidden=!applicable;
+    if(!applicable){
+      comparePanel.hidden=true;
+      return;
+    }
+    compareOpen=true;
+    compareBaseVowel=currentCompareVowel();
+    comparePanel.hidden=false;
+    compareToggleBtn.setAttribute('aria-expanded','true');
+    renderBeginnerCompare();
   }
 
   const EVIDENCE_LABELS = {
@@ -1828,46 +2027,240 @@
   const LEARNING_TOPICS = {
     f0: {
       title:'F0（基本周波数）',
-      text:'声帯の振動の基本的な速さです。主に「声の高さ」の感じに関係します。フォルマントF1〜F3とは別のものです。',
-      example:()=>`いまのF0は ${Math.round(Number(f0El.value))} Hz。スライダーを動かして、母音らしさをなるべく保ったまま高さがどう変わるか聴いてみよう。`
+      one:'声の高さの土台になる、声帯の振動の速さです。',
+      more:'数字が大きいほど、基本的には高い声に聞こえます。F1〜F3とは別のものです。',
+      tryIt:()=>`いまのF0は ${Math.round(Number(f0El.value))} Hz。スライダーを動かして、母音らしさをなるべく保ったまま高さだけがどう変わるか聴いてみよう。`,
+      precise:'周期的な声帯振動の基本的な繰り返し周波数をF0と呼びます。Hzで表し、知覚されるピッチと強く関係しますが、声道の共鳴を表すF1〜F3とは異なる量です。',
+      sources:[
+        {label:'Praat Manual — frequency',url:'https://www.fon.hum.uva.nl/praat/manual/frequency.html'},
+        {label:'Oxford — Source–Filter Theory',url:'https://doi.org/10.1093/acrefore/9780199384655.013.894'}
+      ]
     },
     f1: {
       title:'F1（第1フォルマント）',
-      text:'声道の1番目の大きな共鳴です。母音では舌の高さ・口の開きと強く関係し、一般にF1が高いほど口が開いた母音になりやすいです。',
-      example:()=>{ const v=interpolate('F1',duration()/2); return `中央付近のF1は ${v==null?'—':Math.round(v)+' Hz'}。F1の線だけ上下に動かして比較してみよう。`; }
+      one:'母音の「口の開き」に強く関わる、いちばん低いフォルマントです。',
+      more:'一般にF1が高いほど、口を大きく開いた母音になりやすいです。',
+      tryIt:()=>{ const v=interpolate('F1',duration()/2); return `中央付近のF1は ${v==null?'—':Math.round(v)+' Hz'}。F1の線だけ上下に動かして、母音の変化を聴いてみよう。`; },
+      precise:'F1は第1フォルマントの中心周波数です。母音の高さと逆方向に強く関係しますが、声道全体の共鳴の結果なので、舌の高さだけと一対一に対応する値ではありません。',
+      sources:[
+        {label:'MIT OCW 24.901 — Lecture 8',url:'https://ocw.mit.edu/courses/24-901-language-and-its-structure-i-phonology-fall-2010/resources/mit24_901f10_lec08/'},
+        {label:'Macquarie — Vocal Tract Resonance',url:'https://www.mq.edu.au/faculty-of-medicine-health-and-human-sciences/departments-and-schools/department-of-linguistics/our-research/phonetics-and-phonology/speech/acoustics/acoustic-theory-of-speech-production/vocal-tract-resonance'}
+      ]
     },
     f2: {
       title:'F2（第2フォルマント）',
-      text:'声道の2番目の大きな共鳴です。母音では舌の前後位置などと強く関係します。F1とF2の組み合わせが母音の聞こえを大きく左右します。',
-      example:()=>{ const v=interpolate('F2',duration()/2); return `中央付近のF2は ${v==null?'—':Math.round(v)+' Hz'}。F2だけを動かすと、母音の「前寄り／後ろ寄り」の感じがどう変わるか試せます。`; }
+      one:'母音の「前っぽさ／後ろっぽさ」に強く関わる、2番目のフォルマントです。',
+      more:'一般にF2が高いほど前寄り、低いほど後ろ寄りの母音になりやすいです。唇の丸めもF2に影響します。',
+      tryIt:()=>{ const v=interpolate('F2',duration()/2); return `中央付近のF2は ${v==null?'—':Math.round(v)+' Hz'}。F2だけを動かして、「前っぽい／後ろっぽい」聞こえ方がどう変わるか試そう。`; },
+      precise:'F2は第2フォルマントの中心周波数です。舌の前後位置や唇の丸めと強く関係しますが、F1と同じく声道全体の形から生じる共鳴なので、単一の調音器官だけで決まるわけではありません。',
+      sources:[
+        {label:'MIT OCW 24.901 — Lecture 8',url:'https://ocw.mit.edu/courses/24-901-language-and-its-structure-i-phonology-fall-2010/resources/mit24_901f10_lec08/'},
+        {label:'Macquarie — Vocal Tract Resonance',url:'https://www.mq.edu.au/faculty-of-medicine-health-and-human-sciences/departments-and-schools/department-of-linguistics/our-research/phonetics-and-phonology/speech/acoustics/acoustic-theory-of-speech-production/vocal-tract-resonance'}
+      ]
     },
     f3: {
       title:'F3（第3フォルマント）',
-      text:'3番目の大きな共鳴です。F1・F2ほど母音カテゴリを直接決める主役ではありませんが、声質や特定の音の特徴に関わります。',
-      example:()=>{ const v=interpolate('F3',duration()/2); return `中央付近のF3は ${v==null?'—':Math.round(v)+' Hz'}。F1/F2をそのままにしてF3だけ変え、音色の違いを探してみよう。`; }
+      one:'F1・F2より上にある、3番目のフォルマントです。',
+      more:'F1・F2ほど単純に母音の位置へ結びつけにくいですが、音の特徴や音色を考えるときに使われます。',
+      tryIt:()=>{ const v=interpolate('F3',duration()/2); return `中央付近のF3は ${v==null?'—':Math.round(v)+' Hz'}。F1/F2をそのままにしてF3だけ動かし、どのくらい聞こえ方が変わるか探してみよう。`; },
+      precise:'F3は第3フォルマントの中心周波数です。F1・F2とともに低い周波数側のスペクトル構造を記述しますが、その役割は音・話者・文脈によって異なるため、万能な「舌の○○を表す値」とは扱いません。',
+      sources:[
+        {label:'MIT OCW 24.901 — Lecture 8',url:'https://ocw.mit.edu/courses/24-901-language-and-its-structure-i-phonology-fall-2010/resources/mit24_901f10_lec08/'},
+        {label:'Praat Manual — Formant',url:'https://www.fon.hum.uva.nl/praat/manual/Formant.html'}
+      ]
+    },
+    formant: {
+      title:'フォルマント（formant）',
+      one:'声道が特に響きやすい周波数にできる「音の山」です。',
+      more:'低いほうからF1、F2、F3…と呼びます。母音らしさを作る重要な手がかりです。',
+      tryIt:'F1〜F3の線を1本ずつ動かしてみよう。同じF0でも、フォルマントを変えると母音の聞こえ方が変わります。',
+      precise:'声道の共鳴は音声のスペクトル包絡に特徴的なピークを作ります。フォルマントはその共鳴に対応する周波数として扱われ、Praatでは各フォルマントを中心周波数と帯域幅の組として時間ごとに表します。',
+      sources:[
+        {label:'Oxford Phonetics — Source-Filter Model',url:'https://www.phon.ox.ac.uk/jcoleman/source_filter'},
+        {label:'Praat Manual — Formant',url:'https://www.fon.hum.uva.nl/praat/manual/Formant.html'}
+      ]
+    },
+    resonance: {
+      title:'共鳴（resonance）',
+      one:'ある高さの音だけが、特に響きやすくなる性質です。',
+      more:'声道にもいくつか「響きやすい高さ」があり、その位置が変わると声の聞こえ方も変わります。',
+      tryIt:'F1〜F3を少し動かして、同じ声の高さでも響き方が変わるのを聴いてみよう。',
+      precise:'共鳴系は特定の周波数付近に強く応答します。声道は形に応じて複数の共鳴を持ち、音源スペクトルの一部を相対的に強めたり弱めたりします。これがフォルマントを理解する土台になります。',
+      sources:[
+        {label:'Oxford Phonetics — Source-Filter Model',url:'https://www.phon.ox.ac.uk/jcoleman/source_filter'},
+        {label:'Macquarie — Vocal Tract Resonance',url:'https://www.mq.edu.au/faculty-of-medicine-health-and-human-sciences/departments-and-schools/department-of-linguistics/our-research/phonetics-and-phonology/speech/acoustics/acoustic-theory-of-speech-production/vocal-tract-resonance'}
+      ]
+    },
+    hz: {
+      title:'Hz（ヘルツ）',
+      one:'「1秒に何回くり返すか」を表す、周波数の単位です。',
+      more:'たとえば140 Hzなら、1秒に140回くり返すという意味です。',
+      tryIt:()=>`いまのF0は ${Math.round(Number(f0El.value))} Hz。F0スライダーを動かして、数字と声の高さの変化を結びつけてみよう。`,
+      precise:'Hz（ヘルツ）は周波数のSI単位で、1 Hzは1秒あたり1周期に相当します。F0もフォルマント周波数もHzで表せますが、同じ単位でも表している物理的・音響的な役割は異なります。',
+      sources:[
+        {label:'NIST — SI Units: Time / Frequency',url:'https://www.nist.gov/pml/owm/si-units-time'},
+        {label:'Praat Manual — frequency',url:'https://www.fon.hum.uva.nl/praat/manual/frequency.html'}
+      ]
+    },
+    spectrogram: {
+      title:'スペクトログラム（spectrogram）',
+      one:'音を「時間 × 周波数」の地図にしたものです。',
+      more:'横に時間、縦に周波数をとり、濃い部分ほどそのあたりの音のエネルギーが強いことを表します。',
+      tryIt:'Praatで母音を録音してスペクトログラムを表示すると、フォルマントが帯のように見えます。Formantasiaでは、そのF1〜F3だけを線として直接扱っています。',
+      precise:'スペクトログラムは信号の周波数成分が時間とともにどう変化するかを表す時間–周波数表示です。表示の濃さや色は、各時間・周波数付近のエネルギーや強度を表します。',
+      sources:[
+        {label:'Praat Manual — Spectrogram',url:'https://www.fon.hum.uva.nl/praat/manual/Spectrogram.html'},
+        {label:'Praat Tutorial — Viewing a spectrogram',url:'https://www.fon.hum.uva.nl/praat/manual/Intro_3_1__Viewing_a_spectrogram.html'}
+      ]
+    },
+    sourcefilter: {
+      title:'音源–フィルタ理論（source–filter theory）',
+      one:'声を「音のもと」と「声道による加工」に分けて考えるモデルです。',
+      more:'ざっくり言えば、声帯が音の材料を作り、声道がその響きを整えます。',
+      tryIt:'F0だけを変えたあと、今度はF1〜F3だけを変えてみよう。「音源側」と「フィルタ側」の違いを耳で比べられます。',
+      precise:'音源–フィルタ理論では、音声を音源と声道フィルタの働きに分けて記述します。有声音では声帯振動が主要な音源となり、声道の共鳴がスペクトル包絡を形づくります。FormantasiaのF0／F1〜F3の対応は学習用の単純化で、実際の発声では相互作用もあります。',
+      sources:[
+        {label:'Oxford Research Encyclopedia — Source–Filter Theory',url:'https://doi.org/10.1093/acrefore/9780199384655.013.894'},
+        {label:'Praat Manual — Source-filter synthesis',url:'https://www.fon.hum.uva.nl/praat/manual/Source-filter_synthesis.html'}
+      ]
+    },
+    praat: {
+      title:'Praat（プラート）',
+      one:'声を録音して、見て、測って、加工できる音声学ソフトです。',
+      more:'ピッチ、フォルマント、スペクトログラムなどを調べるときによく使われます。',
+      tryIt:'Formantasiaの「Praatへ書き出し」を使うと、描いたF1〜F3の軌跡をPraat側でも扱えます。',
+      precise:'Praatは音声の録音・表示・分析・合成・加工などを行うためのソフトウェアです。University of Amsterdamで開発され、音声学・音韻論の研究や教育で広く利用されています。',
+      sources:[
+        {label:'Praat official site',url:'https://praat.org/'},
+        {label:'Praat Manual — Intro',url:'https://www.fon.hum.uva.nl/praat/manual/Intro.html'}
+      ]
     },
     bandwidth: {
       title:'Bandwidth（帯域幅）',
-      text:'フォルマントの共鳴の「山がどれくらい広いか」です。狭いほど共鳴が鋭く、広いほどなだらかになります。中心のF1/F2/F3が同じでも、音色は変わります。',
-      example:()=>usingEmpiricalBandwidth()
-        ? `いまは Empirical bandwidth。文献由来のB1〜B3を使い、QはF/Bから自動計算しています。`
-        : `いまは Manual Q ${Number(qEl.value)}。この場合は bandwidth = F ÷ Q として合成しています。`
+      one:'フォルマントの「山の太さ」を表す値です。',
+      more:'小さいほど細く鋭い山、大きいほど広くなだらかな山になります。',
+      tryIt:()=>usingEmpiricalBandwidth()
+        ? 'いまは文献由来の帯域幅を使っています。Manual Qへ切り替えると、「山の鋭さ」を自分で動かして聴き比べられます。'
+        : `いまは Manual Q ${Number(qEl.value)}。Qを動かして、フォルマントの位置を変えずに響き方がどう変わるか聴いてみよう。`,
+      precise:'各フォルマントには中心となる周波数だけでなく、その共鳴が周波数方向にどれくらい広がるかを表す帯域幅があります。帯域幅が狭いほど共鳴ピークは鋭く、広いほどなだらかになります。PraatのFormantデータも中心周波数と帯域幅を持ちます。',
+      sources:[
+        {label:'Praat Manual — Formant',url:'https://www.fon.hum.uva.nl/praat/manual/Formant.html'},
+        {label:'Praat Manual — smoothest formant tracks',url:'https://www.fon.hum.uva.nl/praat/manual/Formants__Extract_smoothest_part___.html'}
+      ]
     },
     q: {
-      title:'Q（共鳴の鋭さ）',
-      text:'共鳴がどれくらい鋭いかを表す指標です。Formantasiaでは Q = F ÷ Bandwidth。Qが大きいほど狭く鋭い共鳴になります。',
-      example:()=>usingEmpiricalBandwidth()
-        ? 'Empirical bandwidthではQスライダーは使わず、各時点のFとBからQを自動計算します。Manual Qにすると自分で共通Qを試せます。'
-        : `いまは Q=${Number(qEl.value)}。Qを上げ下げして、同じフォルマント位置でも音色が変わるか聴き比べよう。`
+      title:'Q（quality factor）',
+      one:'フォルマントの「山のとがり具合」を表す数字です。',
+      more:'Qが大きいほど細く鋭く、小さいほど幅広い共鳴になります。',
+      tryIt:()=>usingEmpiricalBandwidth()
+        ? 'いまは文献由来の帯域幅からQを自動計算しています。Manual Qへ切り替えると、自分でQを動かせます。'
+        : `いまは Q=${Number(qEl.value)}。Qを上げ下げして、F1〜F3の位置を変えずに響き方だけがどう変わるか聴いてみよう。`,
+      precise:'Qは共鳴の鋭さを表す無次元の指標です。Formantasiaのband-passフィルタでは中心周波数Fと帯域幅BからQ=F/Bとして扱い、Qが高いほど帯域が狭くなります。',
+      sources:[
+        {label:'OpenStax University Physics — Resonance and Q',url:'https://openstax.org/books/university-physics-volume-2/pages/15-5-resonance-in-an-ac-circuit'},
+        {label:'Web Audio API — BiquadFilterNode',url:'https://webaudio.github.io/web-audio-api/#BiquadFilterNode'}
+      ]
+    },
+    empirical: {
+      title:'Empirical（実測・観測に基づく）',
+      one:'「実際に観察・測定したデータにもとづく」という意味です。',
+      more:'Formantasiaで Empirical と表示されるときは、研究や公開データで実際に測られた値に根拠があることを示します。',
+      tryIt:()=>usingEmpiricalBandwidth()
+        ? 'いまは Empirical bandwidth。文献由来の測定データから作った帯域幅の値を使っています。研究モードの ● 実測 表示も見てみよう。'
+        : '帯域幅モードを Empirical bandwidth に切り替えられる条件では、Manual Q と聴き比べてみよう。',
+      precise:'Empirical は、理論や仮定だけではなく、観察・測定されたデータに根拠があることを表します。Formantasiaでは、生の測定値そのものだけでなく、測定データから計算した群平均や再集計した派生値も含めて empirical と呼ぶ場合があります。empirical だからといって「万人にとって唯一の正解」や「個人差のない値」という意味ではありません。',
+      sources:[
+        {label:'National Research Council — Scientific Research in Education',url:'https://doi.org/10.17226/10236'}
+      ]
     },
     evidence: {
       title:'● 実測・△ 借用・┄ モデル',
-      text:'●は文献から直接使った数値、△は別条件や別研究から借りた値、破線はアプリが補間・表示のために作った区間です。きれいな線の全部が実測とは限りません。',
-      example:()=>presetDirty
-        ? 'いまは編集済み。元プリセットの根拠が灰色のゴーストとして残るので、「文献・モデル」と「自分の編集」を比べられます。'
-        : 'プリセットを選び替えて、●の数や△・破線の割合がどう違うか見比べてみよう。'
+      one:'その線が「どこまで実測で、どこからアプリのモデルか」を示す印です。',
+      more:'●は採用した資料の値、△は別条件などから借りた値、破線はアプリが作った区間です。',
+      tryIt:()=>presetDirty
+        ? 'いまは編集済み。元プリセットの根拠が灰色のゴーストとして残るので、「文献・モデル」と「自分の編集」を比べてみよう。'
+        : 'プリセットを選び替えて、●・△・破線の割合がどう違うか見比べてみよう。',
+      precise:'●・△・破線はFormantasia独自の表示規約です。学界共通の記号ではありません。●は採用した文献・データセットから直接得た値、△は別条件や別研究から借用した値、破線は補間・合成などアプリがモデル化した区間を示します。',
+      sources:[{label:'Formantasia — Evidence表示規約（アプリ内定義）'}]
     }
   };
+
+  // Empirical glossary entry v1
+  const GLOSSARY_SOURCE_DETAILS = {
+    'https://doi.org/10.17226/10236': {
+      short:'National Research Council (2002)',
+      citation:'National Research Council. (2002). Scientific Research in Education. Washington, DC: The National Academies Press. https://doi.org/10.17226/10236'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/frequency.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “frequency.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://doi.org/10.1093/acrefore/9780199384655.013.894': {
+      short:'Tokuda (2021)',
+      citation:'Tokuda, I. (2021). The source–filter theory of speech. Oxford Research Encyclopedia of Linguistics. https://doi.org/10.1093/acrefore/9780199384655.013.894'
+    },
+    'https://ocw.mit.edu/courses/24-901-language-and-its-structure-i-phonology-fall-2010/resources/mit24_901f10_lec08/': {
+      short:'Kenstowicz (2010)',
+      citation:'Kenstowicz, M. (2010). Phonetics I: Acoustics of vowels, using Praat [Lecture 8 notes]. 24.901 Language and Its Structure I: Phonology. MIT OpenCourseWare, Massachusetts Institute of Technology.'
+    },
+    'https://www.mq.edu.au/faculty-of-medicine-health-and-human-sciences/departments-and-schools/department-of-linguistics/our-research/phonetics-and-phonology/speech/acoustics/acoustic-theory-of-speech-production/vocal-tract-resonance': {
+      short:'Macquarie Linguistics (2026)',
+      citation:'Macquarie University, Department of Linguistics. (2026, June 23). Vocal tract resonance.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Formant.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Formant.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://www.phon.ox.ac.uk/jcoleman/source_filter': {
+      short:'Oxford Phonetics',
+      citation:'University of Oxford, Phonetics Laboratory. (n.d.). The source-filter model of speech production. Retrieved 16 September 2026.'
+    },
+    'https://www.nist.gov/pml/owm/si-units-time': {
+      short:'NIST',
+      citation:'National Institute of Standards and Technology. (n.d.). SI units—Time. Retrieved 16 September 2026.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Spectrogram.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Spectrogram.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Intro_3_1__Viewing_a_spectrogram.html': {
+      short:'Praat Tutorial',
+      citation:'Praat Manual. (n.d.). “Intro 3.1. Viewing a spectrogram.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Source-filter_synthesis.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Source-filter synthesis.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://praat.org/': {
+      short:'Boersma et al. (2026)',
+      citation:'Boersma, P., Weenink, D., & Shchupak, A. (2026). Praat: doing phonetics by computer [Computer program]. Praat.org.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Intro.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Intro.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Formants__Extract_smoothest_part___.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Formants: Extract smoothest part...” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://openstax.org/books/university-physics-volume-2/pages/15-5-resonance-in-an-ac-circuit': {
+      short:'Ling et al. (2016)',
+      citation:'Ling, S. J., Moebs, W., & Sanny, J. (2016). University Physics Volume 2, §15.5 “Resonance in an AC Circuit.” OpenStax, Rice University.'
+    },
+    'https://webaudio.github.io/web-audio-api/#BiquadFilterNode': {
+      short:'Web Audio API',
+      citation:'Adenot, P., & Choi, H. (Eds.). (2024). Web Audio API 1.1, § BiquadFilterNode (First Public Working Draft, 5 November 2024). World Wide Web Consortium.'
+    }
+  };
+
+  function learningSourceInfo(source){
+    const detail=source && source.url ? GLOSSARY_SOURCE_DETAILS[source.url] : null;
+    return {
+      short:(detail && detail.short) || (source && source.label) || '出典',
+      citation:(detail && detail.citation) || (source && source.label) || '出典情報なし',
+      url:source && source.url ? source.url : ''
+    };
+  }
 
   function learningEvidenceLabel(){
     const level=currentMeta ? currentMeta.level : null || 'custom';
@@ -1877,12 +2270,65 @@
     return '自由描画';
   }
 
+  function appendLearningSourceLink(parent,source,text){
+    if(source.url){
+      const a=document.createElement('a');
+      a.href=source.url; a.target='_blank'; a.rel='noreferrer'; a.textContent=text;
+      parent.appendChild(a);
+    }else{
+      const span=document.createElement('span'); span.textContent=text; parent.appendChild(span);
+    }
+  }
+
+  function renderLearningReferences(container,item){
+    if(!container) return;
+    container.textContent='';
+    const sources=(item && item.sources) || [];
+    if(!sources.length){ container.hidden=true; return; }
+    container.hidden=false;
+    const heading=document.createElement('strong');
+    heading.className='learning-source-heading';
+    heading.textContent='出典・参考文献';
+    container.appendChild(heading);
+    const list=document.createElement('ol');
+    list.className='learning-source-list';
+    sources.forEach(source=>{
+      const li=document.createElement('li');
+      const info=learningSourceInfo(source);
+      appendLearningSourceLink(li,info,info.citation);
+      list.appendChild(li);
+    });
+    container.appendChild(list);
+  }
+
+  // Compact glossary source dedupe v1
+  function renderLearningSourceShort(container,item){
+    if(!container) return;
+    container.textContent='';
+    const sources=(item && item.sources) || [];
+    if(!sources.length){ container.hidden=true; return; }
+    container.hidden=false;
+    const prefix=document.createElement('span'); prefix.textContent='出典：'; container.appendChild(prefix);
+    const seen=new Set();
+    let rendered=0;
+    sources.forEach(source=>{
+      const info=learningSourceInfo(source);
+      if(seen.has(info.short)) return;
+      seen.add(info.short);
+      if(rendered){ const sep=document.createElement('span'); sep.className='learning-source-sep'; sep.textContent='·'; container.appendChild(sep); }
+      appendLearningSourceLink(container,info,info.short);
+      rendered++;
+    });
+  }
+
   function updateLearningPanel(){
     if(!learningExplainTitle) return;
     const item=LEARNING_TOPICS[learningTopic] || LEARNING_TOPICS.f1;
     learningExplainTitle.textContent=item.title;
-    learningExplainText.textContent=item.text;
-    learningExplainExample.textContent=typeof item.example==='function'?item.example():item.example;
+    learningExplainText.textContent=typeof item.one==='function'?item.one():item.one;
+    learningExplainExample.textContent=typeof item.tryIt==='function'?item.tryIt():item.tryIt;
+    learningExplainPrecise.textContent=typeof item.precise==='function'?item.precise():item.precise;
+    renderLearningReferences(learningExplainSources,item);
     if(learningPresetBadge) learningPresetBadge.textContent=learningEvidenceLabel();
     document.querySelectorAll('[data-learn-topic].learning-topic').forEach(btn=>btn.classList.toggle('active',btn.dataset.learnTopic===learningTopic));
   }
@@ -1893,19 +2339,130 @@
     updateLearningPanel();
   }
 
-  document.querySelectorAll('[data-learn-topic]').forEach(el=>{
-    const activate=()=>{
-      chooseLearningTopic(el.dataset.learnTopic);
-      if(el.classList.contains('info-dot') && learningCard) learningCard.scrollIntoView({behavior:'smooth',block:'nearest'});
-    };
-    el.addEventListener('click',activate);
-    if(el.classList.contains('info-dot')) el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activate(); } });
+  // Operation help is intentionally separate from glossary definitions.
+  // The round (i) answers "what happens if I change this control?";
+  // the lower learning card answers "what does this term mean?".
+  const CONTROL_HELP = {
+    f0: {
+      title:'基本周波数 F0',
+      lead:'声の高さが変わります。',
+      detail:()=>`上げる → 高い声 ／ 下げる → 低い声。いまは ${Math.round(Number(f0El.value))} Hz です。F1〜F3の線そのものは動きません。`,
+      deepLabel:'F0のしくみを詳しく'
+    },
+    bandwidth: {
+      title:'帯域幅モード',
+      lead:'声の「響きの鋭さ」を、文献値に任せるか自分で調整するかを切り替えます。',
+      detail:()=>usingEmpiricalBandwidth()
+        ? 'いまは Empirical bandwidth。文献由来の帯域幅を使い、Qは自動で決まります。Manual Qにすると下のQつまみを動かせます。'
+        : 'いまは Manual Q。下のQつまみで響きの鋭さを自分で変えられます。Empirical bandwidthにすると文献由来の値へ戻ります。',
+      deepLabel:'Bandwidthのしくみを詳しく'
+    },
+    q: {
+      title:'Manual Q',
+      lead:'声の響きが、キュッと鋭くなったり、ふわっと広がったりします。',
+      detail:()=>usingEmpiricalBandwidth()
+        ? 'いまは Empirical bandwidth なので、このつまみは自動計算になっていて動かせません。Manual Qへ切り替えると調整できます。'
+        : `Qを上げる → 鋭く ／ 下げる → 広くなだらかに。いまは Q=${Number(qEl.value)} です。`,
+      deepLabel:'Qのしくみを詳しく'
+    }
+  };
+
+  const LEARNING_POPOVER_MS=10000;
+  const learningInfoPopover=document.createElement('aside');
+  learningInfoPopover.id='learningInfoPopover';
+  learningInfoPopover.className='learning-popover';
+  learningInfoPopover.setAttribute('role','status');
+  learningInfoPopover.setAttribute('aria-live','polite');
+  learningInfoPopover.innerHTML='<strong class="learning-popover-title"></strong><span class="learning-popover-kicker">ここを変えると？</span><p class="learning-popover-text"></p><p class="learning-popover-example"></p><button class="learning-popover-deep" type="button">📘 しくみを詳しく</button><div class="learning-popover-source"></div>';
+  document.body.appendChild(learningInfoPopover);
+  const learningPopoverTitle=learningInfoPopover.querySelector('.learning-popover-title');
+  const learningPopoverText=learningInfoPopover.querySelector('.learning-popover-text');
+  const learningPopoverExample=learningInfoPopover.querySelector('.learning-popover-example');
+  const learningPopoverSources=learningInfoPopover.querySelector('.learning-popover-source');
+  const learningPopoverDeep=learningInfoPopover.querySelector('.learning-popover-deep');
+  let learningPopoverAnchor=null;
+  let learningPopoverTopic=null;
+  let learningPopoverTimer=null;
+
+  function positionLearningPopover(){
+    if(!learningPopoverAnchor || !learningInfoPopover.classList.contains('visible')) return;
+    const r=learningPopoverAnchor.getBoundingClientRect();
+    const p=learningInfoPopover.getBoundingClientRect();
+    const gap=12, margin=12;
+    let left, top=r.top + r.height/2 - p.height/2;
+    const roomRight=window.innerWidth-r.right;
+    const roomLeft=r.left;
+    if(roomRight>=p.width+gap+margin){
+      left=r.right+gap;
+    }else if(roomLeft>=p.width+gap+margin){
+      left=r.left-p.width-gap;
+    }else{
+      left=r.left+r.width/2-p.width/2;
+      top=r.bottom+gap;
+      if(top+p.height>window.innerHeight-margin) top=r.top-p.height-gap;
+    }
+    left=Math.max(margin,Math.min(left,window.innerWidth-p.width-margin));
+    top=Math.max(margin,Math.min(top,window.innerHeight-p.height-margin));
+    learningInfoPopover.style.left=`${Math.round(left)}px`;
+    learningInfoPopover.style.top=`${Math.round(top)}px`;
+  }
+
+  function hideLearningPopover(){
+    if(learningPopoverTimer){ clearTimeout(learningPopoverTimer); learningPopoverTimer=null; }
+    if(learningPopoverAnchor) learningPopoverAnchor.setAttribute('aria-expanded','false');
+    learningPopoverAnchor=null;
+    learningPopoverTopic=null;
+    learningInfoPopover.classList.remove('visible');
+  }
+
+  function showLearningPopover(anchor,topic){
+    if(uiMode!=='learning' || !LEARNING_TOPICS[topic] || !CONTROL_HELP[topic]) return;
+    if(learningPopoverAnchor===anchor && learningInfoPopover.classList.contains('visible')){
+      hideLearningPopover();
+      return;
+    }
+    if(learningPopoverAnchor) learningPopoverAnchor.setAttribute('aria-expanded','false');
+    const item=LEARNING_TOPICS[topic];
+    const help=CONTROL_HELP[topic];
+    learningPopoverAnchor=anchor;
+    learningPopoverTopic=topic;
+    anchor.setAttribute('aria-expanded','true');
+    learningPopoverTitle.textContent=help.title;
+    learningPopoverText.textContent=typeof help.lead==='function'?help.lead():help.lead;
+    learningPopoverExample.textContent=typeof help.detail==='function'?help.detail():help.detail;
+    learningPopoverDeep.textContent=`📘 ${help.deepLabel || 'しくみを詳しく'}`;
+    renderLearningSourceShort(learningPopoverSources,item);
+    learningInfoPopover.classList.add('visible');
+    positionLearningPopover();
+    requestAnimationFrame(positionLearningPopover);
+    if(learningPopoverTimer) clearTimeout(learningPopoverTimer);
+    learningPopoverTimer=setTimeout(hideLearningPopover,LEARNING_POPOVER_MS);
+  }
+
+  learningPopoverDeep.addEventListener('click',()=>{
+    const topic=learningPopoverTopic;
+    if(!topic) return;
+    chooseLearningTopic(topic);
+    hideLearningPopover();
+    if(learningCard) learningCard.scrollIntoView({behavior:'smooth',block:'start'});
   });
+
+  document.querySelectorAll('[data-learn-topic]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const topic=el.dataset.learnTopic;
+      chooseLearningTopic(topic);
+      if(el.classList.contains('info-dot')) showLearningPopover(el,topic);
+    });
+  });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideLearningPopover(); });
+  window.addEventListener('resize',positionLearningPopover);
+  window.addEventListener('scroll',positionLearningPopover,true);
 
   function setUIMode(next,options){
     options=options || {};
     const persist=options.persist !== false;
     uiMode = ['casual','learning','research'].includes(next) ? next : 'casual';
+    if(uiMode!=='learning') hideLearningPopover();
     document.body.dataset.uiMode=uiMode;
     const casual=uiMode==='casual', learning=uiMode==='learning', research=uiMode==='research';
     casualModeBtn.classList.toggle('active',casual);
@@ -1915,6 +2472,9 @@
     learningModeBtn.setAttribute('aria-pressed',String(learning));
     researchModeBtn.setAttribute('aria-pressed',String(research));
     if(persist){ try{ localStorage.setItem('formantCanvasUiMode',uiMode); }catch(e){} }
+    const previousPreset=vowelPresetEl.value;
+    buildPresetOptions(previousPreset);
+    updateBeginnerCompareVisibility();
     updateLearningPanel();
     resizeCanvases();
     render();
@@ -1922,6 +2482,18 @@
   casualModeBtn.addEventListener('click',()=>setUIMode('casual'));
   learningModeBtn.addEventListener('click',()=>setUIMode('learning'));
   researchModeBtn.addEventListener('click',()=>setUIMode('research'));
+
+  compareToggleBtn.addEventListener('click',()=>{
+    compareOpen=!compareOpen;
+    updateBeginnerCompareVisibility();
+  });
+  vowelPresetEl.addEventListener('change',()=>{
+    if(BASIC_JA_VOWELS.includes(vowelPresetEl.value)) compareBaseVowel=vowelPresetEl.value;
+    compareCurrentKey=null;
+    updateBeginnerCompareVisibility();
+  });
+  presetLanguageEl.addEventListener('change',()=>setTimeout(updateBeginnerCompareVisibility,0));
+  voiceTypeEl.addEventListener('change',()=>setTimeout(()=>{ compareCurrentKey=null; updateBeginnerCompareVisibility(); },0));
 
   function downloadText(filename,text,mime='text/plain'){
     const blob=new Blob([text],{type:mime+';charset=utf-8'});

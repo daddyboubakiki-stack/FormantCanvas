@@ -1,0 +1,109 @@
+name: Expand sourced learning glossary
+
+on:
+  push:
+    branches: [feat/beginner-vowel-compare-ui]
+    paths:
+      - 'tools/expand_learning_glossary.py'
+      - '.github/workflows/expand-learning-glossary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch sourced glossary
+        run: python tools/expand_learning_glossary.py
+
+      - name: Validate structure and JavaScript syntax
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path('index.html').read_text(encoding='utf-8')
+          assert 'Sourced learning glossary v1' in html
+          for topic in ['formant','resonance','hz','spectrogram','sourcefilter','praat']:
+              assert f'data-learn-topic="{topic}"' in html
+          for label in ['Praat Manual — Formant','NIST — SI Units: Time / Frequency','Oxford Research Encyclopedia — Source–Filter Theory','UC San Diego — Quality Factor and Bandwidth']:
+              assert label in html
+          assert '本文は出典を踏まえたFormantasiaによる要約です。原文の直接引用ではありません。' in html
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,flags=re.S)
+          Path('/tmp/formantasia.js').write_text(scripts[-1],encoding='utf-8')
+          PY
+          node --check /tmp/formantasia.js
+
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+
+      - name: Browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1280,1000')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          driver=webdriver.Chrome(options=opts)
+          wait=WebDriverWait(driver,20)
+          try:
+              driver.get('http://127.0.0.1:8000/')
+              driver.find_element('id','learningModeBtn').click()
+              wait.until(lambda d: len(d.find_elements('css selector','.learning-topic'))==13)
+              labels=[x.text for x in driver.find_elements('css selector','.learning-topic')]
+              print('GLOSSARY_TOPICS',labels)
+              assert 'フォルマント' in labels and 'Praat' in labels and 'Hz' in labels
+
+              driver.find_element('css selector','[data-learn-topic="formant"]').click()
+              wait.until(lambda d: 'フォルマント' in d.find_element('id','learningExplainTitle').get_attribute('textContent'))
+              text=driver.find_element('id','learningExplainText').get_attribute('textContent')
+              assert '声道' in text and '共鳴' in text
+              source_links=driver.find_elements('css selector','#learningExplainSources a')
+              print('FORMANT_SOURCE_LINKS',[x.text for x in source_links])
+              assert len(source_links)==2
+              assert all(x.get_attribute('href').startswith('http') for x in source_links)
+
+              # Existing circular info popover also gains source links.
+              info=driver.find_element('css selector','.info-dot[data-learn-topic="f0"]')
+              info.click()
+              pop=driver.find_element('id','learningInfoPopover')
+              wait.until(lambda d: 'visible' in pop.get_attribute('class'))
+              pop_links=driver.find_elements('css selector','#learningInfoPopover .learning-popover-source a')
+              print('F0_POPOVER_SOURCE_LINKS',[x.text for x in pop_links])
+              assert len(pop_links)>=2
+
+              driver.find_element('css selector','[data-learn-topic="evidence"]').click()
+              evidence_sources=driver.find_element('id','learningExplainSources').get_attribute('textContent')
+              assert 'アプリ内定義' in evidence_sources
+
+              severe=[x for x in driver.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              print('FINAL_SEVERE_BROWSER_LOGS',severe)
+              assert not severe, severe
+              print('SOURCED_GLOSSARY_SMOKE_OK')
+          finally:
+              driver.quit()
+          PY
+          cat /tmp/formantasia-server.log
+
+      - name: Commit generated index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No generated index changes.'
+          else
+            git commit -m 'Expand learning glossary with academic sources'
+            git push
+          fi
