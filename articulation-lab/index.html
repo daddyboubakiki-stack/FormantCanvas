@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.5-alpha.1</title>
+  <title>Articulation Lab v0.5-alpha.2</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.5-alpha.1</small></h1>
+        <h1>Articulation Lab <small>v0.5-alpha.2</small></h1>
         <p>Hear real human vowels, then see the same pedagogical articulation from the side and from the front. Mouth Synth keeps the playful continuous model.</p>
       </div>
       <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
@@ -73,6 +73,14 @@
           <p class="mini-note map-note">This quadrilateral is a simplified phonetic map, not literal measured tongue geometry. The two mouth views use a separate pedagogical articulation target; button audio is human recording evidence.</p>
         </section>
 
+        <div class="approx-ipa synth-only" aria-live="polite">
+          <div class="approx-ipa-copy">
+            <span>Approx. IPA · current synth sound</span>
+            <small id="approxIpaNote">VOICE ON to show the nearest modeled IPA vowel.</small>
+          </div>
+          <strong id="approxIpaValue">—</strong>
+        </div>
+
         <div class="readouts synth-only">
           <div class="readout"><span>Synth F1</span><strong id="f1Value">—</strong></div>
           <div class="readout"><span>Synth F2</span><strong id="f2Value">—</strong></div>
@@ -122,11 +130,12 @@
             <input id="lipRounding" type="range" min="0" max="1" step="0.01" value="0.1" />
           </label>
           <p class="mini-note">Current synth acoustics respond directly to tongue body position, jaw opening and lip rounding. Lip spread and tongue-root retraction are visual/model-state axes in this alpha; stronger acoustic coupling is deferred until a more principled tract model is used.</p>
+          <p class="mini-note">Approx. IPA is the nearest vowel anchor in this synth’s own modeled F1/F2/F3 space. It is a teaching hint, not automatic phonetic transcription of a human voice.</p>
         </section>
 
         <section class="panel note buttons-only">
-          <strong>Try /æ/ vs /ɑ/</strong><br />
-          Watch both views. The v0.5 teaching targets give /æ/ stronger lateral lip spread and a front-low tongue, while /ɑ/ uses a more posterior tongue/root configuration and a slightly larger vertical jaw opening.
+          <strong>Try /æ/ vs /ɑ/ — then /i/ vs /u/</strong><br />
+          The v0.5 teaching targets give /æ/ stronger lateral lip spread and a front-low tongue, while /ɑ/ uses a more posterior tongue/root configuration. In alpha.2, strong rounding also visibly narrows the mouth opening, especially near /u/.
         </section>
 
         <section class="panel note synth-only">
@@ -150,6 +159,7 @@
   <script src="src/constraint-mapper.js"></script>
   <script src="src/natural-coordination.js"></script>
   <script src="src/audio/formant-engine.js"></script>
+  <script src="src/approx-ipa.js"></script>
   <script src="src/audio/sample-player.js"></script>
   <script src="src/renderers/simple-renderer.js"></script>
   <script src="src/renderers/frontal-renderer.js"></script>
