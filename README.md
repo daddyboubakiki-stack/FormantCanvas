@@ -14,10 +14,13 @@ The current public build is a **Research Preview**. Presets may combine publishe
 
 Before making code changes, read:
 
-1. [`AGENTS.md`](AGENTS.md) — standing development rules and Formantasia-specific invariants.
-2. [`PROJECT_STATE.md`](PROJECT_STATE.md) — current implementation snapshot, known risks, and handoff context.
-3. [`DECISIONS.md`](DECISIONS.md) — durable design and research decisions and their rationale.
+1. [`DEVELOPMENT_METHOD.md`](DEVELOPMENT_METHOD.md) — the shared AI co-development method and priority rules used across projects.
+2. [`AGENTS.md`](AGENTS.md) — standing Formantasia-specific development rules and invariants.
+3. [`PROJECT_STATE.md`](PROJECT_STATE.md) — current implementation snapshot, known risks, and handoff context.
+4. [`DECISIONS.md`](DECISIONS.md) — durable design and research decisions and their rationale.
 
 These files are the repository's shared project memory. Do not rely on chat history alone for durable implementation assumptions.
+
+**Important:** research values, provenance, evidence classifications, and research-derived parameters are protected data. They must not be silently changed during unrelated implementation work; see `DEVELOPMENT_METHOD.md` and `AGENTS.md` for the required research-data workflow.
 
 *Formantasia · Daddy's little phonetics lab 🧪*
