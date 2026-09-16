@@ -89,6 +89,27 @@ The user owns product direction and experience. The agent owns careful technical
 ### Research integrity
 Formantasia is an educational and experimental phonetics application and the public build is a **Research Preview**.
 
+#### Research values are protected data
+Existing research values, model parameters derived from research, population mappings, duration values, evidence classifications, provenance labels, and source attributions are **not ordinary implementation details**.
+
+Do **not** alter them as a side effect of UI work, refactoring, bug fixing, cleanup, optimization, or visual tuning.
+
+If you notice a research value that may be wrong while working on another task:
+1. do not silently correct it;
+2. report the suspected issue and the evidence;
+3. leave the current value unchanged unless the user explicitly authorizes a research-data correction task.
+
+A research value may be added, replaced, or corrected only when the current task explicitly concerns research data and the change is supported by an identifiable source or documented derivation.
+
+For any permitted research-data change:
+1. record the exact source;
+2. record the old value and the new value, when replacing an existing value;
+3. state whether the value is empirical, borrowed, modeled, or derived;
+4. keep user-visible provenance consistent with the implementation;
+5. do not overstate measurement precision;
+6. keep the research-data change isolated from unrelated feature work whenever practical;
+7. obtain explicit user approval before merging a change that modifies existing research values or their evidence classification.
+
 Research data must retain provenance. Do not silently convert borrowed or modeled values into “empirical” values.
 
 Current evidence categories are:
@@ -99,12 +120,6 @@ Current evidence categories are:
 The UI currently distinguishes evidence visually. Preserve that distinction unless a deliberate redesign is requested.
 
 Do not add non-public/raw research audio or restricted datasets merely because a paper refers to them. Prefer published numerical values, public author/repository data, and clearly documented derived statistics.
-
-When adding or replacing a research value:
-1. record the source;
-2. record whether the value is empirical, borrowed, modeled, or derived;
-3. keep the user-visible provenance consistent with the actual implementation;
-4. do not overstate measurement precision.
 
 ### Current architecture caution
 The application is currently concentrated in a large root-level `index.html`. Because UI, data, audio, and behavior can be close together, make narrow changes and inspect surrounding code before editing.
@@ -128,15 +143,18 @@ Canonical public URL: `https://formantasia.netlify.app/`.
 4. State or infer acceptance criteria.
 5. Identify protected behavior that must not change.
 6. If a better method exists, propose it before implementation.
+7. If research values would be modified, stop and confirm that the task is explicitly a research-data task and that source evidence is available.
 
 ### During coding
 1. Make the smallest coherent change first.
 2. Avoid unrelated cleanup.
-3. Keep research provenance and UI labels synchronized with implementation.
-4. Preserve existing behavior outside the intended scope.
+3. Do not modify protected research values during unrelated work.
+4. Keep research provenance and UI labels synchronized with implementation.
+5. Preserve existing behavior outside the intended scope.
 
 ### After coding
 1. Verify the requested behavior.
 2. Check nearby regression risks, especially the other UI modes and mobile presentation when relevant.
 3. Update project documentation when the change alters durable knowledge.
-4. Report changes, verification, remaining uncertainty, and next recommendation.
+4. For research-data changes, show the source and before/after values and obtain explicit user approval before merge.
+5. Report changes, verification, remaining uncertainty, and next recommendation.
