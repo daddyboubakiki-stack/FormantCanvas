@@ -46,9 +46,9 @@ window.ArticulationLab = window.ArticulationLab || {};
             <path d="M180 132 Q168 169 180 179 Q192 169 180 132" class="frontal-nose"/>
             <path id="outerLip" d="" class="frontal-lip"/>
             <path id="innerMouth" d="" class="frontal-mouth-opening"/>
+            <path id="frontalTongue" d="" class="frontal-tongue"/>
             <path id="upperTeeth" d="" class="frontal-teeth"/>
             <path id="lowerTeeth" d="" class="frontal-teeth lower"/>
-            <path id="frontalTongue" d="" class="frontal-tongue"/>
             <path id="jawGuide" d="" class="frontal-jaw-guide"/>
             <text x="180" y="336" text-anchor="middle" class="anatomy-label">front view · same articulation state</text>
           </svg>
@@ -79,19 +79,6 @@ window.ArticulationLab = window.ArticulationLab || {};
       outerLip.setAttribute('d', ellipsePath(cx, cy, outerRx, outerRy));
       innerMouth.setAttribute('d', ellipsePath(cx, cy, innerRx, innerRy));
 
-      const toothInset = Math.max(7, innerRx * .15);
-      const upperY = cy - innerRy + 4;
-      const upperDepth = Math.max(0, Math.min(20, innerRy * .48 - g.rounding * 8));
-      upperTeeth.setAttribute('d', upperDepth > 2
-        ? `M ${cx-innerRx+toothInset} ${upperY} Q ${cx} ${upperY+upperDepth} ${cx+innerRx-toothInset} ${upperY} L ${cx+innerRx-toothInset-3} ${upperY+upperDepth} Q ${cx} ${upperY+upperDepth+5} ${cx-innerRx+toothInset+3} ${upperY+upperDepth} Z`
-        : '');
-
-      const lowerY = cy + innerRy - 3;
-      const lowerDepth = Math.max(0, Math.min(12, innerRy * .25 - g.rounding * 5));
-      lowerTeeth.setAttribute('d', lowerDepth > 3 && g.jaw < .68
-        ? `M ${cx-innerRx*.58} ${lowerY} Q ${cx} ${lowerY-lowerDepth} ${cx+innerRx*.58} ${lowerY} L ${cx+innerRx*.50} ${lowerY-lowerDepth*.45} Q ${cx} ${lowerY-lowerDepth-3} ${cx-innerRx*.50} ${lowerY-lowerDepth*.45} Z`
-        : '');
-
       const tongueAlpha = g.tongueVisibility;
       if (tongueAlpha > .05) {
         const tongueY = cy + innerRy * (.22 + (1-g.low) * .12);
@@ -101,6 +88,26 @@ window.ArticulationLab = window.ArticulationLab || {};
       } else {
         tongue.setAttribute('d', '');
       }
+
+      // Teeth are drawn after the tongue because, from the front, the incisors
+      // are physically in front of the tongue. The lower teeth are deliberately
+      // shallow and fade out as the jaw opens/rounds so they do not float across
+      // a low/back tongue posture.
+      const toothInset = Math.max(7, innerRx * .15);
+      const upperY = cy - innerRy + 4;
+      const upperDepth = Math.max(0, Math.min(18, innerRy * .42 - g.rounding * 8));
+      upperTeeth.setAttribute('d', upperDepth > 2
+        ? `M ${cx-innerRx+toothInset} ${upperY} Q ${cx} ${upperY+upperDepth} ${cx+innerRx-toothInset} ${upperY} L ${cx+innerRx-toothInset-3} ${upperY+upperDepth*.76} Q ${cx} ${upperY+upperDepth+3} ${cx-innerRx+toothInset+3} ${upperY+upperDepth*.76} Z`
+        : '');
+
+      const lowerVisibility = clamp((0.64 - g.jaw) * 2.35) * (1 - g.rounding * .58);
+      const lowerY = cy + innerRy - 2;
+      const lowerHalfWidth = innerRx * (.34 + (1 - g.spread) * .05);
+      const lowerDepth = Math.max(0, Math.min(7, innerRy * .13)) * lowerVisibility;
+      lowerTeeth.setAttribute('d', lowerVisibility > .12 && lowerDepth > 1.2
+        ? `M ${cx-lowerHalfWidth} ${lowerY} Q ${cx} ${lowerY-lowerDepth} ${cx+lowerHalfWidth} ${lowerY} L ${cx+lowerHalfWidth*.88} ${lowerY-lowerDepth*.45} Q ${cx} ${lowerY-lowerDepth-2} ${cx-lowerHalfWidth*.88} ${lowerY-lowerDepth*.45} Z`
+        : '');
+      lowerTeeth.style.opacity = String(.35 + lowerVisibility * .65);
 
       const jawY = 273 + g.jaw * 23;
       const jawWidth = 92 - g.rounding * 10;
