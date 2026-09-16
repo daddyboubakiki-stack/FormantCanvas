@@ -3,7 +3,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Formantasia（フォルマンタジア）— 声をえがくフォルマント・音声学キャンバス</title>
 <meta name="description" content="Formantasia（フォルマンタジア）は、F1・F2・F3のフォルマント軌跡を描いて音を聴き、母音や音声学を学べる教育・実験用Webアプリです。" />
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
@@ -33,7 +33,7 @@
     --bg: #f6f7fb;
     --panel: rgba(255,255,255,.9);
     --text: #1d2230;
-    --muted: #747b8c;
+    --muted: #667085;
     --grid: #d9deea;
     --border: #d8ddea;
     --accent: #111827;
@@ -96,7 +96,7 @@
   }
   .selector-bar::before {
     content:'Voice preset'; grid-column:1 / -1; font-size:11px; font-weight:800;
-    letter-spacing:.08em; text-transform:uppercase; color:#9097a6; margin:0 0 -2px 2px;
+    letter-spacing:.08em; text-transform:uppercase; color:#667085; margin:0 0 -2px 2px;
   }
   body[data-ui-mode="casual"] .selector-bar::before { content:'あそぶ音'; text-transform:none; letter-spacing:.03em; }
   body[data-ui-mode="learning"] .selector-bar::before { content:'音を選んで、しくみを学ぶ'; text-transform:none; letter-spacing:.03em; }
@@ -120,7 +120,7 @@
     background:var(--panel); border:1px solid var(--border); border-radius:18px;
     box-shadow:0 10px 35px rgba(30,42,75,.05); backdrop-filter:blur(10px);
   }
-  .advanced-panel::before { content:'Research tools'; flex:1 1 100%; color:#9097a6; font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin:0 2px -2px; }
+  .advanced-panel::before { content:'Research tools'; flex:1 1 100%; color:#667085; font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin:0 2px -2px; }
   .mode-export-panel {
     margin-top:12px; padding:12px 14px; display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center;
     background:var(--panel); border:1px solid var(--border); border-radius:18px;
@@ -148,10 +148,13 @@
   button { border:1px solid var(--border); background:#fff; color:var(--text); border-radius:12px; padding:9px 12px; cursor:pointer; font-weight:700; transition:.15s ease; touch-action:manipulation; }
   button:hover { transform:translateY(-1px); box-shadow:0 4px 14px rgba(20,30,55,.08); }
   button:active { transform:translateY(0); }
+  button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible {
+    outline:3px solid #1d4ed8; outline-offset:3px;
+  }
   button.active { color:#fff; border-color:transparent; }
-  .track-btn[data-track="F1"].active { background:var(--f1); }
-  .track-btn[data-track="F2"].active { background:var(--f2); }
-  .track-btn[data-track="F3"].active { background:var(--f3); }
+  .track-btn[data-track="F1"].active { background:#c92f4e; }
+  .track-btn[data-track="F2"].active { background:#2563eb; }
+  .track-btn[data-track="F3"].active { background:#7c3aed; }
   .eraser.active { background:#343946; color:#fff; border-color:#343946; }
   .play { background:var(--play); color:#fff; border-color:var(--play); }
   .stop { background:#fff4f4; color:#bf3030; border-color:#ffd2d2; }
@@ -232,7 +235,7 @@
   .learning-source a, .learning-popover-source a { color:#315fc4; text-decoration:none; font-weight:700; }
   .learning-source a:hover, .learning-popover-source a:hover { text-decoration:underline; }
   .learning-source-sep { margin:0 4px; color:#a0a7b4; }
-  .learning-citation-note { margin-top:5px!important; color:#9299a7!important; font-size:9.5px!important; line-height:1.45!important; }
+  .learning-citation-note { margin-top:5px!important; color:#667085!important; font-size:9.5px!important; line-height:1.45!important; }
   .info-dot {
     display:inline-grid; place-items:center; width:27px; height:27px; min-width:27px; min-height:27px;
     margin:-5px 0 -5px 5px; padding:0; border-radius:50%; border:1px solid #aebbd0;
@@ -240,7 +243,7 @@
     vertical-align:middle; box-shadow:0 2px 7px rgba(36,54,88,.10); transform:none!important;
   }
   .info-dot:hover { background:#eef3fa; border-color:#8fa1be; box-shadow:0 4px 10px rgba(36,54,88,.14); }
-  .info-dot:focus-visible { outline:3px solid rgba(79,140,255,.28); outline-offset:2px; }
+  .info-dot:focus-visible { outline:3px solid #1d4ed8; outline-offset:3px; }
   .info-dot[aria-expanded="true"] { background:#e7eefb; border-color:#7f94b8; color:#253b61; }
 
   .learning-popover {
@@ -254,7 +257,7 @@
   .learning-popover-title { display:block; margin:0 0 5px; font-size:13px; }
   .learning-popover-text, .learning-popover-example { margin:0; font-size:11.5px; line-height:1.6; color:#515c70; }
   .learning-popover-example { margin-top:7px; padding-top:7px; border-top:1px dashed #d2d9e5; color:#687489; }
-  .learning-popover-source { margin-top:8px; padding-top:7px; border-top:1px solid #e1e6ef; color:#7b8495; font-size:9.8px; line-height:1.5; }
+  .learning-popover-source { margin-top:8px; padding-top:7px; border-top:1px solid #e1e6ef; color:#667085; font-size:9.8px; line-height:1.5; }
   .learning-popover-deep {
     margin-top:9px; padding:6px 9px; border-radius:10px; border:1px solid #d8e0ed;
     background:#f7f9fc; color:#44516a; font-size:10.5px; font-weight:800; box-shadow:none;
@@ -308,7 +311,7 @@
   .references ol { padding-left:22px; }
   .references li { margin:8px 0; }
   .research-note { margin-top:10px; padding:10px 12px; border-radius:12px; background:#f6f8fc; color:#5d6575; }
-  .site-signature { margin:18px 0 8px; text-align:center; color:#8a91a0; font-size:11px; letter-spacing:.02em; }
+  .site-signature { margin:18px 0 8px; text-align:center; color:#667085; font-size:11px; letter-spacing:.02em; }
 
   @media (max-width: 920px) {
     .settings { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -346,12 +349,12 @@
   }
   .compare-choice:hover { border-color:#aebbd8; transform:translateY(-1px); }
   .compare-choice.active { outline:2px solid #6a7fae; border-color:#6a7fae; background:#f6f8ff; }
-  .compare-choice .kicker { font-size:10px; font-weight:900; color:#778198; letter-spacing:.03em; }
+  .compare-choice .kicker { font-size:10px; font-weight:900; color:#667085; letter-spacing:.03em; }
   .compare-choice strong { font-size:14px; }
   .compare-choice .desc { display:none; }
   .compare-choice .metric { font-size:11px; font-weight:800; color:#34415f; }
   .compare-choice .listen { font-size:11px; font-weight:900; color:#536b9e; }
-  .compare-note { margin:9px 0 0; font-size:10.5px; line-height:1.55; color:#7a8497; }
+  .compare-note { margin:9px 0 0; font-size:10.5px; line-height:1.55; color:#667085; }
   body[data-ui-mode="research"] .beginner-compare { display:block; }
 
   @media (max-width: 720px) {
@@ -420,11 +423,11 @@
     </div>
   </div>
 
-  <div class="toolbar">
-    <button class="track-btn active" data-track="F1"><span class="casual-only">F1 低め</span><span class="learning-plus">F1 を描く</span></button>
-    <button class="track-btn" data-track="F2"><span class="casual-only">F2 まんなか</span><span class="learning-plus">F2 を描く</span></button>
-    <button class="track-btn" data-track="F3"><span class="casual-only">F3 高め</span><span class="learning-plus">F3 を描く</span></button>
-    <button id="eraserBtn" class="eraser">消しゴム</button>
+  <div class="toolbar" role="group" aria-label="描画ツール">
+    <button class="track-btn active" data-track="F1" type="button" aria-pressed="true"><span class="casual-only">F1 低め</span><span class="learning-plus">F1 を描く</span></button>
+    <button class="track-btn" data-track="F2" type="button" aria-pressed="false"><span class="casual-only">F2 まんなか</span><span class="learning-plus">F2 を描く</span></button>
+    <button class="track-btn" data-track="F3" type="button" aria-pressed="false"><span class="casual-only">F3 高め</span><span class="learning-plus">F3 を描く</span></button>
+    <button id="eraserBtn" class="eraser" type="button" aria-pressed="false">消しゴム</button>
     <div class="spacer"></div>
     <button id="clearCurrent"><span class="casual-only">この線を消す</span><span class="learning-plus">現在の線を消す</span></button>
     <button id="clearAll" class="danger">全部消す</button>
@@ -495,19 +498,19 @@
   <div class="settings">
     <div class="setting">
       <label><span>再生時間</span><strong id="durationValue">0.60 s</strong></label>
-      <input id="duration" type="range" min="0.04" max="8" step="0.001" value="0.600" />
+      <input id="duration" type="range" min="0.04" max="8" step="0.001" value="0.600" aria-label="再生時間" />
     </div>
     <div class="setting">
       <label><span><span class="casual-only">声の高さ</span><span class="learning-plus">基本周波数 F0 <button class="info-dot learning-only" type="button" data-learn-topic="f0" aria-label="F0を変えるとどうなる？" aria-expanded="false">i</button></span></span><strong id="f0Value">140 Hz</strong></label>
-      <input id="f0" type="range" min="70" max="500" step="1" value="140" />
+      <input id="f0" type="range" min="70" max="500" step="1" value="140" aria-label="声の高さ・基本周波数 F0" />
     </div>
     <div class="setting research-only">
       <label><span>最大周波数</span><strong id="maxHzValue">4000 Hz</strong></label>
-      <input id="maxHz" type="range" min="2500" max="6000" step="250" value="4000" />
+      <input id="maxHz" type="range" min="2500" max="6000" step="250" value="4000" aria-label="最大周波数" />
     </div>
     <div class="setting learning-plus">
       <label><span>帯域幅モード <button class="info-dot learning-only" type="button" data-learn-topic="bandwidth" aria-label="帯域幅モードを変えるとどうなる？" aria-expanded="false">i</button></span><strong id="bandwidthModeValue">Empirical</strong></label>
-      <select id="bandwidthMode">
+      <select id="bandwidthMode" aria-label="帯域幅モード">
         <option value="empirical">Empirical bandwidth</option>
         <option value="manual">Manual Q</option>
       </select>
@@ -515,12 +518,12 @@
     </div>
     <div class="setting learning-plus">
       <label><span>Manual Q <button class="info-dot learning-only" type="button" data-learn-topic="q" aria-label="Qを変えるとどうなる？" aria-expanded="false">i</button></span><strong id="qValue">Q 10</strong></label>
-      <input id="q" type="range" min="2" max="25" step="1" value="10" />
+      <input id="q" type="range" min="2" max="25" step="1" value="10" aria-label="Manual Q" />
       <div class="setting-note">Empirical bandwidth時は無効。Qは各時点で F/B から自動計算。</div>
     </div>
     <div class="setting">
       <label><span>手ブレ補正</span><strong id="stabilizeValue">72%</strong></label>
-      <input id="stabilize" type="range" min="0" max="100" step="1" value="72" />
+      <input id="stabilize" type="range" min="0" max="100" step="1" value="72" aria-label="手ブレ補正" />
     </div>
   </div>
 
@@ -1082,7 +1085,7 @@
 
   function compareChoiceCard(key,title,metric){
     const active=compareCurrentKey===key ? ' active' : '';
-    return `<button class="compare-choice${active}" type="button" data-compare-key="${key}"><strong>${title}</strong><span class="metric">${metric}</span><span class="listen">▶ 聴く</span></button>`;
+    return `<button class="compare-choice${active}" type="button" data-compare-key="${key}" aria-pressed="${compareCurrentKey===key}"><strong>${title}</strong><span class="metric">${metric}</span><span class="listen">▶ 聴く</span></button>`;
   }
 
   function renderBeginnerCompare(){
@@ -1208,8 +1211,14 @@
 
   function setActiveTrack(name){
     activeTrack=name; mode='draw';
-    document.querySelectorAll('.track-btn').forEach(b=>b.classList.toggle('active', b.dataset.track===name));
-    document.getElementById('eraserBtn').classList.remove('active');
+    document.querySelectorAll('.track-btn').forEach(b=>{
+      const selected=b.dataset.track===name;
+      b.classList.toggle('active',selected);
+      b.setAttribute('aria-pressed',String(selected));
+    });
+    const eraserBtn=document.getElementById('eraserBtn');
+    eraserBtn.classList.remove('active');
+    eraserBtn.setAttribute('aria-pressed','false');
     render();
   }
 
@@ -1302,7 +1311,7 @@
       gctx.strokeStyle = hz===0 ? '#adb5c6' : '#e3e7ef';
       gctx.beginPath(); gctx.moveTo(0,y+.5); gctx.lineTo(cssW,y+.5); gctx.stroke();
       if (hz>0 && y>6) {
-        gctx.fillStyle = '#81889a';
+        gctx.fillStyle = '#667085';
         gctx.fillText(hz + ' Hz', 8, y+5);
       }
     }
@@ -1313,7 +1322,7 @@
       gctx.strokeStyle = t===0 ? '#adb5c6' : '#edf0f5';
       gctx.beginPath(); gctx.moveTo(x+.5,0); gctx.lineTo(x+.5,cssH); gctx.stroke();
       if (x < cssW-36) {
-        gctx.fillStyle = '#81889a';
+        gctx.fillStyle = '#667085';
         gctx.fillText(t.toFixed(t%1?1:0)+' s', x+6, cssH-20);
       }
     }
@@ -1463,7 +1472,7 @@
         dctx.beginPath(); dctx.moveTo(x0,0); dctx.lineTo(x0,cssH); dctx.stroke();
       }
       if(x1-x0>44){
-        dctx.fillStyle='rgba(89,97,116,.72)';
+        dctx.fillStyle='#596174';
         dctx.fillText(z.label,x0+6,7);
       }
     }
@@ -1646,8 +1655,10 @@
   });
   document.getElementById('eraserBtn').addEventListener('click',()=>{
     mode='erase';
-    document.querySelectorAll('.track-btn').forEach(b=>b.classList.remove('active'));
-    document.getElementById('eraserBtn').classList.add('active');
+    document.querySelectorAll('.track-btn').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+    const eraserBtn=document.getElementById('eraserBtn');
+    eraserBtn.classList.add('active');
+    eraserBtn.setAttribute('aria-pressed','true');
     render();
   });
 
@@ -2369,7 +2380,11 @@
     learningExplainPrecise.textContent=typeof item.precise==='function'?item.precise():item.precise;
     renderLearningReferences(learningExplainSources,item);
     if(learningPresetBadge) learningPresetBadge.textContent=learningEvidenceLabel();
-    document.querySelectorAll('[data-learn-topic].learning-topic').forEach(btn=>btn.classList.toggle('active',btn.dataset.learnTopic===learningTopic));
+    document.querySelectorAll('[data-learn-topic].learning-topic').forEach(btn=>{
+      const selected=btn.dataset.learnTopic===learningTopic;
+      btn.classList.toggle('active',selected);
+      btn.setAttribute('aria-pressed',String(selected));
+    });
   }
 
   function chooseLearningTopic(topic){
