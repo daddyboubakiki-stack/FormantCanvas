@@ -1,0 +1,149 @@
+name: Articulation Lab v0.5-alpha.17 preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - design/articulation-lab-v0.1
+    paths:
+      - 'articulation-lab/**'
+      - '.github/workflows/articulation-v04-preview.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JavaScript syntax
+        run: |
+          set -euxo pipefail
+          node --check articulation-lab/data/voice-profiles.js
+          node --check articulation-lab/data/articulation-targets.js
+          node --check articulation-lab/data/vowel-presets.js
+          node --check articulation-lab/src/state-store.js
+          node --check articulation-lab/src/constraint-mapper.js
+          node --check articulation-lab/src/natural-coordination.js
+          node --check articulation-lab/src/audio/formant-engine.js
+          node --check articulation-lab/src/approx-ipa.js
+          node --check articulation-lab/src/audio/sample-player.js
+          node --check articulation-lab/src/renderers/simple-renderer.js
+          node --check articulation-lab/src/renderers/frontal-renderer.js
+          node --check articulation-lab/src/renderers/vowel-map.js
+          node --check articulation-lab/src/app.js
+
+      - name: Validate articulation, rounding geometry and approximate IPA
+        run: |
+          set -euxo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const vm = require('vm');
+          const sandbox = { window: {} };
+          sandbox.window.ArticulationLab = {};
+          vm.createContext(sandbox);
+          for (const f of [
+            'articulation-lab/data/voice-profiles.js',
+            'articulation-lab/data/articulation-targets.js',
+            'articulation-lab/data/vowel-presets.js',
+            'articulation-lab/src/natural-coordination.js',
+            'articulation-lab/src/audio/formant-engine.js',
+            'articulation-lab/src/approx-ipa.js',
+            'articulation-lab/src/renderers/frontal-renderer.js'
+          ]) {
+            vm.runInContext(fs.readFileSync(f, 'utf8'), sandbox, { filename:f });
+          }
+          const NS = sandbox.window.ArticulationLab;
+          const targets = NS.ARTICULATION_TARGETS.targets;
+          const vowels = NS.VOWEL_PRESETS.languages;
+          for (const lang of Object.values(vowels)) {
+            for (const [id,preset] of Object.entries(lang.vowels)) {
+              if (!targets[preset.articulationTargetId]) throw new Error(`Missing articulation target for ${id}`);
+              if ('articulation' in preset) throw new Error(`Recording preset ${id} still embeds articulation geometry`);
+            }
+          }
+
+          const ae = targets.en_ae, a = targets.en_a;
+          if (!(ae.lipSpread > a.lipSpread)) throw new Error('/æ/ should have more pedagogical lip spread than /ɑ/');
+          if (!(a.tongueBodyFrontBack > ae.tongueBodyFrontBack)) throw new Error('/ɑ/ should be more posterior than /æ/');
+          if (!(a.tongueRootRetraction > ae.tongueRootRetraction)) throw new Error('/ɑ/ target should have greater tongue-root retraction in this teaching model');
+          if (!(a.jawOpening > ae.jawOpening)) throw new Error('/ɑ/ target should have slightly greater jaw opening in this teaching model');
+
+          const frontHigh = NS.NaturalCoordination.estimate(.10, .10);
+          const frontLow = NS.NaturalCoordination.estimate(.20, .82);
+          const backHigh = NS.NaturalCoordination.estimate(.87, .12);
+          if (!(frontLow.jawOpening > frontHigh.jawOpening)) throw new Error('Natural coordination should open the jaw more for front-low than front-high tongue positions');
+          if (!(frontLow.lipSpread > frontHigh.lipRounding)) throw new Error('Front-low coordination should remain predominantly unrounded/spread');
+          if (!(backHigh.lipRounding > backHigh.lipSpread)) throw new Error('Back-high coordination should favor rounding over spreading');
+          if (!(backHigh.tongueRootRetraction > frontHigh.tongueRootRetraction)) throw new Error('Back-high coordination should have more root retraction than front-high in this teaching field');
+
+          const frontal = NS.createFrontalRenderer();
+          const uGeom = frontal.mouthGeometry(targets.en_u);
+          const aeGeom = frontal.mouthGeometry(targets.en_ae);
+          if (!(uGeom.width < aeGeom.width * .45)) throw new Error(`/u/ aperture should be much narrower than /æ/: ${uGeom.width} vs ${aeGeom.width}`);
+          if (!(uGeom.height < aeGeom.height * .45)) throw new Error(`/u/ aperture should be much shorter than /æ/: ${uGeom.height} vs ${aeGeom.height}`);
+
+          const engine = NS.createFormantEngine();
+          const estimator = NS.createApproxIpaEstimator(engine);
+          const nearU = estimator.nearest({ ...targets.en_u, f0Hz: 125, voicing: true });
+          const nearAe = estimator.nearest({ ...targets.en_ae, f0Hz: 125, voicing: true });
+          if (!nearU || nearU.symbol !== 'u') throw new Error(`Expected /u/ target to estimate nearest [u], got ${nearU && nearU.symbol}`);
+          if (!nearAe || nearAe.symbol !== 'æ') throw new Error(`Expected /æ/ target to estimate nearest [æ], got ${nearAe && nearAe.symbol}`);
+          console.log('Validated alpha.17 coordination, strong rounding geometry, and nearest modeled IPA estimator.');
+          NODE
+
+      - name: Validate processed real-voice report
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('articulation-lab/assets/audio/real/build-report.json').read_text())
+          assert report['version'] == 'v0.4.3', report.get('version')
+          for key, item in report['japanese'].items():
+              v = item['validation']
+              assert 0.38 <= v['duration'] <= 0.62, (key, v)
+              assert -19 <= v['activeRmsDbfs'] <= -14, (key, v)
+          for key, item in report['ipaReference']['exports'].items():
+              v = item['validation']
+              assert -19 <= v['activeRmsDbfs'] <= -14, (key, v)
+          assert 'ɪ' not in report['ipaReference']['exports'], report['ipaReference']['exports'].keys()
+          kit = report['englishWordReference']['ɪ']
+          kv = kit['validation']
+          assert kit['sourceWord'] == 'kid', kit
+          assert kit['stretchFactor'] == 1.0, kit
+          assert 0.09 <= kv['duration'] <= 0.16, kv
+          assert -19 <= kv['activeRmsDbfs'] <= -14, kv
+          print('Validated retained v0.4.3 real-voice bundle, including natural KIT /ɪ/.')
+          PY
+
+      - name: Build standalone HTML
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/articulation-v05a17
+          python3 articulation-lab/tools/build_standalone_preview.py \
+            --app-dir articulation-lab \
+            --output /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
+          grep -q 'data:audio/x-wav;base64\|data:audio/wav;base64' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
+          ! grep -q 'assets/audio/real/' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
+          grep -q 'Articulation Lab v0.5-alpha.17' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
+          grep -q 'Frontal · front' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
+          grep -q 'Approx. IPA' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
+          grep -q 'Natural' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
+
+      - name: Package modular source
+        run: |
+          set -euxo pipefail
+          zip -qr /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17_source.zip articulation-lab \
+            -x 'articulation-lab/tools/__pycache__/*'
+          ls -lh /tmp/articulation-v05a17
+
+      - name: Upload distributables
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArticulationLab-v0.5-alpha.17-distributables
+          path: /tmp/articulation-v05a17
+          if-no-files-found: error
+          retention-days: 14

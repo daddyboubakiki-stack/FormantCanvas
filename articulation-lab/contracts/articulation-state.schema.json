@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "articulation-lab.articulation-state.v1",
+  "title": "ArticulationState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tongueBodyFrontBack",
+    "tongueBodyHeight",
+    "lipRounding",
+    "f0Hz",
+    "voicing"
+  ],
+  "properties": {
+    "tongueBodyFrontBack": {"type": "number", "minimum": 0, "maximum": 1, "description": "0=front, 1=back"},
+    "tongueBodyHeight": {"type": "number", "minimum": 0, "maximum": 1, "description": "0=high, 1=low"},
+    "tongueTipFrontBack": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.5},
+    "tongueTipHeight": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.5},
+    "lipRounding": {"type": "number", "minimum": 0, "maximum": 1},
+    "lipAperture": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.5},
+    "jawOpening": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.5},
+    "velumOpening": {"type": "number", "minimum": 0, "maximum": 1, "default": 0},
+    "f0Hz": {"type": "number", "minimum": 40, "maximum": 1000},
+    "voicing": {"type": "boolean"},
+    "modelVersion": {"type": "string"}
+  }
+}

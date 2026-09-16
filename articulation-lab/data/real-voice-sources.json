@@ -1,0 +1,82 @@
+{
+  "schema": "articulation-lab.real-voice-sources.v0.4.3",
+  "policy": "Only sources whose recording license permits redistribution are eligible for bundled app audio. Speaker age/sex labels are used only when explicitly supported by source metadata.",
+  "voiceSets": [
+    {
+      "id": "jp_reference_pd_2009",
+      "language": "ja",
+      "label": "Japanese reference voice",
+      "speakerLabel": "Reference voice",
+      "speakerSex": "unknown",
+      "speakerAge": "unknown",
+      "evidenceType": "human_recording",
+      "license": "Public Domain (PD-self)",
+      "author": "Hakatanoshio117117",
+      "sourceHost": "Wikimedia Commons",
+      "processing": "Detect a voiced kana token, retain a small onset/offset margin, apply pitch-preserving duration adjustment for button usability, active-RMS match, mono 24 kHz PCM, and short fades.",
+      "samples": {
+        "jp_a": {"ipa":"a","sourceFile":"Ja-A.oga","sourcePage":"https://commons.wikimedia.org/wiki/File:Ja-A.oga","localAsset":"assets/audio/real/jp_reference/a.wav"},
+        "jp_i": {"ipa":"i","sourceFile":"Japanese I.ogg","sourcePage":"https://commons.wikimedia.org/wiki/File:Japanese_I.ogg","localAsset":"assets/audio/real/jp_reference/i.wav"},
+        "jp_u": {"ipa":"ɯ","sourceFile":"Japanese U.ogg","sourcePage":"https://commons.wikimedia.org/wiki/File:Japanese_U.ogg","localAsset":"assets/audio/real/jp_reference/u.wav","note":"Language-specific Japanese /u/ sample; app label remains /ɯ/ or [ɯᵝ]-like pedagogical notation."},
+        "jp_e": {"ipa":"e","sourceFile":"Ja-E.oga","sourcePage":"https://commons.wikimedia.org/wiki/File:Ja-E.oga","localAsset":"assets/audio/real/jp_reference/e.wav"},
+        "jp_o": {"ipa":"o","sourceFile":"Japanese O.ogg","sourcePage":"https://commons.wikimedia.org/wiki/File:Japanese_O.ogg","localAsset":"assets/audio/real/jp_reference/o.wav"}
+      }
+    },
+    {
+      "id": "ipa_reference_cc0_2021",
+      "language": "und",
+      "label": "Human IPA reference",
+      "speakerLabel": "IPA reference voice",
+      "speakerSex": "unknown",
+      "speakerAge": "unknown",
+      "evidenceType": "human_recording",
+      "license": "CC0 1.0",
+      "author": "173 Ascension 257 (Alex Eduardo Gonzalez)",
+      "sourceHost": "Wikimedia Commons",
+      "sourceFile": "All IPA Vowels.ogg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:All_IPA_Vowels.ogg",
+      "sequence": ["a","æ","ɛ","e̞","e","ɪ","i","y","ʏ","ø","ø̞","œ","ɶ","ä","ɐ","ɜ","ə","ɘ","ɪ̈","ɨ","ʉ","ʊ̈","ɵ̞","ɞ","ɞ̞","ɒ̈","ɑ","ʌ","ɤ̞","ɤ","ʊ","ɯ","u","o","o̞","ɔ","ɒ"],
+      "processing": "Detect the 37 isolated utterances in the published sequence, map by sequence index, mono 24 kHz PCM, active-RMS match, add short fades. These are generic IPA reference productions, not General American population norms. KIT /ɪ/ is no longer taken from this set in v0.4.3.",
+      "samples": {
+        "en_i": {"ipa":"i","sequenceIndex":6,"localAsset":"assets/audio/real/ipa_reference/i.wav"},
+        "en_e": {"ipa":"ɛ","sequenceIndex":2,"localAsset":"assets/audio/real/ipa_reference/epsilon.wav"},
+        "en_ae": {"ipa":"æ","sequenceIndex":1,"localAsset":"assets/audio/real/ipa_reference/ae.wav"},
+        "en_uh": {"ipa":"ʌ","sequenceIndex":27,"localAsset":"assets/audio/real/ipa_reference/turned_v.wav"},
+        "en_sch": {"ipa":"ə","sequenceIndex":16,"localAsset":"assets/audio/real/ipa_reference/schwa.wav"},
+        "en_a": {"ipa":"ɑ","sequenceIndex":26,"localAsset":"assets/audio/real/ipa_reference/alpha.wav"},
+        "en_o": {"ipa":"ɔ","sequenceIndex":35,"localAsset":"assets/audio/real/ipa_reference/open_o.wav"},
+        "en_U": {"ipa":"ʊ","sequenceIndex":30,"localAsset":"assets/audio/real/ipa_reference/U.wav"},
+        "en_u": {"ipa":"u","sequenceIndex":32,"localAsset":"assets/audio/real/ipa_reference/u.wav"}
+      }
+    },
+    {
+      "id": "en_us_word_reference_dvortygirl_2006",
+      "language": "en-US",
+      "label": "US English word reference",
+      "speakerLabel": "Dvortygirl reference voice",
+      "speakerSex": "unknown",
+      "speakerAge": "unknown",
+      "evidenceType": "human_recording",
+      "license": "CC BY-SA 2.5 (dual-licensed with GFDL 1.2+; app uses the CC BY-SA option)",
+      "author": "Dvortygirl",
+      "sourceHost": "Wikimedia Commons",
+      "sourceFile": "En-us-kid.ogg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:En-us-kid.ogg",
+      "sourceWord": "kid",
+      "processing": "Manual acoustic boundary selection from the US-English word kid: approximately 0.205–0.315 s, after /k/ aspiration and before /d/ closure. No time-stretch. Mono 24 kHz PCM, 6 ms fade-in, 10 ms fade-out, active-RMS match.",
+      "samples": {
+        "en_I": {"ipa":"ɪ","lexicalSet":"KIT","sourceWord":"kid","localAsset":"assets/audio/real/en_us_word_reference/I.wav"}
+      }
+    }
+  ],
+  "withheldSources": [
+    {
+      "id": "hillenbrand_1995_audio",
+      "reason": "Scientifically valuable and publicly mirrored, but the mirror-level MIT license does not by itself establish redistribution rights for the underlying third-party recordings. Do not bundle until recording rights are clarified."
+    },
+    {
+      "id": "jvpd",
+      "reason": "Research-purpose restrictions are not suitable for unrestricted public-app redistribution."
+    }
+  ]
+}
