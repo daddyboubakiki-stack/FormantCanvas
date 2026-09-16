@@ -14,6 +14,7 @@ window.ArticulationLab = window.ArticulationLab || {};
   let viewMode = 'both';
   let coordinationMode = 'natural';
   let voiceProfileId = 'child';
+  let skinMode = 'simple';
   let morphFrame = null;
 
   function articulationForPreset(preset) {
@@ -93,6 +94,24 @@ window.ArticulationLab = window.ArticulationLab || {};
     document.querySelectorAll('[data-view-mode]').forEach(b => b.classList.toggle('selected', b.dataset.viewMode === viewMode));
   }
 
+  function applySkin(mode) {
+    skinMode = mode === 'cute' ? 'cute' : 'simple';
+    document.body.dataset.skin = skinMode;
+    frontalRenderer.setSkin(skinMode);
+    document.querySelectorAll('[data-skin-mode]').forEach(button => {
+      const selected = button.dataset.skinMode === skinMode;
+      button.classList.toggle('selected', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+    const description = $('#skinDescription');
+    if (description) {
+      description.textContent = skinMode === 'cute'
+        ? 'Mogu the monkey · same shared articulation state'
+        : 'Simple skin · shared articulation state';
+    }
+    try { localStorage.setItem('articulationLabSkin', skinMode); } catch (_) {}
+  }
+
   function coordinationHint() {
     if (coordinationMode === 'natural') {
       return 'Natural: dragging the tongue also follows a smooth pedagogical jaw/lip/root coordination field built from the vowel targets. You can still tweak sliders; the next tongue drag re-couples them.';
@@ -160,6 +179,7 @@ window.ArticulationLab = window.ArticulationLab || {};
   }
 
   function initControls() {
+    document.querySelectorAll('[data-skin-mode]').forEach(btn => btn.addEventListener('click', () => applySkin(btn.dataset.skinMode)));
     document.querySelectorAll('[data-play-mode]').forEach(btn => btn.addEventListener('click', () => applyMode(btn.dataset.playMode)));
     document.querySelectorAll('[data-view-mode]').forEach(btn => btn.addEventListener('click', () => applyView(btn.dataset.viewMode)));
     document.querySelectorAll('[data-coordination-mode]').forEach(btn => btn.addEventListener('click', () => {
@@ -262,6 +282,9 @@ window.ArticulationLab = window.ArticulationLab || {};
     $('#voiceHint').textContent = `Child: ${NS.VOICE_PROFILES.child.defaultF0} Hz base · synth rendering preset`;
     $('#recordingHint').textContent = 'Japanese: language-specific PD recording · English buttons: redistribution-safe human references';
     samplePlayer.preload(allRealAudioUrls());
+    let savedSkin = 'simple';
+    try { savedSkin = localStorage.getItem('articulationLabSkin') || 'simple'; } catch (_) {}
+    applySkin(savedSkin);
     applyView('both');
     applyCoordination('natural', false);
     applyMode('buttons');
