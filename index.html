@@ -358,7 +358,7 @@
   <div class="settings">
     <div class="setting">
       <label><span>再生時間</span><strong id="durationValue">0.60 s</strong></label>
-      <input id="duration" type="range" min="0.15" max="8" step="0.001" value="0.600" />
+      <input id="duration" type="range" min="0.04" max="8" step="0.001" value="0.600" />
     </div>
     <div class="setting">
       <label><span><span class="casual-only">声の高さ</span><span class="learning-plus">基本周波数 F0 <span class="info-dot learning-only" tabindex="0" role="button" data-learn-topic="f0" aria-label="F0の説明">i</span></span></span><strong id="f0Value">140 Hz</strong></label>
@@ -486,6 +486,7 @@
       <li>Lee, S., Potamianos, A., & Narayanan, S. (1999). Acoustics of children's speech: Developmental changes of temporal and spectral parameters. <em>Journal of the Acoustical Society of America, 105</em>(3), 1455–1468. <a href="https://doi.org/10.1121/1.426686" target="_blank" rel="noreferrer">doi:10.1121/1.426686</a></li>
       <li>Lee, S., Potamianos, A., & Narayanan, S. S. (2014). Developmental acoustic study of American English diphthongs. <em>Journal of the Acoustical Society of America, 136</em>(4), 1880–1894. <a href="https://doi.org/10.1121/1.4894799" target="_blank" rel="noreferrer">doi:10.1121/1.4894799</a></li>
       <li>Mokhtari, P., &amp; Tanaka, K. (2000). <em>A Corpus of Japanese Vowel Formant Patterns</em>. Bulletin of the Electrotechnical Laboratory (ETL), 64, 57–66. Formantasia uses only derived aggregate B1–B3 statistics recomputed from the publicly downloadable 2,750-pattern data; the raw dataset is not embedded. <a href="https://isd.pu-toyama.ac.jp/~parham/sp_FormantDataETL.html" target="_blank" rel="noreferrer">project page</a></li>
+      <li>Yazawa, K., &amp; Kondo, M. (2019). Acoustic characteristics of Japanese short and long vowels: Formant displacement effect revisited. <em>Proceedings of ICPhS 2019</em>. Formantasiaの成人短長母音プリセットは、公開された Japanese Vowel Length Acoustic Data v3 の条件別派生平均を使用。 <a href="https://zenodo.org/records/15227304" target="_blank" rel="noreferrer">Zenodo dataset</a></li>
       <li>Hara, I. (2016). <em>An acoustic analysis of vowel sequences in Japanese</em> [Doctoral dissertation, Newcastle University]. <a href="http://hdl.handle.net/10443/3420" target="_blank" rel="noreferrer">Newcastle eTheses</a></li>
       <li>Jacewicz, E., Fox, R. A., & Salmons, J. (2011). Cross-generational vowel change in American English. <em>Language Variation and Change, 23</em>(1), 45–86. <a href="https://doi.org/10.1017/S0954394510000219" target="_blank" rel="noreferrer">doi:10.1017/S0954394510000219</a></li>
       <li>Zhang, M. (2022). <em>Prosodic influences on the acoustics of vowel sequences</em> [Doctoral dissertation, University at Buffalo, State University of New York]. <a href="https://miaozhang.org/mz_dissertation.pdf" target="_blank" rel="noreferrer">PDF</a></li>
@@ -688,6 +689,8 @@
   }
 
   function presetDuration(lang,key,voice=voiceTypeEl.value){
+    const yk=YK2019_PRESETS.get(key);
+    if(lang==='ja' && yk) return yk.duration_ms.mean/1000;
     if(lang==='en' && EN_DIPH[voice] && EN_DIPH[voice][key]) return EN_DIPH[voice][key].duration;
     return SYNTH_DEFAULTS.duration;
   }
@@ -804,6 +807,35 @@
     }
   };
 
+  let YK2019_DATA = null;
+  let YK2019_PRESETS = new Map();
+
+  function ykContextLabel(p){ return p.context_label==='isolated_word'?'単独語':'文中'; }
+  function ykLengthLabel(p){ return p.length==='long'?'長':'短'; }
+  function ykOptionLabel(p){
+    const shortKana={i:'い',e:'え',a:'あ',o:'お',u:'う'};
+    const longKana={i:'いい',e:'ええ',a:'ああ',o:'おお',u:'うう'};
+    return p.length==='long' ? `/${p.vowel}ː/ ${longKana[p.vowel]}` : `/${p.vowel}/ ${shortKana[p.vowel]}`;
+  }
+  function ykMatchingPreset(source, sex){
+    if(!source || !YK2019_DATA) return null;
+    return YK2019_DATA.presets.find(p=>p.sex===sex && p.context_label===source.context_label && p.length===source.length && p.vowel===source.vowel) || null;
+  }
+
+  async function loadYazawaKondoData(){
+    try{
+      const response=await fetch('data/yazawa_kondo_2019_adult_presets.json',{cache:'force-cache'});
+      if(!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data=await response.json();
+      if(!data || !Array.isArray(data.presets) || data.presets.length!==40) throw new Error('expected 40 presets');
+      YK2019_DATA=data;
+      YK2019_PRESETS=new Map(data.presets.map(p=>[p.id,p]));
+      if(presetLanguageEl.value==='ja') buildPresetOptions(vowelPresetEl.value);
+    }catch(err){
+      console.warn('Yazawa–Kondo presets could not be loaded:',err);
+    }
+  }
+
   function cloneTarget(v){ return {F1:v.F1,F2:v.F2,F3:v.F3}; }
 
   function buildVoiceOptions(preferred=null){
@@ -822,15 +854,41 @@
   function buildPresetOptions(preferred=null){
     const lang=presetLanguageEl.value;
     const data=PRESETS[lang];
-    const keep=preferred || vowelPresetEl.value;
+    let desired=preferred || vowelPresetEl.value;
+    const oldYk=YK2019_PRESETS.get(desired);
+    if(oldYk && oldYk.sex!==voiceTypeEl.value){
+      const translated=ykMatchingPreset(oldYk,voiceTypeEl.value);
+      if(translated) desired=translated.id;
+    }
     vowelPresetEl.innerHTML='';
-    const mono=document.createElement('optgroup'); mono.label='単母音';
+    const mono=document.createElement('optgroup');
+    mono.label=lang==='ja'?'持続母音（Kasuya 1968）':'単母音';
     data.mono.forEach(([value,label])=>{ const o=document.createElement('option'); o.value=value; o.textContent=label; mono.appendChild(o); });
     const diph=document.createElement('optgroup'); diph.label=lang==='ja'?'母音連続 (VV)':'二重母音';
     data.diph.forEach(([value,label])=>{ const o=document.createElement('option'); o.value=value; o.textContent=label; diph.appendChild(o); });
     vowelPresetEl.append(mono,diph);
     const all=[...data.mono,...data.diph].map(x=>x[0]);
-    vowelPresetEl.value=all.includes(keep)?keep:data.mono[0][0];
+
+    if(lang==='ja' && YK2019_DATA && ['male','female'].includes(voiceTypeEl.value)){
+      const groupSpecs=[
+        ['isolated_word','short','単独語・短（Yazawa–Kondo）'],
+        ['isolated_word','long','単独語・長（Yazawa–Kondo）'],
+        ['carrier_sentence','short','文中・短（Yazawa–Kondo）'],
+        ['carrier_sentence','long','文中・長（Yazawa–Kondo）']
+      ];
+      const vowelOrder={i:0,e:1,a:2,o:3,u:4};
+      for(const [context,length,label] of groupSpecs){
+        const group=document.createElement('optgroup'); group.label=label;
+        const presets=YK2019_DATA.presets
+          .filter(p=>p.sex===voiceTypeEl.value && p.context_label===context && p.length===length)
+          .sort((a,b)=>vowelOrder[a.vowel]-vowelOrder[b.vowel]);
+        presets.forEach(p=>{
+          const o=document.createElement('option'); o.value=p.id; o.textContent=ykOptionLabel(p); group.appendChild(o); all.push(p.id);
+        });
+        vowelPresetEl.appendChild(group);
+      }
+    }
+    vowelPresetEl.value=all.includes(desired)?desired:data.mono[0][0];
   }
 
   const EVIDENCE_LABELS = {
@@ -1417,6 +1475,8 @@
 
   function getPresetSpec(lang,key){
     if(lang==='ja'){
+      const yk=YK2019_PRESETS.get(key);
+      if(yk) return {type:'yk',preset:yk};
       if(JA_MONO[voiceTypeEl.value][key]) return {type:'mono',target:getJapaneseTarget(key)};
       return {type:'jvv',pair:japanesePairForKey(key)};
     }
@@ -1528,10 +1588,53 @@
     return ev;
   }
 
+  function applyYazawaKondoPreset(preset){
+    const d=duration();
+    const ev=emptyVisualEvidence();
+    for(const name of ['F1','F2','F3']){
+      const field=`${name}_hz`;
+      const measured=preset.trajectory.map(pt=>({p:pt.position_normalized,hz:pt[field]}));
+      const first=measured[0], last=measured[measured.length-1];
+      tracks[name]=[
+        {t:0,hz:first.hz},
+        ...measured.map(pt=>({t:d*pt.p,hz:pt.hz})),
+        {t:d,hz:last.hz}
+      ];
+      addEvidencePath(ev,name,[{p:0,hz:first.hz},{p:first.p,hz:first.hz}],'modeled');
+      addEvidencePath(ev,name,measured,'empirical');
+      addEvidencePath(ev,name,[{p:last.p,hz:last.hz},{p:1,hz:last.hz}],'modeled');
+      [0,Math.floor((measured.length-1)/2),measured.length-1].forEach(i=>addEvidenceMarker(ev,name,measured[i].p,measured[i].hz,'empirical','Yazawa–Kondo 2019'));
+    }
+    currentEvidence=ev;
+    const midpoint=preset.midpoint_hz;
+    const midpointSd=preset.midpoint_sd_across_speaker_means_hz;
+    const context=ykContextLabel(preset), length=ykLengthLabel(preset);
+    const vowelLabel=preset.length==='long'?`/${preset.vowel}ː/`:`/${preset.vowel}/`;
+    setMeta({
+      title:`Japanese ${vowelLabel} — ${context}・${length} — ${voiceTypeEl.options[voiceTypeEl.selectedIndex].text}`,
+      confidence:'A · 公開実測データの話者均衡平均',level:'a',
+      summary:`Yazawa & Kondo (2019) の公開CSVから、8話者×各10発話を話者均衡で再集計。再生時間と中央20–80%のF1–F3軌跡は、この発話条件の実測値に基づきます。`,
+      evidence:[
+        {item:'Duration',status:'empirical',detail:`${preset.duration_ms.mean.toFixed(1)} ms（話者平均間SD ${preset.duration_ms.sd_across_speaker_means.toFixed(1)} ms; 8話者, 80 tokens）`},
+        {item:'F1 midpoint',status:'empirical',detail:`${fmtHz(midpoint.F1)} Hz（話者平均間SD ${fmtHz(midpointSd.F1)} Hz）`},
+        {item:'F2 midpoint',status:'empirical',detail:`${fmtHz(midpoint.F2)} Hz（話者平均間SD ${fmtHz(midpointSd.F2)} Hz）`},
+        {item:'F3 midpoint',status:'empirical',detail:`${fmtHz(midpoint.F3)} Hz（話者平均間SD ${fmtHz(midpointSd.F3)} Hz）`},
+        {item:'F1–F3 時系列',status:'empirical',detail:'母音区間の中央20–80%を30点で測定した公開値を、各話者内10発話→8話者等重みで平均。'},
+        {item:'0–20% / 80–100%',status:'synthetic',detail:'公開データの30点測定範囲外。再生のため最初/最後の実測点を一定値で延長しており、実測軌跡とは主張しません。'}
+      ],
+      source:'Yazawa & Kondo (2019), Japanese Vowel Length Acoustic Data v3. Formantasiaが公開 JPLongShortVowels.csv から sex × context × vowel length × vowel ごとに話者均衡平均を再計算。',
+      trajectory:'中央20–80%の30点は公開測定値の派生平均。0–20%と80–100%のみ、音声合成を成立させるため端の実測平均値を水平に保持しています。',
+      reuse:'Formantasiaには元の3,200行を埋め込まず、条件別に再集計した派生平均と話者平均間SDを収録しています。利用時は元研究とZenodoデータセットを引用してください。',
+      refs:'<a href="https://zenodo.org/records/15227304" target="_blank" rel="noreferrer">Yazawa & Kondo dataset — Zenodo 15227304</a>'
+    });
+  }
+
   function applyPreset(lang=presetLanguageEl.value,key=vowelPresetEl.value){
     applyPresetAudioDefaults(lang,key);
     const spec=getPresetSpec(lang,key), voice=voiceTypeEl.value;
-    if(spec.type==='mono'){
+    if(spec.type==='yk'){
+      applyYazawaKondoPreset(spec.preset);
+    } else if(spec.type==='mono'){
       currentEvidence=buildVisualEvidence(lang,key,voice);
       Object.entries(spec.target).forEach(([name,hz])=>setTrackConstant(name,hz));
       const target=spec.target;
@@ -1694,6 +1797,8 @@
     applyPreset(presetLanguageEl.value, vowelPresetEl.value);
   });
   voiceTypeEl.addEventListener('change',()=>{
+    const previousPreset=vowelPresetEl.value;
+    buildPresetOptions(previousPreset);
     const cfg=VOICE_DEFAULTS[presetLanguageEl.value][voiceTypeEl.value];
     f0El.value=cfg.f0;
     if(Number(maxHzEl.value)<cfg.minMaxHz) maxHzEl.value=cfg.minMaxHz;
@@ -2164,6 +2269,7 @@
   updateRegionalEvidenceVisibility();
   applyPreset('ja','i');
   render();
+  loadYazawaKondoData();
 })();
 </script>
 </body>

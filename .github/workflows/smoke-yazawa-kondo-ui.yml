@@ -1,0 +1,96 @@
+# Browser regression check for the Yazawa–Kondo integration.
+name: Smoke test Yazawa-Kondo UI
+
+on:
+  push:
+    branches: [feat/yazawa-kondo-ui-integration]
+    paths:
+      - 'index.html'
+      - 'data/yazawa_kondo_2019_adult_presets.json'
+      - 'tools/integrate_yazawa_kondo_ui.py'
+      - 'tools/finalize_yazawa_kondo_ui.py'
+      - '.github/workflows/smoke-yazawa-kondo-ui.yml'
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+      - name: Run browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          curl -fsS http://127.0.0.1:8000/data/yazawa_kondo_2019_adult_presets.json >/tmp/yk.json
+          python - <<'PY'
+          import json, math
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          print('HTTP_JSON_PRESETS',len(json.load(open('/tmp/yk.json'))['presets']))
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1280,900')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          driver=webdriver.Chrome(options=opts)
+          wait=WebDriverWait(driver,15)
+          try:
+              driver.get('http://127.0.0.1:8000/')
+              wait.until(lambda d: len(d.find_elements('css selector','#vowelPreset option')) >= 30)
+              groups=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset optgroup')).map(g=>g.label)")
+              yk_options=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).map(o=>o.value)")
+              duration_min=float(driver.execute_script("return document.querySelector('#duration').min"))
+              print('GROUPS',groups)
+              print('YK_OPTIONS_MALE',len(yk_options))
+              print('DURATION_MIN_S',duration_min)
+              assert len(yk_options)==20, yk_options
+              assert duration_min<=0.06, duration_min
+              for label in ['単独語・短（Yazawa–Kondo）','単独語・長（Yazawa–Kondo）','文中・短（Yazawa–Kondo）','文中・長（Yazawa–Kondo）']:
+                  assert label in groups, label
+
+              male_key='ja_yk2019_male_isolated_short_a'
+              driver.execute_script("const s=document.querySelector('#vowelPreset'); s.value=arguments[0]; s.dispatchEvent(new Event('change',{bubbles:true}));",male_key)
+              wait.until(lambda d: d.execute_script("return document.querySelector('#vowelPreset').value")==male_key)
+              wait.until(lambda d: '単独語・短' in d.execute_script("return document.querySelector('#provTitle').textContent"))
+              dur=float(driver.execute_script("return document.querySelector('#duration').value"))
+              title=driver.execute_script("return document.querySelector('#provTitle').textContent")
+              print('MALE_A_DURATION_S',dur)
+              print('MALE_TITLE',title)
+              print('BROWSER_LOGS_AFTER_MALE',driver.get_log('browser'))
+              assert math.isclose(dur,0.082,abs_tol=0.000001), dur
+              assert 'Japanese /a/' in title and '単独語・短' in title
+
+              driver.execute_script("const s=document.querySelector('#voiceType'); s.value='female'; s.dispatchEvent(new Event('change',{bubbles:true}));")
+              female_key='ja_yk2019_female_isolated_short_a'
+              wait.until(lambda d: d.execute_script("return document.querySelector('#vowelPreset').value")==female_key)
+              wait.until(lambda d: '単独語・短' in d.execute_script("return document.querySelector('#provTitle').textContent"))
+              dur2=float(driver.execute_script("return document.querySelector('#duration').value"))
+              print('FEMALE_SELECTED',driver.execute_script("return document.querySelector('#vowelPreset').value"))
+              print('FEMALE_A_DURATION_S',dur2)
+              assert math.isclose(dur2,0.078,abs_tol=0.000001), dur2
+
+              driver.execute_script("const s=document.querySelector('#voiceType'); s.value='child'; s.dispatchEvent(new Event('change',{bubbles:true}));")
+              wait.until(lambda d: not d.execute_script("return document.querySelector('#vowelPreset').value").startswith('ja_yk2019_'))
+              yk_child_count=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).length")
+              print('YK_OPTIONS_CHILD',yk_child_count)
+              assert yk_child_count==0
+
+              driver.execute_script("const s=document.querySelector('#presetLanguage'); s.value='en'; s.dispatchEvent(new Event('change',{bubbles:true}));")
+              wait.until(lambda d: d.execute_script("return document.querySelector('#presetLanguage').value")=='en')
+              en_yk_count=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).length")
+              print('YK_OPTIONS_ENGLISH',en_yk_count)
+              assert en_yk_count==0
+              severe=[x for x in driver.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              print('FINAL_SEVERE_BROWSER_LOGS',severe)
+              assert not severe, severe
+              print('SMOKE_OK')
+          finally:
+              driver.quit()
+          PY
+          echo '--- HTTP server log ---'
+          cat /tmp/formantasia-server.log
