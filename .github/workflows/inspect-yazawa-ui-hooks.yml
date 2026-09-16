@@ -1,0 +1,31 @@
+name: Inspect Yazawa UI hooks
+
+on:
+  push:
+    branches: [feat/yazawa-kondo-ui-integration]
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print relevant index.html regions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          markers=[
+            'function buildPresetOptions',
+            'function presetDuration',
+            'function getPresetSpec',
+            'function applyPreset(',
+            "vowelPresetEl.addEventListener",
+            'buildVoiceOptions(',
+          ]
+          for m in markers:
+              i=s.find(m)
+              print('\n===== MARKER',repr(m),'INDEX',i,'=====')
+              if i>=0:
+                  print(s[max(0,i-500):min(len(s),i+5000)])
+          PY
