@@ -247,13 +247,19 @@
   .info-dot[aria-expanded="true"] { background:#e7eefb; border-color:#7f94b8; color:#253b61; }
 
   .learning-popover {
-    position:fixed; z-index:120; width:min(320px,calc(100vw - 24px)); padding:12px 14px;
+    position:fixed; z-index:120; width:min(320px,calc(100vw - 24px)); padding:12px 44px 12px 14px;
     border:1px solid #d5ddeb; border-radius:15px; background:rgba(255,255,255,.98);
     box-shadow:0 16px 42px rgba(28,42,71,.18); backdrop-filter:blur(12px);
     opacity:0; transform:translateY(5px) scale(.985); pointer-events:none;
     transition:opacity .22s ease, transform .22s ease; color:var(--text);
   }
   .learning-popover.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .learning-popover-close {
+    position:absolute; top:8px; right:8px; width:30px; height:30px; min-width:30px; min-height:30px;
+    display:grid; place-items:center; padding:0; border-radius:50%; border:1px solid #cfd7e5;
+    background:#fff; color:#344054; font-size:20px; line-height:1; font-weight:700; box-shadow:none;
+  }
+  .learning-popover-close:hover { background:#eef3fa; transform:none; box-shadow:none; }
   .learning-popover-title { display:block; margin:0 0 5px; font-size:13px; }
   .learning-popover-text, .learning-popover-example { margin:0; font-size:11.5px; line-height:1.6; color:#515c70; }
   .learning-popover-example { margin-top:7px; padding-top:7px; border-top:1px dashed #d2d9e5; color:#687489; }
@@ -2421,14 +2427,16 @@
     }
   };
 
-  const LEARNING_POPOVER_MS=10000;
   const learningInfoPopover=document.createElement('aside');
   learningInfoPopover.id='learningInfoPopover';
   learningInfoPopover.className='learning-popover';
-  learningInfoPopover.setAttribute('role','status');
-  learningInfoPopover.setAttribute('aria-live','polite');
-  learningInfoPopover.innerHTML='<strong class="learning-popover-title"></strong><span class="learning-popover-kicker">ここを変えると？</span><p class="learning-popover-text"></p><p class="learning-popover-example"></p><button class="learning-popover-deep" type="button">📘 しくみを詳しく</button><div class="learning-popover-source"></div>';
+  learningInfoPopover.setAttribute('role','dialog');
+  learningInfoPopover.setAttribute('aria-modal','false');
+  learningInfoPopover.setAttribute('aria-labelledby','learningPopoverTitle');
+  learningInfoPopover.hidden=true;
+  learningInfoPopover.innerHTML='<button class="learning-popover-close" type="button" aria-label="閉じる">×</button><strong class="learning-popover-title" id="learningPopoverTitle"></strong><span class="learning-popover-kicker">ここを変えると？</span><p class="learning-popover-text"></p><p class="learning-popover-example"></p><button class="learning-popover-deep" type="button">📘 しくみを詳しく</button><div class="learning-popover-source"></div>';
   document.body.appendChild(learningInfoPopover);
+  const learningPopoverClose=learningInfoPopover.querySelector('.learning-popover-close');
   const learningPopoverTitle=learningInfoPopover.querySelector('.learning-popover-title');
   const learningPopoverText=learningInfoPopover.querySelector('.learning-popover-text');
   const learningPopoverExample=learningInfoPopover.querySelector('.learning-popover-example');
@@ -2436,7 +2444,6 @@
   const learningPopoverDeep=learningInfoPopover.querySelector('.learning-popover-deep');
   let learningPopoverAnchor=null;
   let learningPopoverTopic=null;
-  let learningPopoverTimer=null;
 
   function positionLearningPopover(){
     if(!learningPopoverAnchor || !learningInfoPopover.classList.contains('visible')) return;
@@ -2462,11 +2469,11 @@
   }
 
   function hideLearningPopover(){
-    if(learningPopoverTimer){ clearTimeout(learningPopoverTimer); learningPopoverTimer=null; }
     if(learningPopoverAnchor) learningPopoverAnchor.setAttribute('aria-expanded','false');
     learningPopoverAnchor=null;
     learningPopoverTopic=null;
     learningInfoPopover.classList.remove('visible');
+    learningInfoPopover.hidden=true;
   }
 
   function showLearningPopover(anchor,topic){
@@ -2486,12 +2493,20 @@
     learningPopoverExample.textContent=typeof help.detail==='function'?help.detail():help.detail;
     learningPopoverDeep.textContent=`📘 ${help.deepLabel || 'しくみを詳しく'}`;
     renderLearningSourceShort(learningPopoverSources,item);
+    learningInfoPopover.hidden=false;
     learningInfoPopover.classList.add('visible');
     positionLearningPopover();
-    requestAnimationFrame(positionLearningPopover);
-    if(learningPopoverTimer) clearTimeout(learningPopoverTimer);
-    learningPopoverTimer=setTimeout(hideLearningPopover,LEARNING_POPOVER_MS);
+    requestAnimationFrame(()=>{
+      positionLearningPopover();
+      learningPopoverClose.focus();
+    });
   }
+
+  learningPopoverClose.addEventListener('click',()=>{
+    const anchor=learningPopoverAnchor;
+    hideLearningPopover();
+    if(anchor) anchor.focus();
+  });
 
   learningPopoverDeep.addEventListener('click',()=>{
     const topic=learningPopoverTopic;
@@ -2508,7 +2523,12 @@
       if(el.classList.contains('info-dot')) showLearningPopover(el,topic);
     });
   });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideLearningPopover(); });
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Escape' || learningInfoPopover.hidden) return;
+    const anchor=learningPopoverAnchor;
+    hideLearningPopover();
+    if(anchor) anchor.focus();
+  });
   window.addEventListener('resize',positionLearningPopover);
   window.addEventListener('scroll',positionLearningPopover,true);
 
