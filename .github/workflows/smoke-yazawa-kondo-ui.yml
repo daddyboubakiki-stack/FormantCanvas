@@ -1,0 +1,78 @@
+name: Smoke test Yazawa-Kondo UI
+
+on:
+  push:
+    branches: [feat/yazawa-kondo-ui-integration]
+    paths:
+      - '.github/workflows/smoke-yazawa-kondo-ui.yml'
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+      - name: Run browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          python - <<'PY'
+          import math, time
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1280,900')
+          driver=webdriver.Chrome(options=opts)
+          wait=WebDriverWait(driver,15)
+          try:
+              driver.get('http://127.0.0.1:8000/')
+              wait.until(lambda d: len(d.find_elements('css selector','#vowelPreset option')) >= 30)
+
+              groups=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset optgroup')).map(g=>g.label)")
+              yk_options=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).map(o=>o.value)")
+              print('GROUPS',groups)
+              print('YK_OPTIONS_MALE',len(yk_options))
+              assert len(yk_options)==20, yk_options
+              for label in ['単独語・短（Yazawa–Kondo）','単独語・長（Yazawa–Kondo）','文中・短（Yazawa–Kondo）','文中・長（Yazawa–Kondo）']:
+                  assert label in groups, label
+
+              male_key='ja_yk2019_male_isolated_short_a'
+              driver.execute_script("const s=document.querySelector('#vowelPreset'); s.value=arguments[0]; s.dispatchEvent(new Event('change',{bubbles:true}));",male_key)
+              wait.until(lambda d: male_key in d.execute_script("return document.querySelector('#vowelPreset').value"))
+              wait.until(lambda d: '単独語・短' in d.find_element('css selector','#provTitle').text)
+              dur=float(driver.execute_script("return document.querySelector('#duration').value"))
+              print('MALE_A_DURATION_S',dur)
+              print('MALE_TITLE',driver.find_element('css selector','#provTitle').text)
+              assert math.isclose(dur,0.081717,abs_tol=0.000001), dur
+
+              driver.execute_script("const s=document.querySelector('#voiceType'); s.value='female'; s.dispatchEvent(new Event('change',{bubbles:true}));")
+              female_key='ja_yk2019_female_isolated_short_a'
+              wait.until(lambda d: d.execute_script("return document.querySelector('#vowelPreset').value")==female_key)
+              wait.until(lambda d: '単独語・短' in d.find_element('css selector','#provTitle').text)
+              dur2=float(driver.execute_script("return document.querySelector('#duration').value"))
+              print('FEMALE_SELECTED',driver.execute_script("return document.querySelector('#vowelPreset').value"))
+              print('FEMALE_A_DURATION_S',dur2)
+              assert math.isclose(dur2,0.077533,abs_tol=0.000001), dur2
+
+              driver.execute_script("const s=document.querySelector('#voiceType'); s.value='child'; s.dispatchEvent(new Event('change',{bubbles:true}));")
+              wait.until(lambda d: not d.execute_script("return document.querySelector('#vowelPreset').value").startswith('ja_yk2019_'))
+              assert len(driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).length")) if False else True
+              yk_child_count=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).length")
+              print('YK_OPTIONS_CHILD',yk_child_count)
+              assert yk_child_count==0
+
+              driver.execute_script("const s=document.querySelector('#presetLanguage'); s.value='en'; s.dispatchEvent(new Event('change',{bubbles:true}));")
+              wait.until(lambda d: d.execute_script("return document.querySelector('#presetLanguage').value")=='en')
+              en_yk_count=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).length")
+              print('YK_OPTIONS_ENGLISH',en_yk_count)
+              assert en_yk_count==0
+              print('SMOKE_OK')
+          finally:
+              driver.quit()
+          PY
