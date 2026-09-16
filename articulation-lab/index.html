@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.5-alpha</title>
+  <title>Articulation Lab v0.5-alpha.1</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.5-alpha</small></h1>
+        <h1>Articulation Lab <small>v0.5-alpha.1</small></h1>
         <p>Hear real human vowels, then see the same pedagogical articulation from the side and from the front. Mouth Synth keeps the playful continuous model.</p>
       </div>
       <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
@@ -85,7 +85,7 @@
         <section class="panel buttons-only">
           <div class="section-title">Human recording</div>
           <div id="recordingHint" class="mini-note">Loading local recording set…</div>
-          <p class="mini-note">Audio evidence and articulation targets are now stored separately. A recording tells us how that speaker sounded; the side/front drawings show a teaching target and do not claim to reconstruct that speaker’s measured anatomy.</p>
+          <p class="mini-note">Audio evidence and articulation targets are stored separately. A recording tells us how that speaker sounded; the side/front drawings show a teaching target and do not claim to reconstruct that speaker’s measured anatomy.</p>
           <p class="mini-note">Japanese buttons use one Japanese speaker’s public-domain recordings. Most English buttons use a redistribution-safe IPA reference; KIT /ɪ/ uses the natural vowel nucleus cut from US-English <em>kid</em>.</p>
           <p class="mini-note">KIT source: <a href="https://commons.wikimedia.org/wiki/File:En-us-kid.ogg" target="_blank" rel="noreferrer">Dvortygirl, “En-us-kid.ogg”</a>, adapted under <a href="https://creativecommons.org/licenses/by-sa/2.5/" target="_blank" rel="noreferrer">CC BY-SA 2.5</a>.</p>
         </section>
@@ -95,22 +95,33 @@
           <label class="select-label" for="voiceProfile">Voice</label>
           <select id="voiceProfile" class="voice-select"></select>
           <div id="voiceHint" class="mini-note"></div>
+
+          <div class="control">
+            <span class="control-row"><span>Free articulation</span><span>coordination</span></span>
+            <div class="segmented two coordination-tabs" aria-label="Free articulation coordination mode">
+              <button type="button" data-coordination-mode="independent">Independent</button>
+              <button type="button" class="selected" data-coordination-mode="natural">Natural</button>
+            </div>
+            <div id="coordinationHint" class="mini-note">Natural: dragging the tongue also follows a smooth pedagogical jaw/lip/root coordination field built from the vowel targets.</div>
+          </div>
+
           <label class="control">
             <span class="control-row"><span>Pitch</span><span id="f0Value">245 Hz</span></span>
             <input id="f0" type="range" min="80" max="320" step="1" value="245" />
           </label>
           <label class="control">
-            <span class="control-row"><span>Jaw opening</span><span>closed ↔ open</span></span>
+            <span class="control-row"><span>Jaw opening</span><span>closed ↔ open · affects F1</span></span>
             <input id="jawOpening" type="range" min="0" max="1" step="0.01" value="0.48" />
           </label>
           <label class="control">
-            <span class="control-row"><span>Lip spread</span><span>neutral ↔ wide</span></span>
+            <span class="control-row"><span>Lip spread</span><span>neutral ↔ spread · visual axis</span></span>
             <input id="lipSpread" type="range" min="0" max="1" step="0.01" value="0.12" />
           </label>
           <label class="control">
-            <span class="control-row"><span>Lip rounding</span><span>flat ↔ round</span></span>
+            <span class="control-row"><span>Lip rounding</span><span>unrounded ↔ rounded · affects formants</span></span>
             <input id="lipRounding" type="range" min="0" max="1" step="0.01" value="0.1" />
           </label>
+          <p class="mini-note">Current synth acoustics respond directly to tongue body position, jaw opening and lip rounding. Lip spread and tongue-root retraction are visual/model-state axes in this alpha; stronger acoustic coupling is deferred until a more principled tract model is used.</p>
         </section>
 
         <section class="panel note buttons-only">
@@ -120,7 +131,7 @@
 
         <section class="panel note synth-only">
           <strong>Mouth Synth = continuous synthesis</strong><br />
-          Drag the tongue in the side view and independently change jaw opening, lip spread, and lip rounding. The front view follows the same state.
+          In <strong>Natural</strong>, dragging the tongue also moves jaw/lips/root using a smooth interpolation of the vowel teaching targets. In <strong>Independent</strong>, every control stays separate so you can explore unusual combinations deliberately.
         </section>
 
         <section class="panel note">
@@ -137,6 +148,7 @@
   <script src="data/vowel-presets.js"></script>
   <script src="src/state-store.js"></script>
   <script src="src/constraint-mapper.js"></script>
+  <script src="src/natural-coordination.js"></script>
   <script src="src/audio/formant-engine.js"></script>
   <script src="src/audio/sample-player.js"></script>
   <script src="src/renderers/simple-renderer.js"></script>
