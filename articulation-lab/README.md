@@ -1,4 +1,4 @@
-# Articulation Lab — v0.5-alpha.2 staging build
+# Articulation Lab — v0.5-alpha.17 staging checkpoint
 
 Articulation Lab is a proposed sister app to Formant Canvas.
 
@@ -10,46 +10,49 @@ The app deliberately separates two experiences:
 1. **Vowel Buttons** — tap IPA buttons. A short **human recording** plays while a separate pedagogical articulation target is visualized.
 2. **Mouth Synth** — turn on continuous synthesis and manipulate a pedagogical articulation model like an instrument.
 
-This prevents “real recorded vowel evidence” and “freely generated articulatory synthesis” from pretending to be the same scientific object.
+This prevents real recorded vowel evidence and freely generated articulatory synthesis from pretending to be the same scientific object.
 
-## v0.5-alpha.2 — front-view refinement, stronger rounding, approximate IPA
+## v0.5-alpha.17 checkpoint
 
-### More human-looking frontal Simple skin
+The current checkpoint consolidates the visual-articulation work that was user-reviewed through alpha.3–alpha.17.
 
-The frontal mouth is no longer built from two plain concentric ellipses. The renderer now uses shaped Bezier contours with:
+### Shared side + front articulation
 
-- a simplified Cupid's-bow upper-lip contour
-- a fuller lower-lip contour
-- distinct mouth-corner geometry
-- a separate darker oral cavity
-- more subdued, anatomically distinct colors for lips, tongue, teeth and skin
-- small nostril cues
-- subtle upper-incisor separators
-- reduced lower-incisor prominence
+Both views are driven by the same articulation state. Shared axes currently include:
 
-This remains a schematic teaching face, not photorealistic anatomy.
+- tongue-body front/back
+- tongue-body high/low
+- tongue-root retraction
+- independent jaw opening
+- lip rounding
+- lip spreading
 
-### Stronger visible rounding
+`Side / Front / Both` switching remains available.
 
-User review found the /u/-like rounded posture visually too open. alpha.2 therefore makes strong rounding visibly reduce **both horizontal and vertical aperture** while increasing side-view protrusion.
+### Frontal Simple skin
 
-The CI now explicitly checks that the pedagogical English `/u/` target has a much smaller frontal aperture than `/æ/`.
+The current frontal renderer is intentionally schematic rather than photorealistic. It now includes:
 
-### Approximate IPA while Mouth Synth is sounding
+- a neutral-gray UI/background rather than the earlier warm yellow cast
+- stronger visual narrowing/protrusion for rounded vowels, especially `/u/`
+- a smoother single-color lip contour
+- a short-midface, friendly schematic face
+- round eyes with short, soft brows
+- the earlier simple line nose
+- teeth clipped inside the mouth aperture
+- upper/lower tooth widths kept close, with the upper row slightly wider
+- a state-dependent choice between showing lower teeth or the tongue so the lower oral slot does not become visually crowded
+- intentionally **no gum layer** in Simple skin, after testing showed that gums added complexity without reliably improving the teaching view across narrow/open postures
 
-Mouth Synth now displays a prominent `≈ [IPA]` hint while VOICE is on.
+The renderer remains a teaching model, not measured anatomy.
 
-The estimator does **not** infer IPA from the drawing alone. It compares the current synth's modeled F1/F2/F3 values with the same synth model evaluated at the 15 English/Japanese vowel anchors, and reports the nearest anchor.
+### Close front vowels and lower teeth
 
-This means:
+For close, spread postures such as `/i/` and `/ɪ/`, the renderer can prioritize lower teeth to suggest the familiar front-view “ee/grin” appearance. More open front vowels such as `/ɛ/` and `/æ/` prioritize the tongue instead.
 
-- jaw-opening effects already represented in the synth can affect the estimate
-- lip-rounding effects already represented in the synth can affect the estimate
-- visual-only axes such as `lipSpread` do not falsely count as audible evidence
+This is a display heuristic for clarity, not a claim that one structure is literally invisible in all speakers.
 
-The readout is explicitly a **pedagogical synth estimate**, not automatic phonetic transcription of a human speaker.
-
-## v0.5-alpha.1 — Natural / Independent free articulation
+### Natural / Independent free articulation
 
 Mouth Synth has two coordination modes:
 
@@ -58,22 +61,11 @@ Mouth Synth has two coordination modes:
 
 Natural coordination is a pedagogical interpolation, not an anatomical inverse solver. Tongue position does not uniquely determine all other articulators in real speech.
 
-## v0.5 visual foundation
+### Approximate IPA while Mouth Synth is sounding
 
-Articulation targets are stored separately from recording metadata in `data/articulation-targets.js`.
+Mouth Synth displays `≈ [IPA]` while VOICE is on.
 
-Shared normalized articulation axes currently include:
-
-- tongue body front/back
-- tongue body high/low
-- tongue-root retraction
-- independent jaw opening
-- lip rounding
-- lip spreading
-
-The sagittal Simple renderer includes jaw movement, tongue-root response, lip rounding/spreading and schematic airway shading. The frontal Simple renderer shows vertical/horizontal aperture, rounding, teeth/tongue visibility and jaw/chin movement from the **same articulation state**.
-
-Side / Front / Both switching is available.
+The estimator compares the current synth's modeled F1/F2/F3 values with the same synth model evaluated at the English/Japanese vowel anchors. It is explicitly a **pedagogical synth estimate**, not automatic transcription of a human speaker.
 
 ## First visual acceptance pair: `/æ/` vs `/ɑ/`
 
@@ -95,17 +87,6 @@ Side / Front / Both switching is available.
 
 These are teaching targets, not measured anatomy or claims about every English speaker.
 
-## Scientific / educational precedents
-
-The design is informed by established articulatory resources without copying their artwork or restricted materials.
-
-- **Seeing Speech / STAR**: useful precedent for imaging-backed 2-D articulator animation, independent jaw motion and multiple tongue regions.
-- **Sounds of Speech (University of Iowa)**: useful precedent for combining articulatory animation, real-speaker visual material, audio and explanatory teaching content.
-- **Dynamic Dialects**: useful reference for synchronized lip video and ultrasound tongue imaging.
-- **VocalTractLab**: useful precedent for separating higher-level phonetic controls from a richer tract model and for future area-function-based acoustics.
-
-Seeing Speech and Dynamic Dialects are treated as reference/validation resources; their restricted artwork/video is not modified or bundled into this app.
-
 ## Current Mouth Synth acoustic boundary
 
 The current pedagogical formant mapping responds directly to:
@@ -123,31 +104,21 @@ The current pedagogical formant mapping responds directly to:
 - English buttons `/i ɪ ɛ æ ʌ ə ɑ ɔ ʊ u/`
 - Japanese buttons `/i e a o ɯ/`
 - locally bundled human recordings for Vowel Buttons
-- cached/retriggerable playback with short fades
 - continuous synthesis retained for Mouth Synth
-- Child / Teen / Adult / Soft-airy synth-rendering profiles
-- synth F1/F2/F3 estimates shown only in Mouth Synth
-- fail-closed duration/loudness validation
+- retained v0.4.2 Japanese/loudness repair
+- retained v0.4.3 natural KIT `/ɪ/` nucleus from US-English `kid`, with no time-stretch
+- explicit provenance and redistribution boundaries
 
-### Japanese/loudness repair (v0.4.2)
+## Scientific / educational precedents
 
-Japanese source recordings contain unusually short repeated kana tokens. The build detects an actual voiced token, retains onset/offset margin, applies documented pitch-preserving duration adjustment, and active-RMS matches the resulting samples while respecting peak headroom.
+The design is informed by established articulatory resources without copying their artwork or restricted materials.
 
-Current Japanese outputs contain about **0.39–0.41 s** of audible vowel material.
+- **Seeing Speech / STAR:** imaging-backed 2-D articulator animation and independent jaw/tongue-region control
+- **Sounds of Speech (University of Iowa):** articulatory animation + audio + teaching material
+- **Dynamic Dialects:** synchronized lip video and ultrasound tongue imaging
+- **VocalTractLab:** higher-level phonetic controls separated from a richer tract model; area-function work is a future direction
 
-### Natural KIT `/ɪ/` (v0.4.3)
-
-The generic isolated IPA `/ɪ/` was replaced after listening review with the vowel nucleus from a US-English `kid` recording.
-
-- source: `En-us-kid.ogg`
-- author/speaker attribution: Dvortygirl
-- Wikimedia Commons
-- CC BY-SA 2.5
-- selected interval approximately `0.205–0.315 s`
-- exported length approximately `0.110 s`
-- no time-stretch
-- 6 ms fade-in / 10 ms fade-out
-- mono 24 kHz conversion + active-RMS matching
+Restricted artwork/video from reference resources is not modified or bundled here.
 
 ## Scientific boundary
 
@@ -165,38 +136,27 @@ The cavity shading is a teaching visualization, not a measured area function.
 
 Only recordings with sufficiently explicit redistribution permission are bundled. “Publicly downloadable” or “usable for research” is not treated as redistribution permission.
 
-Research corpora such as JVPD are not copied into the app unless their terms explicitly permit the intended redistribution.
-
 ## Distribution build
 
-`.github/workflows/articulation-v04-preview.yml` is a historical filename. It now validates alpha.2 and builds:
+`.github/workflows/articulation-v04-preview.yml` is a historical filename. It validates the current alpha checkpoint and builds:
 
-- `ArticulationLab_v0.5-alpha.2.html` — self-contained preview with CSS, JavaScript and vetted WAV samples embedded
-- `ArticulationLab_v0.5-alpha.2_source.zip` — modular source bundle
+- `ArticulationLab_v0.5-alpha.17.html` — self-contained preview with CSS, JavaScript and vetted WAV samples embedded
+- `ArticulationLab_v0.5-alpha.17_source.zip` — modular source bundle
 
-Validation includes:
-
-- JavaScript syntax
-- articulation-target / recording-data separation
-- Natural coordination behavior
-- strong `/u/` rounding geometry relative to `/æ/`
-- nearest-modeled-IPA checks for `/u/` and `/æ/`
-- retained v0.4.3 audio provenance/duration/loudness checks
-- self-contained distribution packaging
+Validation includes JavaScript syntax, articulation-target / recording-data separation, Natural coordination behavior, strong `/u/` rounding geometry, nearest-modeled-IPA checks, retained real-voice provenance/duration/loudness checks, and standalone packaging.
 
 ## Next stages
 
-- user-device review of alpha.2 mouth geometry and approximate IPA behavior
-- further tune teeth, lip contour and face proportions
+- design exploration in a separate MetaAI/Cute branch
 - renderer/skin registry
 - Anatomy skin
-- Cute exterior skins (monkey/cat/etc.) driven by exactly the same articulation state
+- Cute exterior skins driven by the same articulation state
 - Compare A/B overlay
 - richer tract acoustics / area-function exploration
 - consonant-ready tongue-tip, constriction, velum, airflow and voicing controls
 
 ## Repository status
 
-This folder lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical. The current staged app is v0.5-alpha.2.
+This folder lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical. The current staged checkpoint is **v0.5-alpha.17**.
 
 The draft staging PR should **not** be merged into Formant Canvas `main` merely to ship this sister-app prototype.
