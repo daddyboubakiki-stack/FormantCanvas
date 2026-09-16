@@ -17,26 +17,37 @@ jobs:
       - name: Run browser smoke test
         run: |
           python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          curl -fsS http://127.0.0.1:8000/data/yazawa_kondo_2019_adult_presets.json >/tmp/yk.json
           python - <<'PY'
-          import math, time
+          import json, math, time
           from selenium import webdriver
           from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
           from selenium.webdriver.support.ui import WebDriverWait
 
+          print('HTTP_JSON_PRESETS',len(json.load(open('/tmp/yk.json'))['presets']))
           opts=Options()
           opts.add_argument('--headless=new')
           opts.add_argument('--no-sandbox')
           opts.add_argument('--disable-dev-shm-usage')
           opts.add_argument('--window-size=1280,900')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
           driver=webdriver.Chrome(options=opts)
           wait=WebDriverWait(driver,15)
           try:
               driver.get('http://127.0.0.1:8000/')
-              wait.until(lambda d: len(d.find_elements('css selector','#vowelPreset option')) >= 30)
+              time.sleep(3)
+              count=len(driver.find_elements('css selector','#vowelPreset option'))
+              print('OPTION_COUNT_AFTER_3S',count)
+              print('SELECTED_LANGUAGE',driver.execute_script("return document.querySelector('#presetLanguage')?.value"))
+              print('SELECTED_VOICE',driver.execute_script("return document.querySelector('#voiceType')?.value"))
+              print('GROUPS_AFTER_3S',driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset optgroup')).map(g=>g.label)"))
+              print('BROWSER_LOGS',driver.get_log('browser'))
+              assert count>=30, f'expected >=30 options after YK load, got {count}'
 
               groups=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset optgroup')).map(g=>g.label)")
               yk_options=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).map(o=>o.value)")
-              print('GROUPS',groups)
               print('YK_OPTIONS_MALE',len(yk_options))
               assert len(yk_options)==20, yk_options
               for label in ['単独語・短（Yazawa–Kondo）','単独語・長（Yazawa–Kondo）','文中・短（Yazawa–Kondo）','文中・長（Yazawa–Kondo）']:
@@ -44,7 +55,7 @@ jobs:
 
               male_key='ja_yk2019_male_isolated_short_a'
               driver.execute_script("const s=document.querySelector('#vowelPreset'); s.value=arguments[0]; s.dispatchEvent(new Event('change',{bubbles:true}));",male_key)
-              wait.until(lambda d: male_key in d.execute_script("return document.querySelector('#vowelPreset').value"))
+              wait.until(lambda d: d.execute_script("return document.querySelector('#vowelPreset').value")==male_key)
               wait.until(lambda d: '単独語・短' in d.find_element('css selector','#provTitle').text)
               dur=float(driver.execute_script("return document.querySelector('#duration').value"))
               print('MALE_A_DURATION_S',dur)
@@ -62,7 +73,6 @@ jobs:
 
               driver.execute_script("const s=document.querySelector('#voiceType'); s.value='child'; s.dispatchEvent(new Event('change',{bubbles:true}));")
               wait.until(lambda d: not d.execute_script("return document.querySelector('#vowelPreset').value").startswith('ja_yk2019_'))
-              assert len(driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).length")) if False else True
               yk_child_count=driver.execute_script("return Array.from(document.querySelectorAll('#vowelPreset option')).filter(o=>o.value.startsWith('ja_yk2019_')).length")
               print('YK_OPTIONS_CHILD',yk_child_count)
               assert yk_child_count==0
@@ -76,3 +86,5 @@ jobs:
           finally:
               driver.quit()
           PY
+          echo '--- HTTP server log ---'
+          cat /tmp/formantasia-server.log
