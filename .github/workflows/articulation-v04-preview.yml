@@ -1,10 +1,11 @@
-name: Articulation Lab v0.5-alpha.17 preview
+name: Articulation Lab v0.5-alpha.18 preview
 
 on:
   workflow_dispatch:
   push:
     branches:
       - design/articulation-lab-v0.1
+      - design/codex-cute-monkey
     paths:
       - 'articulation-lab/**'
       - '.github/workflows/articulation-v04-preview.yml'
@@ -91,7 +92,7 @@ jobs:
           const nearAe = estimator.nearest({ ...targets.en_ae, f0Hz: 125, voicing: true });
           if (!nearU || nearU.symbol !== 'u') throw new Error(`Expected /u/ target to estimate nearest [u], got ${nearU && nearU.symbol}`);
           if (!nearAe || nearAe.symbol !== 'æ') throw new Error(`Expected /æ/ target to estimate nearest [æ], got ${nearAe && nearAe.symbol}`);
-          console.log('Validated alpha.17 coordination, strong rounding geometry, and nearest modeled IPA estimator.');
+          console.log('Validated alpha.18 coordination, strong rounding geometry, and nearest modeled IPA estimator.');
           NODE
 
       - name: Validate processed real-voice report
@@ -122,28 +123,29 @@ jobs:
       - name: Build standalone HTML
         run: |
           set -euxo pipefail
-          mkdir -p /tmp/articulation-v05a17
+          mkdir -p /tmp/articulation-v05a18
           python3 articulation-lab/tools/build_standalone_preview.py \
             --app-dir articulation-lab \
-            --output /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
-          grep -q 'data:audio/x-wav;base64\|data:audio/wav;base64' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
-          ! grep -q 'assets/audio/real/' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
-          grep -q 'Articulation Lab v0.5-alpha.17' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
-          grep -q 'Frontal · front' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
-          grep -q 'Approx. IPA' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
-          grep -q 'Natural' /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17.html
+            --output /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18.html
+          grep -q 'data:audio/x-wav;base64\|data:audio/wav;base64' /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18.html
+          ! grep -q 'assets/audio/real/' /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18.html
+          grep -q 'Articulation Lab v0.5-alpha.18' /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18.html
+          grep -q 'Frontal · front' /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18.html
+          grep -q 'Approx. IPA' /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18.html
+          grep -q 'Natural' /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18.html
+          grep -q 'Cute 🐵' /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18.html
 
       - name: Package modular source
         run: |
           set -euxo pipefail
-          zip -qr /tmp/articulation-v05a17/ArticulationLab_v0.5-alpha.17_source.zip articulation-lab \
+          zip -qr /tmp/articulation-v05a18/ArticulationLab_v0.5-alpha.18_source.zip articulation-lab \
             -x 'articulation-lab/tools/__pycache__/*'
-          ls -lh /tmp/articulation-v05a17
+          ls -lh /tmp/articulation-v05a18
 
       - name: Upload distributables
         uses: actions/upload-artifact@v4
         with:
-          name: ArticulationLab-v0.5-alpha.17-distributables
-          path: /tmp/articulation-v05a17
+          name: ArticulationLab-v0.5-alpha.18-distributables
+          path: /tmp/articulation-v05a18
           if-no-files-found: error
           retention-days: 14
