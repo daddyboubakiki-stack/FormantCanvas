@@ -1,0 +1,101 @@
+name: Add mode-specific export controls
+
+on:
+  push:
+    branches:
+      - feat/export-controls-by-mode
+    paths:
+      - 'tools/add_mode_export_controls.py'
+      - '.github/workflows/add-mode-export-controls.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply export controls patch
+        run: python tools/add_mode_export_controls.py
+
+      - name: Validate JavaScript and structure
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path('index.html').read_text(encoding='utf-8')
+          assert html.count('id="downloadWavBtn"') == 1
+          assert html.count('id="casualDownloadWavBtn"') == 1
+          assert html.count('id="exportPraat"') == 1
+          assert html.count('id="exportCsv"') == 1
+          assert html.count('id="importCsvBtn"') == 1
+          assert '🔊 おとを保存する' in html
+          assert 'WAVを保存' in html and 'Praat用に保存' in html and 'CSVを保存' in html and 'CSVを読み込む' in html
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,flags=re.S)
+          Path('/tmp/formantasia.js').write_text(scripts[-1],encoding='utf-8')
+          PY
+          node --check /tmp/formantasia.js
+
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+
+      - name: Browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          opts=Options(); opts.add_argument('--headless=new'); opts.add_argument('--no-sandbox'); opts.add_argument('--disable-dev-shm-usage'); opts.add_argument('--window-size=1280,1000')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          d=webdriver.Chrome(options=opts); w=WebDriverWait(d,20)
+          try:
+              d.get('http://127.0.0.1:8000/')
+              casual=d.find_element('id','casualExportPanel')
+              shared=d.find_element('id','modeExportPanel')
+              assert casual.is_displayed()
+              assert not shared.is_displayed()
+              casual_btn=d.find_element('id','casualDownloadWavBtn')
+              assert casual_btn.is_displayed()
+              assert 'おとを保存する' in casual_btn.get_attribute('textContent')
+              assert len([b for b in casual.find_elements('tag name','button') if b.is_displayed()]) == 1
+
+              d.find_element('id','learningModeBtn').click()
+              w.until(lambda x: shared.is_displayed())
+              assert not casual.is_displayed()
+              assert not d.find_element('css selector','.advanced-panel').is_displayed()
+              visible=[b.get_attribute('textContent').strip() for b in shared.find_elements('tag name','button') if b.is_displayed()]
+              print('LEARNING_EXPORT_BUTTONS',visible)
+              assert visible == ['WAVを保存','Praat用に保存','CSVを保存','CSVを読み込む']
+
+              d.find_element('id','researchModeBtn').click()
+              w.until(lambda x: d.find_element('css selector','.advanced-panel').is_displayed())
+              assert shared.is_displayed()
+              visible=[b.get_attribute('textContent').strip() for b in shared.find_elements('tag name','button') if b.is_displayed()]
+              print('RESEARCH_EXPORT_BUTTONS',visible)
+              assert visible == ['WAV書き出し','Praatへ書き出し','CSV書き出し','CSV読込']
+
+              severe=[x for x in d.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              print('FINAL_SEVERE_BROWSER_LOGS',severe)
+              assert not severe,severe
+              print('MODE_EXPORT_CONTROLS_OK')
+          finally:
+              d.quit()
+          PY
+          cat /tmp/formantasia-server.log
+
+      - name: Commit generated index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No generated index changes.'
+          else
+            git commit -m 'Add export controls to Casual and Learning modes'
+            git push
+          fi
