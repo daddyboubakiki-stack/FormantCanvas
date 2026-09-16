@@ -5,6 +5,7 @@ on:
     branches: [feat/yazawa-kondo-ui-integration]
     paths:
       - 'tools/integrate_yazawa_kondo_ui.py'
+      - 'tools/finalize_yazawa_kondo_ui.py'
       - '.github/workflows/integrate-yazawa-kondo-ui.yml'
   workflow_dispatch:
 
@@ -22,6 +23,8 @@ jobs:
           git checkout origin/feat/yazawa-kondo-adult-presets -- data/yazawa_kondo_2019_adult_presets.json data/yazawa_kondo_2019_adult_summary.csv
       - name: Patch Formantasia UI
         run: python tools/integrate_yazawa_kondo_ui.py
+      - name: Finalize short-duration support and references
+        run: python tools/finalize_yazawa_kondo_ui.py
       - name: Validate data and JavaScript syntax
         run: |
           python - <<'PY'
@@ -32,8 +35,14 @@ jobs:
           combos={(p['sex'],p['context_label'],p['length'],p['vowel']) for p in data['presets']}
           assert len(combos)==40
           html=Path('index.html').read_text()
-          for needle in ['YK2019_PRESETS','applyYazawaKondoPreset','単独語・短（Yazawa–Kondo）','文中・長（Yazawa–Kondo）','loadYazawaKondoData();']:
+          for needle in [
+              'YK2019_PRESETS','applyYazawaKondoPreset',
+              '単独語・短（Yazawa–Kondo）','文中・長（Yazawa–Kondo）',
+              'loadYazawaKondoData();','min="0.04" max="8" step="0.001"',
+              'Japanese Vowel Length Acoustic Data v3'
+          ]:
               assert needle in html, needle
+          assert "  render();\n  loadYazawaKondoData();\n})();" in html
           scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,flags=re.S)
           Path('/tmp/formantasia-last-script.js').write_text(scripts[-1])
           print('DATA_PRESETS',len(data['presets']))
