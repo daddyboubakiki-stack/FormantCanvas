@@ -1,118 +1,112 @@
 # AGENTS.md — Formantasia development instructions
 
-This file is the standing instruction manual for AI coding agents and human contributors working on Formantasia. Read it before changing code.
+This file is the standing **Formantasia-specific** instruction manual for AI coding agents and human contributors.
 
-Also read:
-- `PROJECT_STATE.md` for the current snapshot and known risks.
-- `DECISIONS.md` for important design and research decisions and their rationale.
-- `README.md` for the public product description.
+Before changing code or research data, read:
 
-## Priority rules
+1. `DEVELOPMENT_METHOD.md` — the shared AI co-development method and global priority rules.
+2. `PROJECT_STATE.md` — the current snapshot and known risks.
+3. `DECISIONS.md` — important design and research decisions and their rationale.
+4. `README.md` — the public product description.
 
-### P0 — Preserve the user's goal
-Implement the intended user experience, not merely the literal wording of a requested technique.
+`DEVELOPMENT_METHOD.md` defines the general workflow. This file adds Formantasia-specific invariants and safety rules.
 
-If the requested implementation method is not the best way to achieve the goal, propose a safer, simpler, more maintainable, or higher-quality alternative before implementation. Do not silently replace the user's design intent.
+---
 
-### P1 — Inspect before editing
-Before changing code, inspect the relevant implementation, data structures, dependencies, and existing behavior.
+## Priority rules for Formantasia
+
+### P0 — Protect research data and other protected artifacts
+
+Research values, research-derived parameters, population mappings, duration values, evidence classifications, provenance labels, and source attributions are **protected data**, not ordinary implementation details.
+
+Do **not** alter them as a side effect of UI work, refactoring, bug fixing, cleanup, optimization, visual tuning, or unrelated feature work.
+
+If you suspect a research-data error while working on another task:
+
+1. do not silently correct it;
+2. report the suspected issue and evidence;
+3. leave the current value unchanged;
+4. treat any correction as a separate, explicit research-data task.
+
+A research value may be added, replaced, or corrected only when the current task explicitly concerns research data and the change is supported by an identifiable source or documented derivation.
+
+For any permitted change to existing research values or evidence classification:
+
+1. record the exact source;
+2. record old value → new value;
+3. state whether the value is empirical, borrowed, modeled, or derived;
+4. keep user-visible provenance synchronized with implementation;
+5. do not overstate measurement precision;
+6. isolate the research-data change from unrelated feature work whenever practical;
+7. obtain **explicit user approval before merge**.
+
+### P1 — Preserve the user's actual goal
+
+Implement the intended experience, not merely the literal wording of a requested technique.
+
+If the requested implementation method is not the best way to achieve the goal, proactively propose a safer, simpler, more maintainable, or higher-quality alternative before implementation. Do not silently replace the user's design intent.
+
+### P2 — Inspect before editing
+
+Before making changes, inspect the relevant implementation, data structures, dependencies, protected data, and existing behavior.
 
 Determine:
+
 - whether the request can be implemented as stated;
-- whether it conflicts with existing behavior or research assumptions;
+- whether it conflicts with working behavior or research assumptions;
 - whether a better implementation path exists;
 - whether the change requires architectural work rather than a local patch.
 
-If there is an important technical constraint, explain it before making the change whenever practical.
+Surface important constraints early.
 
-### P2 — Do not stop at “cannot”
-When the direct request is difficult or unsafe for the current architecture, identify the blocking cause and consider, in order:
-1. removing or correcting the cause;
-2. an alternative implementation that preserves the same experience;
-3. a clearly labeled approximation only when necessary.
+### P3 — Keep changes small and protect working behavior
 
-State the recommended option and why.
-
-### P3 — Keep changes small and testable
-Break large requests into small implementation units. Prefer the dependency order:
+Break large requests into small, testable units. Prefer the dependency order:
 
 **data / architecture → behavior / logic → UI → visual polish**
 
-Do not bundle unrelated refactors into a feature or bug-fix patch.
+For each change, identify both what is intentionally changing and what must remain unchanged. Do not bundle unrelated refactors into feature or bug-fix work.
 
-### P4 — Protect working behavior
-For each change, identify both:
-- what is intentionally changing;
-- what must remain unchanged.
+### P4 — Resolve high-impact ambiguity and define completion
 
-Avoid regressions in unrelated modes, presets, drawing behavior, audio behavior, research displays, and mobile layout.
+Ask a focused question when different interpretations would materially change architecture, interaction, data meaning, protected data, or animation relationships.
 
-### P5 — Resolve high-impact ambiguity
-Ask a focused question when different interpretations would materially change architecture, interaction, data meaning, or animation relationships.
+Otherwise, state the adopted interpretation briefly and proceed.
 
-If clarification is unnecessary, state the adopted interpretation briefly and proceed.
+Translate the request into observable acceptance criteria before implementation. After implementation, verify those criteria and nearby regression risks. User-visible or interaction-level dissatisfaction counts as a failed acceptance criterion even if automated checks pass.
 
-### P6 — Define and verify completion
-Before implementation, translate the request into observable acceptance criteria.
+### P5 — Preserve project knowledge
 
-After implementation, verify those criteria and relevant regression behavior. Visual or interaction-level user dissatisfaction counts as a failed acceptance criterion even if automated checks pass.
-
-### P7 — Preserve project knowledge
-Keep important durable knowledge in the repository instead of relying on chat history.
+Keep durable knowledge in the repository rather than relying on chat history.
 
 Update as appropriate:
-- `AGENTS.md` — durable rules and invariants;
-- `PROJECT_STATE.md` — current implementation state, known issues, and near-term work;
+
+- `DEVELOPMENT_METHOD.md` — cross-project AI co-development principles;
+- `AGENTS.md` — Formantasia-specific rules and invariants;
+- `PROJECT_STATE.md` — current implementation state and known issues;
 - `DECISIONS.md` — durable design/research decisions and rationale.
 
-### P8 — Report after implementation
-Summarize:
-- what changed;
-- what was verified;
-- remaining uncertainty or known issues;
-- the recommended next step, if any.
-
-### P9 — Be a co-designer, not an instruction repeater
-Proactively surface better UX, architecture, research handling, maintainability, or implementation ideas when they directly support the current goal.
-
-The user owns product direction and experience. The agent owns careful technical reasoning and should not withhold a materially better approach merely because it was not explicitly requested.
+After implementation, report what changed, what was verified, remaining uncertainty, and the recommended next step.
 
 ---
 
 ## Formantasia-specific invariants
 
 ### Product identity
+
 - Public product name: **Formantasia（フォルマンタジア）**.
 - Tagline: **声をえがくキャンバス · Draw Your Voice**.
-- The repository may still contain legacy/internal identifiers based on `FormantCanvas`. Do not rename internal identifiers or persisted keys casually; treat migration as a separate, explicit task.
+- The repository may still contain legacy/internal identifiers based on `FormantCanvas`.
+- Do not rename internal identifiers or persisted keys casually; treat migration as a separate, explicit task.
 
 ### Research integrity
+
 Formantasia is an educational and experimental phonetics application and the public build is a **Research Preview**.
 
-#### Research values are protected data
-Existing research values, model parameters derived from research, population mappings, duration values, evidence classifications, provenance labels, and source attributions are **not ordinary implementation details**.
-
-Do **not** alter them as a side effect of UI work, refactoring, bug fixing, cleanup, optimization, or visual tuning.
-
-If you notice a research value that may be wrong while working on another task:
-1. do not silently correct it;
-2. report the suspected issue and the evidence;
-3. leave the current value unchanged unless the user explicitly authorizes a research-data correction task.
-
-A research value may be added, replaced, or corrected only when the current task explicitly concerns research data and the change is supported by an identifiable source or documented derivation.
-
-For any permitted research-data change:
-1. record the exact source;
-2. record the old value and the new value, when replacing an existing value;
-3. state whether the value is empirical, borrowed, modeled, or derived;
-4. keep user-visible provenance consistent with the implementation;
-5. do not overstate measurement precision;
-6. keep the research-data change isolated from unrelated feature work whenever practical;
-7. obtain explicit user approval before merging a change that modifies existing research values or their evidence classification.
-
-Research data must retain provenance. Do not silently convert borrowed or modeled values into “empirical” values.
+Research data must retain provenance. Do not silently convert borrowed or modeled values into empirical values.
 
 Current evidence categories are:
+
 - **A / empirical** — directly transcribed published numerical averages or otherwise explicitly empirical values;
 - **B / borrowed or combined model** — empirical anchors with interpolation or an explicitly combined model;
 - **C / approximation** — values borrowed from another population/source or otherwise approximate.
@@ -122,14 +116,19 @@ The UI currently distinguishes evidence visually. Preserve that distinction unle
 Do not add non-public/raw research audio or restricted datasets merely because a paper refers to them. Prefer published numerical values, public author/repository data, and clearly documented derived statistics.
 
 ### Current architecture caution
-The application is currently concentrated in a large root-level `index.html`. Because UI, data, audio, and behavior can be close together, make narrow changes and inspect surrounding code before editing.
+
+The application is currently concentrated in a large root-level `index.html`. UI, data, audio, and behavior can therefore be close together.
+
+Make narrow changes and inspect surrounding code before editing.
 
 Do not perform a broad component/framework migration as a side effect of an unrelated feature request. If modularization would materially reduce risk for a requested feature, propose it first as an architectural task.
 
 ### UI modes
+
 The current application includes separate casual, learning, and research presentation modes. A change intended for one mode must be checked for accidental effects on the others.
 
 ### Public site
+
 Canonical public URL: `https://formantasia.netlify.app/`.
 
 ---
@@ -137,15 +136,17 @@ Canonical public URL: `https://formantasia.netlify.app/`.
 ## Standard workflow
 
 ### Before coding
-1. Read the relevant request and identify the actual goal.
-2. Read `PROJECT_STATE.md` and relevant entries in `DECISIONS.md`.
-3. Inspect the relevant code and research data.
-4. State or infer acceptance criteria.
-5. Identify protected behavior that must not change.
-6. If a better method exists, propose it before implementation.
-7. If research values would be modified, stop and confirm that the task is explicitly a research-data task and that source evidence is available.
+
+1. Identify the actual user goal.
+2. Read `DEVELOPMENT_METHOD.md`, `PROJECT_STATE.md`, and relevant `DECISIONS.md` entries.
+3. Classify what is editable and what is protected.
+4. Inspect relevant code, data, dependencies, and current behavior.
+5. Define acceptance criteria and protected behavior.
+6. Propose a better method before implementation if one materially improves the result.
+7. If research values would be modified, stop and confirm that this is explicitly a research-data task and that source evidence is available.
 
 ### During coding
+
 1. Make the smallest coherent change first.
 2. Avoid unrelated cleanup.
 3. Do not modify protected research values during unrelated work.
@@ -153,8 +154,9 @@ Canonical public URL: `https://formantasia.netlify.app/`.
 5. Preserve existing behavior outside the intended scope.
 
 ### After coding
-1. Verify the requested behavior.
-2. Check nearby regression risks, especially the other UI modes and mobile presentation when relevant.
-3. Update project documentation when the change alters durable knowledge.
+
+1. Verify the requested behavior against acceptance criteria.
+2. Check nearby regression risks, especially other UI modes and mobile presentation when relevant.
+3. Update repository memory when durable knowledge changed.
 4. For research-data changes, show the source and before/after values and obtain explicit user approval before merge.
-5. Report changes, verification, remaining uncertainty, and next recommendation.
+5. Report changes, verification, remaining uncertainty, and the next recommendation.
