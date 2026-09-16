@@ -68,7 +68,7 @@ window.ArticulationLab = window.ArticulationLab || {};
           const nudge = languageMode === 'both' ? (langId === 'english' ? -8 : 8) : 0;
           btn.style.left = `${((p.x + nudge) / 460) * 100}%`;
           btn.style.top = `${(p.y / 300) * 100}%`;
-          btn.innerHTML = `<span>${preset.label}</span><small>${lang.short}</small>`;
+          btn.innerHTML = `<span>${preset.label}</span>`;
           btn.classList.toggle('selected', key === selectedKey);
           btn.addEventListener('click', () => {
             selectedKey = key;
