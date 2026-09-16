@@ -12,6 +12,19 @@ def replace_once(old, new, label):
         raise SystemExit(f'{label}: expected exactly 1 match, found {count}')
     s = s.replace(old, new, 1)
 
+# If the UI integration is already present, only normalize the loader call so it
+# stays inside the app IIFE. This makes the script safe to re-run in CI.
+if 'let YK2019_DATA = null;' in s:
+    outside = "})();\n  loadYazawaKondoData();\n</script>"
+    inside = "  loadYazawaKondoData();\n})();\n</script>"
+    if outside in s:
+        s = s.replace(outside, inside, 1)
+    elif inside not in s:
+        raise SystemExit('YK integration exists but loader placement is unknown')
+    path.write_text(s, encoding='utf-8')
+    print('Normalized existing Yazawa–Kondo UI integration')
+    raise SystemExit(0)
+
 # 1) Runtime data store + helpers, inserted before cloneTarget.
 marker = "  function cloneTarget(v){ return {F1:v.F1,F2:v.F2,F3:v.F3}; }"
 insert = r'''  let YK2019_DATA = null;
@@ -155,11 +168,11 @@ old = """  voiceTypeEl.addEventListener('change',()=>{\n    const cfg=VOICE_DEFA
 new = """  voiceTypeEl.addEventListener('change',()=>{\n    const previousPreset=vowelPresetEl.value;\n    buildPresetOptions(previousPreset);\n    const cfg=VOICE_DEFAULTS[presetLanguageEl.value][voiceTypeEl.value];"""
 replace_once(old, new, 'patch voice change menu rebuild')
 
-# 8) Start async data load after existing startup code has run.
-end = s.rfind('</script>')
-if end < 0:
-    raise SystemExit('closing script tag not found')
-s = s[:end] + "  loadYazawaKondoData();\n" + s[end:]
+# 8) Start async data load after the existing startup render, but still inside
+# the app IIFE so it can see the integration helpers and DOM bindings.
+startup = "  applyPreset('ja','i');\n  render();\n})();"
+startup_with_load = "  applyPreset('ja','i');\n  render();\n  loadYazawaKondoData();\n})();"
+replace_once(startup, startup_with_load, 'start YK data loader')
 
 path.write_text(s, encoding='utf-8')
 print('Patched index.html for Yazawa–Kondo UI integration')
