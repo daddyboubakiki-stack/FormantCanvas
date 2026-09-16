@@ -10,4 +10,14 @@ Formantasia is an educational and experimental formant-drawing synthesizer. Draw
 
 The current public build is a **Research Preview**. Presets may combine published empirical values with clearly labeled borrowed or modeled intervals; see the in-app Research mode for provenance details.
 
+## For AI coding agents and contributors
+
+Before making code changes, read:
+
+1. [`AGENTS.md`](AGENTS.md) — standing development rules and Formantasia-specific invariants.
+2. [`PROJECT_STATE.md`](PROJECT_STATE.md) — current implementation snapshot, known risks, and handoff context.
+3. [`DECISIONS.md`](DECISIONS.md) — durable design and research decisions and their rationale.
+
+These files are the repository's shared project memory. Do not rely on chat history alone for durable implementation assumptions.
+
 *Formantasia · Daddy's little phonetics lab 🧪*
