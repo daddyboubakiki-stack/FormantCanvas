@@ -61,21 +61,21 @@ jobs:
               assert not shared.is_displayed()
               casual_btn=d.find_element('id','casualDownloadWavBtn')
               assert casual_btn.is_displayed()
-              assert 'おとを保存する' in casual_btn.get_attribute('textContent')
+              assert 'おとを保存する' in casual_btn.text
               assert len([b for b in casual.find_elements('tag name','button') if b.is_displayed()]) == 1
 
               d.find_element('id','learningModeBtn').click()
               w.until(lambda x: shared.is_displayed())
               assert not casual.is_displayed()
               assert not d.find_element('css selector','.advanced-panel').is_displayed()
-              visible=[b.get_attribute('textContent').strip() for b in shared.find_elements('tag name','button') if b.is_displayed()]
+              visible=[b.text.strip() for b in shared.find_elements('tag name','button') if b.is_displayed()]
               print('LEARNING_EXPORT_BUTTONS',visible)
               assert visible == ['WAVを保存','Praat用に保存','CSVを保存','CSVを読み込む']
 
               d.find_element('id','researchModeBtn').click()
               w.until(lambda x: d.find_element('css selector','.advanced-panel').is_displayed())
               assert shared.is_displayed()
-              visible=[b.get_attribute('textContent').strip() for b in shared.find_elements('tag name','button') if b.is_displayed()]
+              visible=[b.text.strip() for b in shared.find_elements('tag name','button') if b.is_displayed()]
               print('RESEARCH_EXPORT_BUTTONS',visible)
               assert visible == ['WAV書き出し','Praatへ書き出し','CSV書き出し','CSV読込']
 
