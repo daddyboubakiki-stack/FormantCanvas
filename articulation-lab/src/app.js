@@ -11,6 +11,7 @@ window.ArticulationLab = window.ArticulationLab || {};
   let playMode = 'buttons';
   let languageMode = 'both';
   let viewMode = 'both';
+  let coordinationMode = 'natural';
   let voiceProfileId = 'child';
   let morphFrame = null;
 
@@ -91,6 +92,25 @@ window.ArticulationLab = window.ArticulationLab || {};
     document.querySelectorAll('[data-view-mode]').forEach(b => b.classList.toggle('selected', b.dataset.viewMode === viewMode));
   }
 
+  function coordinationHint() {
+    if (coordinationMode === 'natural') {
+      return 'Natural: dragging the tongue also follows a smooth pedagogical jaw/lip/root coordination field built from the vowel targets. You can still tweak sliders; the next tongue drag re-couples them.';
+    }
+    return 'Independent: tongue, jaw, lip spread and lip rounding can be manipulated separately, including deliberately unusual combinations.';
+  }
+
+  function applyCoordination(mode, recouple = true) {
+    coordinationMode = mode === 'independent' ? 'independent' : 'natural';
+    document.body.dataset.coordinationMode = coordinationMode;
+    document.querySelectorAll('[data-coordination-mode]').forEach(b => b.classList.toggle('selected', b.dataset.coordinationMode === coordinationMode));
+    const hint = $('#coordinationHint');
+    if (hint) hint.textContent = coordinationHint();
+    if (playMode === 'synth' && coordinationMode === 'natural' && recouple && NS.NaturalCoordination) {
+      const current = store.getState();
+      updateState(NS.NaturalCoordination.fromTongue({}, current));
+    }
+  }
+
   function applyMode(mode) {
     playMode = mode === 'synth' ? 'synth' : 'buttons';
     samplePlayer.stop();
@@ -111,7 +131,9 @@ window.ArticulationLab = window.ArticulationLab || {};
       $('#selectedVowel').textContent = 'Free articulation';
       $('#modeTitle').textContent = 'Mouth Synth';
       $('#modeDescription').textContent = 'Turn the synthetic voice on and manipulate tongue, jaw and lips like an instrument.';
-      $('#dragHint').textContent = 'VOICE ON → drag the tongue; jaw, lip spread and lip rounding have their own controls.';
+      $('#dragHint').textContent = coordinationMode === 'natural'
+        ? 'VOICE ON → drag the tongue; jaw, lip spread, rounding and tongue root follow the pedagogical coordination field.'
+        : 'VOICE ON → drag the tongue; jaw and lips stay independent until you move their controls.';
       $('#status').textContent = 'Press VOICE ON, then play the mouth.';
     }
     document.body.dataset.playMode = playMode;
@@ -139,6 +161,14 @@ window.ArticulationLab = window.ArticulationLab || {};
   function initControls() {
     document.querySelectorAll('[data-play-mode]').forEach(btn => btn.addEventListener('click', () => applyMode(btn.dataset.playMode)));
     document.querySelectorAll('[data-view-mode]').forEach(btn => btn.addEventListener('click', () => applyView(btn.dataset.viewMode)));
+    document.querySelectorAll('[data-coordination-mode]').forEach(btn => btn.addEventListener('click', () => {
+      applyCoordination(btn.dataset.coordinationMode, true);
+      if (playMode === 'synth') {
+        $('#dragHint').textContent = coordinationMode === 'natural'
+          ? 'VOICE ON → drag the tongue; jaw, lip spread, rounding and tongue root follow the pedagogical coordination field.'
+          : 'VOICE ON → drag the tongue; jaw and lips stay independent until you move their controls.';
+      }
+    }));
     document.querySelectorAll('[data-language-mode]').forEach(btn => btn.addEventListener('click', () => {
       languageMode = btn.dataset.languageMode;
       vowelMap.setLanguageMode(languageMode);
@@ -180,7 +210,10 @@ window.ArticulationLab = window.ArticulationLab || {};
   function init() {
     mouthRenderer.mount($('#mouthMount'), partial => {
       if (playMode !== 'synth') return;
-      updateState(partial);
+      const intended = coordinationMode === 'natural' && NS.NaturalCoordination
+        ? NS.NaturalCoordination.fromTongue(partial, store.getState())
+        : partial;
+      updateState(intended);
       $('#selectedVowel').textContent = 'Free articulation';
     });
     frontalRenderer.mount($('#frontalMount'));
@@ -206,7 +239,7 @@ window.ArticulationLab = window.ArticulationLab || {};
       $('#voiceButton').classList.toggle('active', state.voicing);
       if (playMode === 'synth') {
         $('#status').textContent = state.voicing
-          ? `${NS.VOICE_PROFILES[voiceProfileId].label} synth voice on — tongue, jaw and lips share one state.`
+          ? `${NS.VOICE_PROFILES[voiceProfileId].label} synth voice on — ${coordinationMode === 'natural' ? 'Natural coordination' : 'Independent articulation'}.`
           : 'Press VOICE ON, then play the mouth.';
       }
     });
@@ -215,6 +248,7 @@ window.ArticulationLab = window.ArticulationLab || {};
     $('#recordingHint').textContent = 'Japanese: language-specific PD recording · English buttons: redistribution-safe human references';
     samplePlayer.preload(allRealAudioUrls());
     applyView('both');
+    applyCoordination('natural', false);
     applyMode('buttons');
     window.addEventListener('pagehide', () => {
       samplePlayer.stop();
