@@ -3,6 +3,7 @@ window.ArticulationLab = window.ArticulationLab || {};
   function $(sel) { return document.querySelector(sel); }
   const store = NS.createStateStore({ f0Hz: NS.VOICE_PROFILES.child.defaultF0 });
   const engine = NS.createFormantEngine();
+  const approxIpa = NS.createApproxIpaEstimator(engine);
   const samplePlayer = NS.createSamplePlayer();
   const mouthRenderer = NS.createSimpleRenderer();
   const frontalRenderer = NS.createFrontalRenderer();
@@ -237,6 +238,20 @@ window.ArticulationLab = window.ArticulationLab || {};
       $('#f0').value = state.f0Hz;
       $('#voiceButton').textContent = state.voicing ? 'VOICE OFF' : 'VOICE ON';
       $('#voiceButton').classList.toggle('active', state.voicing);
+
+      const approxEl = $('#approxIpaValue');
+      const approxNote = $('#approxIpaNote');
+      if (state.voicing) {
+        const nearest = approxIpa.nearest(state);
+        approxEl.textContent = nearest ? `≈ [${nearest.symbol}]` : '≈ —';
+        approxEl.classList.add('sounding');
+        approxNote.textContent = 'Nearest IPA anchor in the current synth F1/F2/F3 model.';
+      } else {
+        approxEl.textContent = '—';
+        approxEl.classList.remove('sounding');
+        approxNote.textContent = 'VOICE ON to show the nearest modeled IPA vowel.';
+      }
+
       if (playMode === 'synth') {
         $('#status').textContent = state.voicing
           ? `${NS.VOICE_PROFILES[voiceProfileId].label} synth voice on — ${coordinationMode === 'natural' ? 'Natural coordination' : 'Independent articulation'}.`
