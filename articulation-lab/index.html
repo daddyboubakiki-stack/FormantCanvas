@@ -4,17 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.5-alpha.17</title>
+  <title>Articulation Lab v0.5-alpha.18</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.5-alpha.17</small></h1>
+        <h1>Articulation Lab <small>v0.5-alpha.18</small></h1>
         <p>Hear real human vowels, then see the same pedagogical articulation from the side and from the front. Mouth Synth keeps the playful continuous model.</p>
       </div>
-      <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
+      <div class="hero-actions">
+        <div class="segmented two skin-tabs" aria-label="Character skin">
+          <button type="button" class="selected" data-skin-mode="simple" aria-pressed="true">Simple</button>
+          <button type="button" data-skin-mode="cute" aria-pressed="false">Cute 🐵</button>
+        </div>
+        <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
+      </div>
     </header>
 
     <section class="mode-switch panel compact-panel" aria-label="Play mode">
@@ -32,7 +38,7 @@
       <section class="panel stage-panel">
         <div class="stage-head">
           <div>
-            <div class="eyebrow">Simple skin · shared articulation state</div>
+            <div id="skinDescription" class="eyebrow">Simple skin · shared articulation state</div>
             <strong id="selectedVowel">Choose a vowel below</strong>
           </div>
           <div class="stage-tools">
