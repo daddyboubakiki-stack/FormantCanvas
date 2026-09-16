@@ -1,0 +1,25 @@
+name: Inspect Yazawa-Kondo dataset
+
+on:
+  push:
+    branches:
+      - feat/yazawa-kondo-adult-presets
+    paths:
+      - '.github/workflows/inspect-yazawa-kondo.yml'
+      - 'tools/inspect_yazawa_kondo.py'
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download public dataset
+        run: |
+          python - <<'PY'
+          import urllib.request
+          url='https://zenodo.org/records/15227304/files/JPLongShortVowels.csv?download=1'
+          urllib.request.urlretrieve(url, 'JPLongShortVowels.csv')
+          PY
+      - name: Inspect schema
+        run: python tools/inspect_yazawa_kondo.py JPLongShortVowels.csv
