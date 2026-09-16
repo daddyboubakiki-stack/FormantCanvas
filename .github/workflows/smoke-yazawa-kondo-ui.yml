@@ -5,6 +5,10 @@ on:
   push:
     branches: [feat/yazawa-kondo-ui-integration]
     paths:
+      - 'index.html'
+      - 'data/yazawa_kondo_2019_adult_presets.json'
+      - 'tools/integrate_yazawa_kondo_ui.py'
+      - 'tools/finalize_yazawa_kondo_ui.py'
       - '.github/workflows/smoke-yazawa-kondo-ui.yml'
   workflow_dispatch:
 
@@ -21,7 +25,7 @@ jobs:
           sleep 1
           curl -fsS http://127.0.0.1:8000/data/yazawa_kondo_2019_adult_presets.json >/tmp/yk.json
           python - <<'PY'
-          import json, math, time
+          import json, math
           from selenium import webdriver
           from selenium.webdriver.chrome.options import Options
           from selenium.webdriver.support.ui import WebDriverWait
