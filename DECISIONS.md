@@ -97,6 +97,24 @@ If a requested feature becomes unsafe or unnecessarily difficult because of the 
 
 ---
 
+## D-007 — Treat research values as protected data
+
+**Status:** Accepted  
+**Date:** 2026-09-16
+
+### Decision
+Existing research values and their evidence classifications are protected data. They must not be changed incidentally during UI work, refactoring, bug fixes, cleanup, optimization, or visual tuning.
+
+Research values may be changed only in an explicit research-data task with identifiable source evidence or a documented derivation. Changes to existing values or evidence classes require a recorded before/after comparison and explicit user approval before merge.
+
+### Rationale
+Formantasia's educational and research credibility depends on numerical values remaining traceable to sources rather than being silently adjusted for implementation convenience or visual plausibility.
+
+### Consequence
+If an agent suspects a data error during unrelated work, it should report the suspected problem and evidence but leave the value unchanged. Research-data changes should be isolated from unrelated feature work whenever practical.
+
+---
+
 ## Entry template
 
 ```md
