@@ -19,6 +19,16 @@ window.ArticulationLab = window.ArticulationLab || {};
     let leftEye = null;
     let rightEye = null;
     let nose = null;
+    let monkeyLeftEar = null;
+    let monkeyRightEar = null;
+    let monkeyFacePatch = null;
+    let monkeyLeftCheek = null;
+    let monkeyRightCheek = null;
+    let monkeyMuzzle = null;
+    let monkeyNose = null;
+    let monkeyNostrils = null;
+    let skin = 'simple';
+    let lastState = null;
 
     const clamp = v => Math.max(0, Math.min(1, Number(v)));
 
@@ -84,11 +94,36 @@ window.ArticulationLab = window.ArticulationLab || {};
               </clipPath>
             </defs>
             <rect x="1" y="1" width="358" height="348" rx="26" class="cavity-bg"/>
+            <g class="monkey-exterior" aria-hidden="true">
+              <path class="monkey-tuft" d="M151 48 Q159 27 174 44 Q181 20 190 44 Q204 28 211 51"/>
+              <g id="monkeyLeftEar" class="monkey-ear">
+                <ellipse cx="62" cy="157" rx="34" ry="43"/>
+                <path d="M65 132 C44 132 42 178 65 181 C78 180 83 165 76 153 C69 143 56 149 57 163"/>
+              </g>
+              <g id="monkeyRightEar" class="monkey-ear">
+                <ellipse cx="298" cy="157" rx="34" ry="43"/>
+                <path d="M295 132 C316 132 318 178 295 181 C282 180 277 165 284 153 C291 143 304 149 303 163"/>
+              </g>
+            </g>
             <path id="frontalFace" d="M180 40 C105 40 62 92 65 176 C68 267 117 315 180 318 C243 315 292 267 295 176 C298 92 255 40 180 40 Z" class="frontal-face"/>
+            <g class="monkey-face-details" aria-hidden="true">
+              <path id="monkeyFacePatch" class="monkey-face-patch" d="M180 79 C157 58 111 67 95 102 C75 145 96 191 119 205 C129 212 137 221 140 235 C151 224 165 218 180 218 C195 218 209 224 220 235 C223 221 231 212 241 205 C264 191 285 145 265 102 C249 67 203 58 180 79 Z"/>
+              <ellipse class="monkey-eye-mask left" cx="139" cy="141" rx="31" ry="37"/>
+              <ellipse class="monkey-eye-mask right" cx="221" cy="141" rx="31" ry="37"/>
+              <ellipse id="monkeyLeftCheek" class="monkey-cheek" cx="112" cy="190" rx="15" ry="10"/>
+              <ellipse id="monkeyRightCheek" class="monkey-cheek" cx="248" cy="190" rx="15" ry="10"/>
+              <ellipse id="monkeyMuzzle" class="monkey-muzzle" cx="180" cy="183" rx="32" ry="27"/>
+              <path id="monkeyNose" class="monkey-nose" d="M164 168 Q180 158 196 168 Q193 181 180 183 Q167 181 164 168 Z"/>
+              <path id="monkeyNostrils" class="monkey-nostrils" d="M171 171 Q175 168 178 172 M182 172 Q185 168 189 171"/>
+            </g>
             <path id="leftBrow" d="M124 118 Q145 114 166 118" class="frontal-brow"/>
             <path id="rightBrow" d="M194 118 Q215 114 236 118" class="frontal-brow"/>
             <ellipse id="leftEye" cx="145" cy="144" rx="6.4" ry="6.4" class="frontal-eye"/>
             <ellipse id="rightEye" cx="215" cy="144" rx="6.4" ry="6.4" class="frontal-eye"/>
+            <g class="monkey-eye-highlights" aria-hidden="true">
+              <circle class="monkey-eye-shine left" cx="133" cy="134" r="4.6"/>
+              <circle class="monkey-eye-shine right" cx="215" cy="134" r="4.6"/>
+            </g>
             <path id="frontalNose" d="M180 136 Q171 165 180 176 Q189 165 180 136" class="frontal-nose"/>
             <path id="outerLip" d="" class="frontal-lip"/>
             <path id="innerMouth" d="" class="frontal-mouth-opening"/>
@@ -118,20 +153,34 @@ window.ArticulationLab = window.ArticulationLab || {};
       leftEye = container.querySelector('#leftEye');
       rightEye = container.querySelector('#rightEye');
       nose = container.querySelector('#frontalNose');
+      monkeyLeftEar = container.querySelector('#monkeyLeftEar');
+      monkeyRightEar = container.querySelector('#monkeyRightEar');
+      monkeyFacePatch = container.querySelector('#monkeyFacePatch');
+      monkeyLeftCheek = container.querySelector('#monkeyLeftCheek');
+      monkeyRightCheek = container.querySelector('#monkeyRightCheek');
+      monkeyMuzzle = container.querySelector('#monkeyMuzzle');
+      monkeyNose = container.querySelector('#monkeyNose');
+      monkeyNostrils = container.querySelector('#monkeyNostrils');
+      stage.dataset.skin = skin;
     }
 
     function render(state) {
       if (!svg) return;
+      lastState = state;
       const g = mouthGeometry(state);
       const cx = 180;
       const cy = 216 + g.jaw * 8;
-      const outerRx = g.outerWidth / 2;
-      const outerRy = g.outerHeight / 2;
       const innerRx = g.width / 2;
       const innerRy = g.height / 2;
+      const baseOuterRx = g.outerWidth / 2;
+      const baseOuterRy = g.outerHeight / 2;
+      const outerRx = skin === 'cute' ? innerRx + (baseOuterRx - innerRx) * .56 : baseOuterRx;
+      const outerRy = skin === 'cute' ? innerRy + (baseOuterRy - innerRy) * .56 : baseOuterRy;
       const chinDrop = g.jaw * 14;
 
-      facePath.setAttribute('d', `M180 40 C105 40 62 92 65 176 C68 267 117 ${309+chinDrop*.55} 180 ${318+chinDrop} C243 ${309+chinDrop*.55} 292 267 295 176 C298 92 255 40 180 40 Z`);
+      facePath.setAttribute('d', skin === 'cute'
+        ? `M180 43 C116 30 72 72 70 151 C67 239 112 ${291+chinDrop*.42} 180 ${301+chinDrop*.70} C248 ${291+chinDrop*.42} 293 239 290 151 C288 72 244 30 180 43 Z`
+        : `M180 40 C105 40 62 92 65 176 C68 267 117 ${309+chinDrop*.55} 180 ${318+chinDrop} C243 ${309+chinDrop*.55} 292 267 295 176 C298 92 255 40 180 40 Z`);
       leftBrow.setAttribute('d', 'M 124 118 Q 145 114 166 118');
       rightBrow.setAttribute('d', 'M 194 118 Q 215 114 236 118');
       leftEye.setAttribute('cx', '145');
@@ -142,6 +191,16 @@ window.ArticulationLab = window.ArticulationLab || {};
       rightEye.setAttribute('cy', '144');
       rightEye.setAttribute('rx', '6.4');
       rightEye.setAttribute('ry', '6.4');
+      if (skin === 'cute') {
+        leftEye.setAttribute('cx', '139');
+        leftEye.setAttribute('cy', '141');
+        leftEye.setAttribute('rx', '14');
+        leftEye.setAttribute('ry', '16');
+        rightEye.setAttribute('cx', '221');
+        rightEye.setAttribute('cy', '141');
+        rightEye.setAttribute('rx', '14');
+        rightEye.setAttribute('ry', '16');
+      }
       outerLip.setAttribute('d', lipContourPath(cx, cy, outerRx, outerRy, g.rounding));
       const innerPath = openingPath(cx, cy, innerRx, innerRy, g.rounding);
       innerMouth.setAttribute('d', innerPath);
@@ -231,17 +290,32 @@ window.ArticulationLab = window.ArticulationLab || {};
       const jawWidth = 92 - g.rounding * 14;
       jawGuide.setAttribute('d', `M ${cx-jawWidth} ${jawY} Q ${cx} ${jawY+38} ${cx+jawWidth} ${jawY}`);
 
+      if (monkeyMuzzle) {
+        const muzzleY = 181 + g.jaw * 2.5;
+        monkeyMuzzle.setAttribute('cy', String(muzzleY));
+        monkeyNose.setAttribute('transform', `translate(0 ${g.jaw * 1.2})`);
+        monkeyNostrils.setAttribute('transform', `translate(0 ${g.jaw * 1.2})`);
+        monkeyLeftCheek.setAttribute('cy', String(188 + g.jaw * 2));
+        monkeyRightCheek.setAttribute('cy', String(188 + g.jaw * 2));
+      }
+
       stage.dataset.rounded = g.rounding > .55 ? 'true' : 'false';
       stage.dataset.strongRounded = g.rounding > .82 ? 'true' : 'false';
       stage.dataset.spread = g.spread > .48 ? 'true' : 'false';
     }
 
     function setInteractive() {}
+    function setSkin(nextSkin) {
+      skin = nextSkin === 'cute' ? 'cute' : 'simple';
+      if (stage) stage.dataset.skin = skin;
+      if (lastState) render(lastState);
+    }
     function destroy() {
       if (container) container.innerHTML = '';
-      container = stage = svg = facePath = outerLip = innerMouth = innerLipRim = mouthClipPath = upperTeeth = lowerTeeth = toothSeparators = tongue = jawGuide = leftBrow = rightBrow = leftEye = rightEye = nose = null;
+      container = stage = svg = facePath = outerLip = innerMouth = innerLipRim = mouthClipPath = upperTeeth = lowerTeeth = toothSeparators = tongue = jawGuide = leftBrow = rightBrow = leftEye = rightEye = nose = monkeyLeftEar = monkeyRightEar = monkeyFacePatch = monkeyLeftCheek = monkeyRightCheek = monkeyMuzzle = monkeyNose = monkeyNostrils = null;
+      lastState = null;
     }
 
-    return { mount, render, setInteractive, destroy, mouthGeometry };
+    return { mount, render, setInteractive, setSkin, destroy, mouthGeometry };
   };
 })(window.ArticulationLab);
