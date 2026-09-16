@@ -133,6 +133,30 @@ New AI agents should read `DEVELOPMENT_METHOD.md` before `AGENTS.md`, then consu
 
 ---
 
+## D-009 — Treat visual and sensory craft as a standing design protocol
+
+**Status:** Accepted  
+**Date:** 2026-09-17
+
+### Decision
+Use `VISUAL_SENSORY_DESIGN.md` as the canonical cross-project visual/sensory craft protocol alongside `DEVELOPMENT_METHOD.md`.
+
+For material UI, illustration, motion, density, art-direction, or sensory changes, agents should apply this protocol rather than treating visual polish as an implementation afterthought.
+
+The default aesthetic direction is **cute, soothing, gentle, warm, approachable, slightly analog, and low-stimulation**, while preserving accessibility, clarity, and scientific/educational integrity.
+
+Sound effects and custom web fonts are **opt-in**: agents may research or propose them, but must not add or replace them without explicit user request or approval.
+
+### Rationale
+Functional correctness alone does not guarantee a pleasant or coherent experience. AI-generated interfaces tend to fall back to generic card layouts, arbitrary rounded corners, default blue actions, excessive information density, or other implementation-convenient patterns unless aesthetic intent, references, hierarchy, sensory load, and review are explicitly designed.
+
+The protocol turns visual quality from an assumed talent into a repeatable process: visual intent, reference study, concept variation, hierarchy, design tokens, accessibility review, visual QA, sensory QA, and user review.
+
+### Consequence
+New agents should read `VISUAL_SENSORY_DESIGN.md` for material visual/sensory work. User feedback such as “なんかダサい”, “固い”, “ごちゃごちゃする”, “目が疲れる”, or “耳が疲れる” is a valid QA signal to investigate rather than dismiss as purely subjective preference.
+
+---
+
 ## Entry template
 
 ```md
