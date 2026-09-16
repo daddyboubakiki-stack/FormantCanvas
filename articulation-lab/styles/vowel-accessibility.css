@@ -1,0 +1,96 @@
+:root {
+  --en:#3f5fbf;
+  --jp:#a6466b;
+}
+
+.dot{
+  width:12px;
+  height:12px;
+  vertical-align:-2px;
+  box-shadow:0 0 0 1px rgba(44,42,49,.55);
+}
+.dot.en{border:2px solid #fff}
+.dot.jp{border:3px double #fff}
+
+.vowel-map-btn{
+  opacity:1;
+  border:3px solid #fff;
+  color:#fff;
+  text-shadow:0 1px 1px rgba(0,0,0,.35);
+  transition:transform .12s ease,box-shadow .12s ease,filter .12s ease;
+  forced-color-adjust:auto;
+}
+.vowel-map-btn small{
+  margin-top:2px;
+  padding:2px 4px;
+  min-width:22px;
+  border-radius:999px;
+  background:#fff;
+  color:#24222a;
+  font-size:.56rem;
+  font-weight:900;
+  line-height:1;
+  letter-spacing:.03em;
+  text-shadow:none;
+}
+.map-english{
+  background:var(--en);
+  border-style:solid;
+}
+.map-japanese{
+  background:var(--jp);
+  border:4px double #fff;
+}
+.vowel-map-btn:hover{
+  z-index:2;
+  opacity:1;
+  filter:brightness(1.07);
+}
+.vowel-map-btn:focus-visible{
+  z-index:4;
+  opacity:1;
+  outline:4px solid var(--text);
+  outline-offset:4px;
+  filter:brightness(1.07);
+}
+.vowel-map-btn.selected{
+  z-index:3;
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1.12);
+  outline:3px solid var(--text);
+  outline-offset:3px;
+  box-shadow:0 5px 15px rgba(40,35,50,.26);
+}
+.vowel-map-btn.selected:focus-visible{
+  outline-width:4px;
+  outline-offset:4px;
+}
+
+@media(max-width:760px){
+  .vowel-map-btn small{
+    min-width:20px;
+    padding:2px 3px;
+    font-size:.52rem;
+  }
+}
+
+@media(forced-colors:active){
+  .vowel-map-btn,
+  .map-english,
+  .map-japanese{
+    background:ButtonFace;
+    color:ButtonText;
+    text-shadow:none;
+  }
+  .vowel-map-btn small{
+    background:Canvas;
+    color:CanvasText;
+    border:1px solid CanvasText;
+  }
+  .map-english{border:3px solid ButtonText}
+  .map-japanese{border:4px double ButtonText}
+  .vowel-map-btn.selected,
+  .vowel-map-btn:focus-visible{
+    outline-color:Highlight;
+  }
+}
