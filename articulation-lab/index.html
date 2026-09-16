@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Articulation Lab v0.5-alpha.2</title>
+  <title>Articulation Lab v0.5-alpha.17</title>
   <link rel="stylesheet" href="styles/base.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <h1>Articulation Lab <small>v0.5-alpha.2</small></h1>
+        <h1>Articulation Lab <small>v0.5-alpha.17</small></h1>
         <p>Hear real human vowels, then see the same pedagogical articulation from the side and from the front. Mouth Synth keeps the playful continuous model.</p>
       </div>
       <button id="voiceButton" class="voice synth-only" type="button">VOICE ON</button>
@@ -122,12 +122,12 @@
             <input id="jawOpening" type="range" min="0" max="1" step="0.01" value="0.48" />
           </label>
           <label class="control">
-            <span class="control-row"><span>Lip spread</span><span>neutral ↔ spread · visual axis</span></span>
-            <input id="lipSpread" type="range" min="0" max="1" step="0.01" value="0.12" />
-          </label>
-          <label class="control">
             <span class="control-row"><span>Lip rounding</span><span>unrounded ↔ rounded · affects formants</span></span>
             <input id="lipRounding" type="range" min="0" max="1" step="0.01" value="0.1" />
+          </label>
+          <label class="control">
+            <span class="control-row"><span>Lip spread</span><span>neutral ↔ spread · visual axis</span></span>
+            <input id="lipSpread" type="range" min="0" max="1" step="0.01" value="0.12" />
           </label>
           <p class="mini-note">Current synth acoustics respond directly to tongue body position, jaw opening and lip rounding. Lip spread and tongue-root retraction are visual/model-state axes in this alpha; stronger acoustic coupling is deferred until a more principled tract model is used.</p>
           <p class="mini-note">Approx. IPA is the nearest vowel anchor in this synth’s own modeled F1/F2/F3 space. It is a teaching hint, not automatic phonetic transcription of a human voice.</p>
@@ -135,7 +135,7 @@
 
         <section class="panel note buttons-only">
           <strong>Try /æ/ vs /ɑ/ — then /i/ vs /u/</strong><br />
-          The v0.5 teaching targets give /æ/ stronger lateral lip spread and a front-low tongue, while /ɑ/ uses a more posterior tongue/root configuration. In alpha.2, strong rounding also visibly narrows the mouth opening, especially near /u/.
+          The v0.5 teaching targets give /æ/ stronger lateral lip spread and a front-low tongue, while /ɑ/ uses a more posterior tongue/root configuration. Strong rounding visibly narrows the mouth opening near /u/. The current Simple front view uses a neutral gray UI, a simplified childlike face, and intentionally omits gums for visual stability.
         </section>
 
         <section class="panel note synth-only">
