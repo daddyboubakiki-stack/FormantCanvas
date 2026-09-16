@@ -106,7 +106,7 @@ window.ArticulationLab = window.ArticulationLab || {};
     const description = $('#skinDescription');
     if (description) {
       description.textContent = skinMode === 'cute'
-        ? 'Mogu the monkey · same shared articulation state'
+        ? 'Friendly tutor · same shared articulation state'
         : 'Simple skin · shared articulation state';
     }
     try { localStorage.setItem('articulationLabSkin', skinMode); } catch (_) {}
