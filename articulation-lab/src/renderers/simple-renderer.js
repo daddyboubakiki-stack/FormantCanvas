@@ -55,7 +55,7 @@ window.ArticulationLab = window.ArticulationLab || {};
           <svg class="mouth-svg sagittal-svg" viewBox="0 0 520 350" role="img" aria-label="Interactive sagittal vocal-tract teaching model">
             <defs>
               <linearGradient id="tongueGlow" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#ff9aae"/><stop offset="1" stop-color="#f36f89"/>
+                <stop offset="0" stop-color="#eaa0a5"/><stop offset="1" stop-color="#cf747f"/>
               </linearGradient>
               <linearGradient id="airGlow" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0" stop-color="#dff4ff" stop-opacity=".72"/><stop offset="1" stop-color="#d8d4ff" stop-opacity=".45"/>
@@ -164,16 +164,21 @@ window.ArticulationLab = window.ArticulationLab || {};
       const jawDrop = Math.max(0, jaw - 0.18) * 7;
       lowerJawGroup.setAttribute('transform', `translate(0 ${jawDrop}) rotate(${jawAngle} 405 160)`);
 
-      const protrude = rounding * 14 - spread * 4;
+      // Rounded vowels both protrude and narrow at the opening. This makes /u/
+      // visibly much smaller than an open or spread vowel instead of merely
+      // adding a thicker lip outline.
+      const protrude = rounding * 22 - spread * 4;
       const flatten = spread * 5;
-      lipTop.setAttribute('d', `M94 166 Q ${77-protrude} ${176+rounding*3-flatten*.25} 92 ${183-flatten*.22}`);
-      lipBottom.setAttribute('d', `M94 205 Q ${77-protrude} ${198-rounding*2+flatten*.18} 92 ${191+flatten*.18}`);
+      const upperInnerY = 183 + rounding * 4.2 - flatten * .20;
+      const lowerInnerY = 191 - rounding * 4.4 + flatten * .16;
+      lipTop.setAttribute('d', `M94 166 Q ${77-protrude} ${175+rounding*2.2-flatten*.24} 92 ${upperInnerY}`);
+      lipBottom.setAttribute('d', `M94 205 Q ${77-protrude} ${199-rounding*2.5+flatten*.16} 92 ${lowerInnerY}`);
 
       // Air-space visualization is intentionally schematic. It helps learners see
       // how changing articulators reshapes the available cavity without claiming
       // a measured area function.
-      const mouthTopY = 181 - spread * 2;
-      const mouthBottomY = 191 + jaw * 19;
+      const mouthTopY = upperInnerY - 2;
+      const mouthBottomY = lowerInnerY + jaw * 18;
       const posteriorX = 401;
       cavityPath.setAttribute('d', [
         `M 94 ${mouthTopY}`,
