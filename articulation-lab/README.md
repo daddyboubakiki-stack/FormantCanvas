@@ -1,4 +1,4 @@
-# Articulation Lab — v0.5-alpha.17 staging checkpoint
+# Articulation Lab — v0.5-alpha.18 staging checkpoint
 
 Articulation Lab is a proposed sister app to Formant Canvas.
 
@@ -12,7 +12,11 @@ The app deliberately separates two experiences:
 
 This prevents real recorded vowel evidence and freely generated articulatory synthesis from pretending to be the same scientific object.
 
-## v0.5-alpha.17 checkpoint
+## v0.5-alpha.18 checkpoint
+
+### Simple / Cute skin switch
+
+The frontal teaching model now has two visual skins driven by the same articulation state. `Simple` preserves the alpha.17 schematic face. `Cute` adds an original small-monkey exterior with a round silhouette, large ears and eyes, a squirrel-monkey-inspired face patch, and thinner lips. The skin changes presentation only; articulation targets, mouth-state semantics, recordings, synthesis, coordination, and IPA estimation are unchanged.
 
 The current checkpoint consolidates the visual-articulation work that was user-reviewed through alpha.3–alpha.17.
 
@@ -140,23 +144,22 @@ Only recordings with sufficiently explicit redistribution permission are bundled
 
 `.github/workflows/articulation-v04-preview.yml` is a historical filename. It validates the current alpha checkpoint and builds:
 
-- `ArticulationLab_v0.5-alpha.17.html` — self-contained preview with CSS, JavaScript and vetted WAV samples embedded
-- `ArticulationLab_v0.5-alpha.17_source.zip` — modular source bundle
+- `ArticulationLab_v0.5-alpha.18.html` — self-contained preview with CSS, JavaScript and vetted WAV samples embedded
+- `ArticulationLab_v0.5-alpha.18_source.zip` — modular source bundle
 
 Validation includes JavaScript syntax, articulation-target / recording-data separation, Natural coordination behavior, strong `/u/` rounding geometry, nearest-modeled-IPA checks, retained real-voice provenance/duration/loudness checks, and standalone packaging.
 
 ## Next stages
 
 - design exploration in a separate MetaAI/Cute branch
-- renderer/skin registry
 - Anatomy skin
-- Cute exterior skins driven by the same articulation state
+- additional Cute characters driven by the same articulation state
 - Compare A/B overlay
 - richer tract acoustics / area-function exploration
 - consonant-ready tongue-tip, constriction, velum, airflow and voicing controls
 
 ## Repository status
 
-This folder lives in the Formant Canvas repository as a **staging implementation** on branch `design/articulation-lab-v0.1`. The branch name is historical. The current staged checkpoint is **v0.5-alpha.17**.
+This folder lives in the Formant Canvas repository as a **staging implementation**. The original staging branch name, `design/articulation-lab-v0.1`, is historical. The current Cute-skin checkpoint is **v0.5-alpha.18**.
 
 The draft staging PR should **not** be merged into Formant Canvas `main` merely to ship this sister-app prototype.
