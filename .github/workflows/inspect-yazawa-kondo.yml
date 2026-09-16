@@ -1,4 +1,4 @@
-name: Inspect Yazawa-Kondo dataset
+name: Build Yazawa-Kondo adult presets
 
 on:
   push:
@@ -7,10 +7,14 @@ on:
     paths:
       - '.github/workflows/inspect-yazawa-kondo.yml'
       - 'tools/inspect_yazawa_kondo.py'
+      - 'tools/build_yazawa_kondo_adult_presets.py'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  inspect:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,3 +27,16 @@ jobs:
           PY
       - name: Inspect schema
         run: python tools/inspect_yazawa_kondo.py JPLongShortVowels.csv
+      - name: Build speaker-balanced presets
+        run: python tools/build_yazawa_kondo_adult_presets.py JPLongShortVowels.csv data/yazawa_kondo_2019_adult_presets.json
+      - name: Commit generated aggregate JSON
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/yazawa_kondo_2019_adult_presets.json
+          if git diff --cached --quiet; then
+            echo 'Aggregate JSON unchanged.'
+          else
+            git commit -m 'Generate Yazawa-Kondo adult preset aggregates'
+            git push
+          fi
