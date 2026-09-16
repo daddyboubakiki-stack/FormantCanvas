@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import csv
+import json
 import sys
-from collections import defaultdict
+import urllib.request
 
 path = sys.argv[1]
 with open(path, newline='', encoding='utf-8-sig') as f:
@@ -22,3 +23,9 @@ for col in r.fieldnames:
 for stem in ('F1', 'F2', 'F3'):
     cols = [c for c in r.fieldnames if c.startswith(stem)]
     print('FORMANT_COLUMNS', stem, len(cols), repr(cols))
+
+# Record current Zenodo rights metadata as an additional provenance check.
+with urllib.request.urlopen('https://zenodo.org/api/records/15227304') as response:
+    meta = json.load(response)
+print('ZENODO_VERSION', meta.get('metadata', {}).get('version'))
+print('ZENODO_RIGHTS', repr(meta.get('metadata', {}).get('rights')))
