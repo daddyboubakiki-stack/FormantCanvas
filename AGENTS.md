@@ -4,13 +4,14 @@ This file is the standing **Formantasia-specific** instruction manual for AI cod
 
 Before changing code or research data, read:
 
-1. `DEVELOPMENT_METHOD.md` — the shared AI co-development method and global priority rules.
-2. `VISUAL_SENSORY_DESIGN.md` — the shared visual/sensory craft protocol for UI, art direction, motion, low-stimulation design, and optional sound/font decisions.
-3. `PROJECT_STATE.md` — the current snapshot and known risks.
-4. `DECISIONS.md` — important design and research decisions and their rationale.
-5. `README.md` — the public product description.
+1. `GLOBAL_APP_PRINCIPLES.md` — the entrypoint for all current and future app projects.
+2. `DEVELOPMENT_METHOD.md` — the shared AI co-development method and global priority rules.
+3. `VISUAL_SENSORY_DESIGN.md` — the shared visual/sensory craft protocol for UI, art direction, motion, low-stimulation design, typography, and guarded-autonomy sound/font decisions.
+4. `PROJECT_STATE.md` — the current snapshot and known risks.
+5. `DECISIONS.md` — important design and research decisions and their rationale.
+6. `README.md` — the public product description.
 
-`DEVELOPMENT_METHOD.md` defines the general workflow. `VISUAL_SENSORY_DESIGN.md` defines the default aesthetic and sensory-quality workflow. This file adds Formantasia-specific invariants and safety rules.
+`GLOBAL_APP_PRINCIPLES.md`, `DEVELOPMENT_METHOD.md`, and `VISUAL_SENSORY_DESIGN.md` are cross-project rules. This file adds Formantasia-specific invariants and safety rules; it does not silently weaken the shared principles.
 
 ---
 
@@ -49,7 +50,7 @@ If the requested implementation method is not the best way to achieve the goal, 
 
 ### P1-V — Treat visual and sensory craft as product quality, not decoration
 
-When a task materially changes UI, illustration, layout, motion, density, visual hierarchy, or sensory presentation, read and apply `VISUAL_SENSORY_DESIGN.md` before polishing the implementation.
+When a task materially changes UI, illustration, layout, motion, density, visual hierarchy, typography, sound, or sensory presentation, read and apply `VISUAL_SENSORY_DESIGN.md` before polishing the implementation.
 
 The default Formantasia art direction favors **cute, soothing, gentle, warm, approachable, slightly analog, low-stimulation** presentation while preserving scientific clarity and accessibility.
 
@@ -57,7 +58,7 @@ Do not equate "simple" with "unrefined". Use intentional hierarchy, spacing, typ
 
 User feedback such as "なんかダサい", "固い", "ごちゃごちゃする", "目が疲れる", or "耳が疲れる" is a legitimate QA signal and should be decomposed into concrete visual/sensory causes rather than dismissed as subjective noise.
 
-**Sound effects and custom web fonts are opt-in.** They may be researched or proposed, but do not add SE, operation sounds, success/error sounds, auto-playing audio, custom web fonts, or replace the existing font unless the user explicitly requests or approves it.
+**Custom fonts and lightweight SE use guarded autonomy.** They may be added without a separate request when they materially improve the experience and satisfy `VISUAL_SENSORY_DESIGN.md` requirements for licensing, reasonable loading cost, device/browser compatibility, robust fallback, accessibility, and low sensory burden. If those risks are substantial or uncertain, propose the change first. Never make sound essential to understanding, and never let a missing custom font break readability or core interaction.
 
 ### P2 — Inspect before editing
 
@@ -94,6 +95,7 @@ Keep durable knowledge in the repository rather than relying on chat history.
 
 Update as appropriate:
 
+- `GLOBAL_APP_PRINCIPLES.md` — scope and portability of rules across all app projects;
 - `DEVELOPMENT_METHOD.md` — cross-project AI co-development principles;
 - `VISUAL_SENSORY_DESIGN.md` — cross-project visual/sensory craft principles;
 - `AGENTS.md` — Formantasia-specific rules and invariants;
@@ -152,7 +154,7 @@ Canonical public URL: `https://formantasia.netlify.app/`.
 ### Before coding
 
 1. Identify the actual user goal.
-2. Read `DEVELOPMENT_METHOD.md`, `PROJECT_STATE.md`, and relevant `DECISIONS.md` entries.
+2. Read `GLOBAL_APP_PRINCIPLES.md`, `DEVELOPMENT_METHOD.md`, `PROJECT_STATE.md`, and relevant `DECISIONS.md` entries.
 3. For material UI / illustration / motion / sensory changes, read `VISUAL_SENSORY_DESIGN.md` and define the intended visual/sensory direction before polishing.
 4. Classify what is editable and what is protected.
 5. Inspect relevant code, data, dependencies, and current behavior.
@@ -167,13 +169,14 @@ Canonical public URL: `https://formantasia.netlify.app/`.
 3. Do not modify protected research values during unrelated work.
 4. Keep research provenance and UI labels synchronized with implementation.
 5. Preserve existing behavior outside the intended scope.
-6. Do not silently add SE or custom fonts as visual polish.
+6. If adding a custom font or SE autonomously, keep it lightweight, licensed, accessible, nonessential to core understanding, and safe under fallback/failure conditions.
 
 ### After coding
 
 1. Verify the requested behavior against acceptance criteria.
 2. Check nearby regression risks, especially other UI modes and mobile presentation when relevant.
 3. For material visual changes, perform a separate visual/sensory QA pass according to `VISUAL_SENSORY_DESIGN.md` rather than treating functional success as aesthetic completion.
-4. Update repository memory when durable knowledge changed.
-5. For research-data changes, show the source and before/after values and obtain explicit user approval before merge.
-6. Report changes, verification, remaining uncertainty, and the next recommendation.
+4. If custom fonts or SE were added, verify loading cost, fallback/non-audio behavior, device/browser compatibility, and readability/sensory comfort.
+5. Update repository memory when durable knowledge changed.
+6. For research-data changes, show the source and before/after values and obtain explicit user approval before merge.
+7. Report changes, verification, remaining uncertainty, and the next recommendation.
