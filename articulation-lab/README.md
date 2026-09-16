@@ -1,9 +1,9 @@
-# Articulation Lab — v0.5-alpha.19 staging checkpoint
+# ベロちゃん — さわる音声学 / Interactive Phonetics Lab — v0.5-alpha.19 staging checkpoint
 
-Articulation Lab is a proposed sister app to Formant Canvas.
+**ベロちゃん** is the current product name for this proposed sister app to Formant Canvas.
 
 - **Formant Canvas:** manipulate acoustic space and hear the result.
-- **Articulation Lab:** manipulate vocal-tract articulation and hear the result.
+- **ベロちゃん — さわる音声学 / Interactive Phonetics Lab:** manipulate vocal-tract articulation and hear the result.
 
 The app deliberately separates two experiences:
 
@@ -126,7 +126,7 @@ Restricted artwork/video from reference resources is not modified or bundled her
 
 ## Scientific boundary
 
-Articulation Lab intentionally separates:
+ベロちゃん intentionally separates:
 
 - **recorded audio evidence** — a human sample with documented preprocessing
 - **articulatory teaching target** — modeled tongue/jaw/lip posture
@@ -147,6 +147,8 @@ Only recordings with sufficiently explicit redistribution permission are bundled
 - `ArticulationLab_v0.5-alpha.19.html` — self-contained preview with CSS, JavaScript and vetted WAV samples embedded
 - `ArticulationLab_v0.5-alpha.19_source.zip` — modular source bundle
 
+The internal directory, workflow, and artifact names still use `articulation-lab` / `ArticulationLab` for compatibility. They are implementation identifiers, not the public-facing product name.
+
 Validation includes JavaScript syntax, articulation-target / recording-data separation, Natural coordination behavior, strong `/u/` rounding geometry, nearest-modeled-IPA checks, retained real-voice provenance/duration/loudness checks, and standalone packaging.
 
 ## Next stages
@@ -161,5 +163,7 @@ Validation includes JavaScript syntax, articulation-target / recording-data sepa
 ## Repository status
 
 This folder lives in the Formant Canvas repository as a **staging implementation**. The original staging branch name, `design/articulation-lab-v0.1`, is historical. The current Cute-skin checkpoint is **v0.5-alpha.19**.
+
+The public-facing name is **ベロちゃん — さわる音声学 / Interactive Phonetics Lab**. The historical internal path and build identifiers remain unchanged for now so the existing staging workflow does not break.
 
 The draft staging PR should **not** be merged into Formant Canvas `main` merely to ship this sister-app prototype.
