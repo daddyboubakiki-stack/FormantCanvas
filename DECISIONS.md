@@ -115,6 +115,24 @@ If an agent suspects a data error during unrelated work, it should report the su
 
 ---
 
+## D-008 — Use DEVELOPMENT_METHOD.md as the canonical AI co-development method
+
+**Status:** Accepted  
+**Date:** 2026-09-16
+
+### Decision
+Keep the cross-project AI development method in `DEVELOPMENT_METHOD.md`. `AGENTS.md` applies that method to Formantasia and adds project-specific invariants.
+
+The priority order explicitly places protected artifacts—especially research values and evidence classifications—above ordinary implementation freedom.
+
+### Rationale
+A single canonical method reduces drift between chats and AI agents, while separating universal workflow rules from project-specific constraints. Promoting protected research data to the highest priority prevents well-intentioned implementation agents from silently changing evidence-backed values for convenience or visual fit.
+
+### Consequence
+New AI agents should read `DEVELOPMENT_METHOD.md` before `AGENTS.md`, then consult `PROJECT_STATE.md` and `DECISIONS.md`. Changes to the development method should be deliberate, documented, and motivated by real workflow experience rather than ad-hoc preference.
+
+---
+
 ## Entry template
 
 ```md
