@@ -145,15 +145,19 @@ For material UI, illustration, motion, density, art-direction, or sensory change
 
 The default aesthetic direction is **cute, soothing, gentle, warm, approachable, slightly analog, and low-stimulation**, while preserving accessibility, clarity, and scientific/educational integrity.
 
-Sound effects and custom web fonts are **opt-in**: agents may research or propose them, but must not add or replace them without explicit user request or approval.
+Sound effects and custom web fonts are **guarded autonomous improvements** rather than opt-in-only features. Agents may add them without a separate user request when they materially improve the experience and satisfy the protocol's performance, compatibility, fallback, licensing, accessibility, and sensory-load checks. If those risks are substantial or uncertain, propose the change before implementing it.
 
 ### Rationale
 Functional correctness alone does not guarantee a pleasant or coherent experience. AI-generated interfaces tend to fall back to generic card layouts, arbitrary rounded corners, default blue actions, excessive information density, or other implementation-convenient patterns unless aesthetic intent, references, hierarchy, sensory load, and review are explicitly designed.
 
-The protocol turns visual quality from an assumed talent into a repeatable process: visual intent, reference study, concept variation, hierarchy, design tokens, accessibility review, visual QA, sensory QA, and user review.
+The protocol turns visual quality from an assumed talent into a repeatable process: visual intent, reference study, concept variation, hierarchy, design tokens, accessibility review, visual QA, sensory QA, performance/fallback QA, and user review.
+
+Allowing lightweight fonts or sound effects gives the co-designer enough artistic freedom to improve the product, while fallback and performance requirements prevent visual polish from creating device incompatibility, excessive loading cost, or sensory overload.
 
 ### Consequence
 New agents should read `VISUAL_SENSORY_DESIGN.md` for material visual/sensory work. User feedback such as “なんかダサい”, “固い”, “ごちゃごちゃする”, “目が疲れる”, or “耳が疲れる” is a valid QA signal to investigate rather than dismiss as purely subjective preference.
+
+When adding a custom font, preserve a robust fallback path and verify that the app remains usable if the font fails to load. When adding SE, keep it lightweight, restrained, nonessential to understanding, and safe when audio is unavailable or disabled.
 
 ---
 
