@@ -161,6 +161,34 @@ When adding a custom font, preserve a robust fallback path and verify that the a
 
 ---
 
+## D-010 — Treat gamification as adaptive, optional, and subordinate to purpose
+
+**Status:** Accepted  
+**Date:** 2026-09-17
+
+### Decision
+Use `GAMIFICATION_DESIGN.md` as the canonical cross-project protocol whenever game elements such as points, badges, collections, progress systems, challenges, rankings, streaks, rewards, or game-like progression are considered.
+
+Gamification is **not mandatory**, including for educational apps. Its intensity and form should change with the audience, task, age, expertise, and usage context.
+
+Child and novice learning experiences may use playful exploration, discovery, meaningful collections, gentle achievements, characters, or challenges when these support learning. Adult research, professional, and high-efficiency tools should normally use subtle progress/feedback or no gamification unless stronger game elements clearly improve the task.
+
+Competition, public rankings, streak-loss pressure, external rewards, random rewards, and attention-maximizing mechanics require special caution and must not be added merely to increase engagement time.
+
+### Rationale
+Research syntheses report that gamification can improve motivation and learning outcomes, but the size and direction of effects vary substantially by design and context. Other work documents negative effects associated with poorly adapted badges, leaderboards, competition, social comparison, and external rewards.
+
+A one-size-fits-all game layer would conflict with the broader development principles: preserve the user's real goal, avoid attention exploitation, design for accessibility and low sensory load, and adapt the interface to the people and work involved.
+
+### Consequence
+Agents should ask first whether gamification is useful, then choose an appropriate strength rather than automatically adding badges or points.
+
+For research/professional contexts, efficiency, clarity, trust, and task completion take priority over visible game mechanics. For child/novice educational contexts, game elements may be more playful, but should favor curiosity, autonomy, mastery, exploration, and gentle progress over pressure or social comparison.
+
+Gamification must remain adjustable, reversible, accessible, and subordinate to the purpose of the app.
+
+---
+
 ## Entry template
 
 ```md
