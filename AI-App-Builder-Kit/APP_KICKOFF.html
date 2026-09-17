@@ -107,6 +107,21 @@
     #status { min-height: 1.6em; font-weight: 650; }
     #status.error { color: var(--error); }
     #output { min-height: 30rem; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .9rem; }
+    .history-list { display: grid; gap: .7rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+    .history-item {
+      display: flex;
+      gap: .8rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: .75rem;
+      border: 1px solid var(--line);
+      border-radius: .45rem;
+      background: var(--bg);
+    }
+    .history-label { min-width: 0; }
+    .history-title { display: block; font-weight: 700; overflow-wrap: anywhere; }
+    .history-time { display: block; color: var(--muted); font-size: .9rem; }
+    .history-item button { flex: 0 0 auto; }
     .required { color: var(--error); }
 
     @media (max-width: 46rem) {
@@ -115,6 +130,7 @@
       .wide { grid-column: auto; }
       .choice { width: 100%; }
       button { width: 100%; }
+      .history-item { align-items: stretch; flex-direction: column; }
     }
 
     @media (prefers-color-scheme: dark) {
@@ -144,7 +160,7 @@
   <header>
     <h1>App Kickoff <span aria-hidden="true">—</span> 企画カルテ</h1>
     <p class="lede">選択肢を埋めると、AIへ渡せるProject Briefを生成します。未定の項目は「AIに提案してもらう」を選べます。</p>
-    <p class="note"><strong>プライバシー：</strong>入力内容はこのページ内だけで処理されます。外部通信や自動保存は行いません。機密情報や個人情報は入力しないでください。</p>
+    <p class="note"><strong>プライバシー：</strong>入力内容はこのページ内だけで処理されます。外部通信や永続的な自動保存は行いません。生成履歴はこのタブ内だけに最大5件保持され、再読み込みまたはタブを閉じると消えます。機密情報や個人情報は入力しないでください。</p>
   </header>
 
   <form id="kickoffForm">
@@ -389,6 +405,12 @@
       <button type="button" class="secondary" id="download">Markdownを保存</button>
     </div>
   </section>
+
+  <section class="section" id="historySection" aria-labelledby="historyHeading" hidden>
+    <h2 id="historyHeading">このタブの生成履歴</h2>
+    <p>直近5件までを一時的に保持します。再読み込みまたはタブを閉じると消えます。</p>
+    <ol id="historyList" class="history-list"></ol>
+  </section>
 </main>
 
 <script>
@@ -398,6 +420,9 @@
     const result = document.getElementById('result');
     const output = document.getElementById('output');
     const status = document.getElementById('status');
+    const historySection = document.getElementById('historySection');
+    const historyList = document.getElementById('historyList');
+    const generationHistory = [];
 
     const value = (id, fallback = '未定') => {
       const text = document.getElementById(id).value.trim();
@@ -412,6 +437,34 @@
     const cleanFileName = text => {
       const base = text === '未定' ? 'project' : text;
       return base.replace(/[\\/:*?"<>|\s]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'project';
+    };
+
+    const renderHistory = () => {
+      historyList.replaceChildren();
+      generationHistory.forEach((entry, index) => {
+        const item = document.createElement('li');
+        item.className = 'history-item';
+
+        const label = document.createElement('span');
+        label.className = 'history-label';
+        const title = document.createElement('span');
+        title.className = 'history-title';
+        title.textContent = entry.title;
+        const time = document.createElement('span');
+        time.className = 'history-time';
+        time.textContent = entry.time;
+        label.append(title, time);
+
+        const restore = document.createElement('button');
+        restore.type = 'button';
+        restore.className = 'secondary';
+        restore.textContent = 'この版を表示';
+        restore.dataset.historyIndex = String(index);
+        restore.setAttribute('aria-label', `${entry.title}（${entry.time}）を表示`);
+        item.append(label, restore);
+        historyList.append(item);
+      });
+      historySection.hidden = generationHistory.length === 0;
     };
 
     form.addEventListener('submit', event => {
@@ -478,6 +531,15 @@
       ];
 
       output.value = lines.join('\n');
+      output.dataset.fileName = `${cleanFileName(title)}-PROJECT_BRIEF.md`;
+      generationHistory.unshift({
+        title,
+        time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        content: output.value,
+        fileName: output.dataset.fileName
+      });
+      generationHistory.splice(5);
+      renderHistory();
       result.hidden = false;
       status.textContent = 'Project Briefを生成しました。';
       result.scrollIntoView({ block: 'start' });
@@ -500,14 +562,28 @@
     document.getElementById('download').addEventListener('click', () => {
       const blob = new Blob([output.value], { type: 'text/markdown;charset=utf-8' });
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${cleanFileName(value('title'))}-PROJECT_BRIEF.md`;
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = output.dataset.fileName || `${cleanFileName(value('title'))}-PROJECT_BRIEF.md`;
       document.body.appendChild(link);
       link.click();
       link.remove();
-      URL.revokeObjectURL(link.href);
-      status.textContent = 'Markdownファイルを保存しました。';
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      status.textContent = 'Markdownファイルのダウンロードを開始しました。ブラウザの設定によっては保存先の確認が表示されます。';
       status.className = '';
+    });
+
+    historyList.addEventListener('click', event => {
+      const button = event.target.closest('button[data-history-index]');
+      if (!button) return;
+      const entry = generationHistory[Number(button.dataset.historyIndex)];
+      if (!entry) return;
+      output.value = entry.content;
+      output.dataset.fileName = entry.fileName;
+      result.hidden = false;
+      status.textContent = `「${entry.title}」の生成版を表示しました。`;
+      status.className = '';
+      output.focus();
     });
   })();
 </script>
