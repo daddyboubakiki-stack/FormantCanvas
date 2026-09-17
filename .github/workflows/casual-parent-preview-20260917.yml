@@ -1,0 +1,154 @@
+name: Casual parent research note
+
+on:
+  push:
+    branches: [casual-parent-preview-20260917]
+    paths:
+      - '.github/workflows/casual-parent-preview-20260917.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Move casual research notice to a parent-facing footer note
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          html = path.read_text(encoding='utf-8')
+          marker = 'Casual guardian research note — 2026-09-17'
+          if marker in html:
+              print('Patch already present.')
+          else:
+              css = r'''
+
+  /* Casual guardian research note — 2026-09-17
+     Keep research transparency for adults without interrupting children's play. */
+  body[data-ui-mode="casual"] .public-preview-compact {
+    display:none!important;
+  }
+  .casual-guardian-note {
+    display:none;
+    margin:14px auto 0;
+    max-width:780px;
+    padding:0 4px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.7;
+  }
+  body[data-ui-mode="casual"] .casual-guardian-note {
+    display:block;
+  }
+  .casual-guardian-note summary {
+    width:max-content;
+    max-width:100%;
+    cursor:pointer;
+    font-weight:800;
+    color:#766b68;
+  }
+  .casual-guardian-note p {
+    margin:8px 0 0;
+  }
+'''
+              if '</style>' not in html:
+                  raise SystemExit('No </style> marker found')
+              html = html.replace('</style>', css + '\n</style>', 1)
+
+              note = r'''
+  <details class="casual-guardian-note">
+    <summary>保護者・先生の方へ</summary>
+    <p>
+      Formantasiaは教育・実験用の開発中アプリです。プリセットには、公表された研究データと、文献をもとにアプリ内でモデル化した値が含まれます。根拠や出典は🔬研究モードで確認できます。
+    </p>
+  </details>
+'''
+              sig = re.search(r'(?m)^\s*<[^>]*class=["\'][^"\']*site-signature[^"\']*["\'][^>]*>', html)
+              if not sig:
+                  raise SystemExit('Could not locate site-signature element')
+              html = html[:sig.start()] + note + html[sig.start():]
+              path.write_text(html, encoding='utf-8')
+          PY
+
+      - name: Static validation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          assert 'Casual guardian research note — 2026-09-17' in html
+          assert '保護者・先生の方へ' in html
+          assert 'Formantasiaは教育・実験用の開発中アプリです。' in html
+          assert 'body[data-ui-mode="casual"] .public-preview-compact' in html
+          assert 'Research Preview ⓘ' in html, 'Existing learning-mode compact notice was unexpectedly removed'
+          print('STATIC_PARENT_NOTE_OK')
+          PY
+
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+
+      - name: Browser visibility test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-parent-note.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+          import time
+
+          opts = Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=390,844')
+          d = webdriver.Chrome(options=opts)
+          wait = WebDriverWait(d, 20)
+          try:
+              d.get('http://127.0.0.1:8000/')
+              wait.until(lambda x: len(x.find_elements('css selector','#vowelPreset option')) >= 5)
+              d.find_element('id','casualModeBtn').click()
+              wait.until(lambda x: x.find_element('tag name','body').get_attribute('data-ui-mode') == 'casual')
+              time.sleep(.3)
+
+              compact = d.find_element('css selector','.public-preview-compact')
+              guardian = d.find_element('css selector','.casual-guardian-note')
+              assert not compact.is_displayed(), 'Research Preview is still visible in casual mode'
+              assert guardian.is_displayed(), 'Guardian note is not available in casual mode'
+              assert '保護者・先生の方へ' in guardian.text
+              assert '公表された研究データ' not in guardian.text, 'Details should start collapsed'
+
+              d.execute_script('arguments[0].open = true;', guardian)
+              time.sleep(.1)
+              assert '公表された研究データ' in guardian.text
+
+              d.find_element('id','learningModeBtn').click()
+              wait.until(lambda x: x.find_element('tag name','body').get_attribute('data-ui-mode') == 'learning')
+              time.sleep(.2)
+              assert compact.is_displayed(), 'Learning-mode compact Research Preview should remain visible'
+              assert not guardian.is_displayed(), 'Guardian footer note leaked into learning mode'
+
+              d.find_element('id','researchModeBtn').click()
+              wait.until(lambda x: x.find_element('tag name','body').get_attribute('data-ui-mode') == 'research')
+              time.sleep(.2)
+              assert d.find_element('css selector','.public-preview-banner').is_displayed(), 'Research-mode full notice should remain visible'
+              assert not guardian.is_displayed(), 'Guardian footer note leaked into research mode'
+              print('PARENT_NOTE_BROWSER_OK')
+          finally:
+              d.quit()
+          PY
+
+      - name: Commit validated index and remove helper
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Move casual research notice to parent footer [skip netlify]'
+          git rm .github/workflows/casual-parent-preview-20260917.yml
+          git commit -m 'Remove parent-note helper [skip netlify]'
+          git push
