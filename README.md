@@ -17,16 +17,19 @@ Before making code changes, read:
 1. [`GLOBAL_APP_PRINCIPLES.md`](GLOBAL_APP_PRINCIPLES.md) — the entrypoint declaring which rules apply across all current and future app projects.
 2. [`DEVELOPMENT_METHOD.md`](DEVELOPMENT_METHOD.md) — the shared AI co-development method and priority rules used across projects.
 3. [`VISUAL_SENSORY_DESIGN.md`](VISUAL_SENSORY_DESIGN.md) — the shared visual/sensory craft protocol for art direction, hierarchy, spacing, low-stimulation design, motion, typography, and guarded-autonomy sound/font decisions.
-4. [`AGENTS.md`](AGENTS.md) — standing Formantasia-specific development rules and invariants.
-5. [`PROJECT_STATE.md`](PROJECT_STATE.md) — current implementation snapshot, known risks, and handoff context.
-6. [`DECISIONS.md`](DECISIONS.md) — durable design and research decisions and their rationale.
+4. [`GAMIFICATION_DESIGN.md`](GAMIFICATION_DESIGN.md) — the shared adaptive gamification protocol: use game elements only when they support the purpose, and vary their intensity by age, context, and tool type.
+5. [`AGENTS.md`](AGENTS.md) — standing Formantasia-specific development rules and invariants.
+6. [`PROJECT_STATE.md`](PROJECT_STATE.md) — current implementation snapshot, known risks, and handoff context.
+7. [`DECISIONS.md`](DECISIONS.md) — durable design and research decisions and their rationale.
 
-The first three documents are **cross-project principles**, not Formantasia-only rules. New app projects should carry them forward and add their own project-specific `AGENTS.md`, `PROJECT_STATE.md`, and `DECISIONS.md` as appropriate.
+The first four documents are **cross-project principles**, not Formantasia-only rules. New app projects should carry them forward and add their own project-specific `AGENTS.md`, `PROJECT_STATE.md`, and `DECISIONS.md` as appropriate.
 
 These files are the repository's shared project memory. Do not rely on chat history alone for durable implementation assumptions.
 
 **Important:** research values, provenance, evidence classifications, and research-derived parameters are protected data. They must not be silently changed during unrelated implementation work; see `DEVELOPMENT_METHOD.md` and `AGENTS.md` for the required research-data workflow.
 
 **Visual/sensory quality is also part of product quality:** substantial UI, illustration, motion, or sensory changes should follow `VISUAL_SENSORY_DESIGN.md`. Lightweight custom fonts and SE may be added autonomously only when the protocol's licensing, performance, compatibility, fallback, accessibility, and sensory-load checks are satisfied; otherwise propose them first.
+
+**Gamification is adaptive, not mandatory:** when points, badges, collections, progress systems, streaks, rankings, challenges, or other game elements are considered, apply `GAMIFICATION_DESIGN.md`. Child/novice learning experiences may benefit from playful exploration and gentle achievement, while adult research/professional tools should usually keep gamification subtle or omit it unless it clearly helps the task.
 
 *Formantasia · Daddy's little phonetics lab 🧪*
