@@ -515,6 +515,35 @@
     .canvas-hero .transport-btn { width:44px; height:44px; min-width:44px; min-height:44px; }
   }
 
+
+  /* Casual guardian research note — 2026-09-17
+     Keep research transparency for adults without interrupting children's play. */
+  body[data-ui-mode="casual"] .public-preview-compact {
+    display:none!important;
+  }
+  .casual-guardian-note {
+    display:none;
+    margin:14px auto 0;
+    max-width:780px;
+    padding:0 4px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.7;
+  }
+  body[data-ui-mode="casual"] .casual-guardian-note {
+    display:block;
+  }
+  .casual-guardian-note summary {
+    width:max-content;
+    max-width:100%;
+    cursor:pointer;
+    font-weight:800;
+    color:#766b68;
+  }
+  .casual-guardian-note p {
+    margin:8px 0 0;
+  }
+
 </style>
 </head>
 <body data-ui-mode="casual">
@@ -798,6 +827,12 @@
       <li>Sun, J., & Hayashi, R. (2025). Acoustic, auditory and articulatory analysis of vowel sequences in Japanese by Chinese learners. <em>Journal of the Phonetic Society of Japan, 29</em>(1), 72–86. <a href="https://doi.org/10.24467/onseikenkyu.29.1_72" target="_blank" rel="noreferrer">doi:10.24467/onseikenkyu.29.1_72</a></li>
     </ol>
     <div class="research-note"><strong>信頼レベル：</strong> A = 公表された数値平均を直接転記 / B = 実測アンカー＋合成補間、または複数資料を明示的に組み合わせたモデル / C = 成人データ等を借用した近似。<br><strong>暫定版の原則：</strong> 論文に公表された平均値・公開資料だけを使用。CID / North Texas 等の非公開または研究者間提供の可能性がある raw audio はこの版には含めていません。Mokhtari & Tanaka (2000) の成人男性帯域幅は、公開2,750-patternデータを独立再集計した母音別派生統計（B1–B3 mean/SD, n=550）だけを実装し、原raw行は同梱していません。キャンバス上では ●=実測、△=借用、┄=アプリモデルとして視覚的に区別します。単母音の横線は実測時系列ではなくdisplay-onlyです。Hillenbrand et al. (1995) の公開10%軌跡は今後の統合候補です。</div>
+  </details>
+  <details class="casual-guardian-note">
+    <summary>保護者・先生の方へ</summary>
+    <p>
+      Formantasiaは教育・実験用の開発中アプリです。プリセットには、公表された研究データと、文献をもとにアプリ内でモデル化した値が含まれます。根拠や出典は🔬研究モードで確認できます。
+    </p>
   </details>
   <footer class="site-signature">Formantasia · Daddy's little phonetics lab 🧪</footer>
 </div>
