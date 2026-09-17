@@ -1,6 +1,6 @@
 # PROJECT_STATE.md — Formantasia
 
-Snapshot date: 2026-09-16
+Snapshot date: 2026-09-17
 
 This file records the current repository state so that a new human or AI collaborator can understand the project without relying on chat history.
 
@@ -38,6 +38,10 @@ The current `index.html` contains:
 - Research tools and evidence display.
 - Evidence categories visually distinguishing empirical, borrowed, and modeled information.
 - Mobile-specific presentation rules.
+- Casual mode now uses a warmer, softer visual treatment and friendlier preset labels while preserving the research/learning information model.
+- The preset selector and drawing canvas are grouped as the primary canvas workspace on larger screens; mobile keeps the selector as a fixed two-row controller.
+- Research Preview disclosure is compact in Casual/Learning and fully visible in Research mode.
+- A casual-only empty-canvas hint appears when all three formant tracks are empty.
 - SEO/canonical metadata for the Formantasia public site.
 
 ## Research-data policy currently represented in the app

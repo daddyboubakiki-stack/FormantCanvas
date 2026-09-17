@@ -189,6 +189,22 @@ Gamification must remain adjustable, reversible, accessible, and subordinate to 
 
 ---
 
+## D-011 — Make the canvas workspace the visual hero and adapt density by mode/device
+
+**Status:** Accepted  
+**Date:** 2026-09-17
+
+### Decision
+Treat the preset selector plus drawing canvas as Formantasia's primary interactive workspace. Casual mode should feel warmer and more approachable, while Learning and Research retain progressively denser explanatory information. On mobile, keep the preset selector reachable as a fixed two-row controller rather than compressing all controls into one row.
+
+### Rationale
+The core product loop is choose a sound → draw/edit → listen. Giving the canvas workspace stronger hierarchy reduces competition from surrounding cards and makes the app easier to understand at a glance. Mode-specific disclosure preserves scientific detail without forcing research-level density into casual exploration. The two-row mobile controller improves label and option readability without sacrificing thumb reach.
+
+### Consequence
+Future UI changes should preserve the canvas as the primary visual/interaction target, avoid making every panel equally prominent, and verify Casual/Learning/Research plus desktop/mobile separately. Research provenance remains fully available even when its preview notice is visually quieter outside Research mode.
+
+---
+
 ## Entry template
 
 ```md
