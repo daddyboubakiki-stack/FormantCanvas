@@ -16,13 +16,16 @@ Before making code changes, read:
 
 1. [`GLOBAL_APP_PRINCIPLES.md`](GLOBAL_APP_PRINCIPLES.md) — the entrypoint declaring which rules apply across all current and future app projects.
 2. [`DEVELOPMENT_METHOD.md`](DEVELOPMENT_METHOD.md) — the shared AI co-development method and priority rules used across projects.
-3. [`VISUAL_SENSORY_DESIGN.md`](VISUAL_SENSORY_DESIGN.md) — the shared visual/sensory craft protocol for art direction, hierarchy, spacing, low-stimulation design, motion, typography, and guarded-autonomy sound/font decisions.
-4. [`GAMIFICATION_DESIGN.md`](GAMIFICATION_DESIGN.md) — the shared adaptive gamification protocol: use game elements only when they support the purpose, and vary their intensity by age, context, and tool type.
-5. [`AGENTS.md`](AGENTS.md) — standing Formantasia-specific development rules and invariants.
-6. [`PROJECT_STATE.md`](PROJECT_STATE.md) — current implementation snapshot, known risks, and handoff context.
-7. [`DECISIONS.md`](DECISIONS.md) — durable design and research decisions and their rationale.
+3. [`APP_KICKOFF.md`](APP_KICKOFF.md) — the shared kickoff routine for aligning target users, age, purpose, context, experience direction, priorities, and assumptions before implementation.
+4. [`VISUAL_SENSORY_DESIGN.md`](VISUAL_SENSORY_DESIGN.md) — the shared visual/sensory craft protocol for art direction, hierarchy, spacing, low-stimulation design, motion, typography, and guarded-autonomy sound/font decisions.
+5. [`GAMIFICATION_DESIGN.md`](GAMIFICATION_DESIGN.md) — the shared adaptive gamification protocol: use game elements only when they support the purpose, and vary their intensity by age, context, and tool type.
+6. [`AGENTS.md`](AGENTS.md) — standing Formantasia-specific development rules and invariants.
+7. [`PROJECT_STATE.md`](PROJECT_STATE.md) — current implementation snapshot, known risks, and handoff context.
+8. [`DECISIONS.md`](DECISIONS.md) — durable design and research decisions and their rationale.
 
-The first four documents are **cross-project principles**, not Formantasia-only rules. New app projects should carry them forward and add their own project-specific `AGENTS.md`, `PROJECT_STATE.md`, and `DECISIONS.md` as appropriate.
+The first five documents are **cross-project principles**, not Formantasia-only rules. New app projects should carry them forward and add their own project-specific `AGENTS.md`, `PROJECT_STATE.md`, and `DECISIONS.md` as appropriate.
+
+For a new app or a major new product direction, use `APP_KICKOFF.md` before substantial implementation. Start with the short selectable Mini Kickoff, let the AI prefill anything already known from the conversation, and ask only the unresolved questions that materially affect design. The resulting Project Brief is a living shared understanding, not a permanent contract.
 
 These files are the repository's shared project memory. Do not rely on chat history alone for durable implementation assumptions.
 

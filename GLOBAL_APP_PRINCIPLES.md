@@ -19,7 +19,14 @@
    - 教育向けアプリでは教育目的・子どもの権利・データ保護等を設計段階から考える
    - durableなプロジェクト記憶をGitHubへ残す
 
-2. [`VISUAL_SENSORY_DESIGN.md`](VISUAL_SENSORY_DESIGN.md)
+2. [`APP_KICKOFF.md`](APP_KICKOFF.md)
+   - 新しいアプリでは、実装前にターゲット・対象年齢・経験レベル・目的・利用場面・体験方向・ゲーム性・優先順位をそろえる
+   - まずAIが会話から分かる項目を埋め、不明で設計影響の大きい項目だけ質問する
+   - 通常は選択式のMini Kickoffを使い、複雑な企画だけDeep Kickoffへ進む
+   - 回答からMini Project Briefを作り、ユーザーとAIの共通認識を確認してから本格実装へ進む
+   - 決定は仮説として扱い、試作や利用結果に応じて柔軟に更新する
+
+3. [`VISUAL_SENSORY_DESIGN.md`](VISUAL_SENSORY_DESIGN.md)
    - 美的品質を後付けにしない
    - かわいい・癒し・やさしい・温かい・少しアナログ・低刺激を基本方向とする
    - Visual Intent、参考研究、複数案、階層、余白、デザイントークン
@@ -27,7 +34,7 @@
    - 認知的・感覚的な負荷を増やしすぎない
    - フォント・SEは性能、互換性、ライセンス、fallback、刺激量の安全条件を満たす低リスクな改善ならAI判断で導入してよい
 
-3. [`GAMIFICATION_DESIGN.md`](GAMIFICATION_DESIGN.md)
+4. [`GAMIFICATION_DESIGN.md`](GAMIFICATION_DESIGN.md)
    - ゲーミフィケーションを目的ではなく、学習・探索・継続・作業を助ける手段として扱う
    - 年齢、利用目的、専門性、場面に応じてゲーム性の強度と方法を調整する
    - 子ども・初学者向けでは探索、発見、進捗、図鑑、穏やかな達成感等を検討できる
@@ -57,6 +64,7 @@
 
 - **GLOBAL_APP_PRINCIPLES.md** — 全アプリ共通ルールの入口
 - **DEVELOPMENT_METHOD.md** — 全アプリ共通の開発原則
+- **APP_KICKOFF.md** — 全アプリ共通の企画開始・共通認識形成ルーティン
 - **VISUAL_SENSORY_DESIGN.md** — 全アプリ共通の美術・感覚設計原則
 - **GAMIFICATION_DESIGN.md** — 全アプリ共通の、用途適応型ゲーミフィケーション原則
 - **AGENTS.md** — そのアプリ固有の追加ルール、不変条件、保護対象
@@ -73,11 +81,13 @@
 
 1. 最新の `GLOBAL_APP_PRINCIPLES.md` を確認する。
 2. 最新の `DEVELOPMENT_METHOD.md` を共通開発原則として適用する。
-3. UI・デザイン・イラスト・モーション・音等を扱う場合は `VISUAL_SENSORY_DESIGN.md` を適用する。
-4. 学習、探索、継続、達成表示、ポイント、バッジ、コレクション、ランキング、streak等を検討する場合は `GAMIFICATION_DESIGN.md` を適用し、まずゲーム要素が本当に必要か判断する。
-5. 新しいリポジトリにも、可能ならこれらの共通文書をコピーまたは明示的に参照できる形で置く。
-6. そのアプリ専用の `AGENTS.md` を作り、固有の不変条件、保護対象、テスト方法、注意事項を追加する。
-7. 必要に応じて `PROJECT_STATE.md` と `DECISIONS.md` を作る。
+3. `APP_KICKOFF.md` を使い、会話から既に分かる内容を先に埋めた上で、不明な重要項目だけをユーザーに質問する。通常はMini Kickoffから始める。
+4. 回答をProject Briefにまとめ、「ユーザーとAIがだいたい同じアプリを想像している」ことを確認する。
+5. UI・デザイン・イラスト・モーション・音等を扱う場合は `VISUAL_SENSORY_DESIGN.md` を適用する。
+6. 学習、探索、継続、達成表示、ポイント、バッジ、コレクション、ランキング、streak等を検討する場合は `GAMIFICATION_DESIGN.md` を適用し、まずゲーム要素が本当に必要か判断する。
+7. 新しいリポジトリにも、可能ならこれらの共通文書をコピーまたは明示的に参照できる形で置く。
+8. そのアプリ専用の `AGENTS.md` を作り、固有の不変条件、保護対象、テスト方法、注意事項を追加する。
+9. 必要に応じて `PROJECT_STATE.md` と `DECISIONS.md` を作る。
 
 これにより、チャットやAIが変わっても「最初から全部説明し直す」状態を避けます。
 
