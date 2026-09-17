@@ -1,0 +1,88 @@
+name: Fix mode labels
+
+on:
+  push:
+    branches: [fix-mode-labels-20260917]
+    paths:
+      - '.github/workflows/fix-mode-labels-20260917.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore 学習 and 研究 labels
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          h=p.read_text(encoding='utf-8')
+          old="tx(id('learningModeBtn'),c?'📘 まなぶ':'📘 学習');tx(id('researchModeBtn'),c?'🔬 くわしく':'🔬 研究');"
+          new="tx(id('learningModeBtn'),'📘 学習');tx(id('researchModeBtn'),'🔬 研究');"
+          if old not in h:
+              raise SystemExit('Expected mode-label line not found')
+          h=h.replace(old,new,1)
+          h=h.replace('もっと知りたくなったら「📘 まなぶ」へ！','もっと知りたくなったら「📘 学習」へ！',1)
+          p.write_text(h,encoding='utf-8')
+          PY
+
+      - name: Static validation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          h=Path('index.html').read_text(encoding='utf-8')
+          assert "tx(id('learningModeBtn'),'📘 学習')" in h
+          assert "tx(id('researchModeBtn'),'🔬 研究')" in h
+          assert '📘 まなぶ' not in h
+          assert '🔬 くわしく' not in h
+          assert 'もっと知りたくなったら「📘 学習」へ！' in h
+          assert 'こえをえがくキャンバス' in h
+          assert 'こども（7〜12さい）' in h
+          print('MODE_LABEL_STATIC_OK')
+          PY
+
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+
+      - name: Browser validation
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-mode-label.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+          import time
+          o=Options();o.add_argument('--headless=new');o.add_argument('--no-sandbox');o.add_argument('--disable-dev-shm-usage');o.add_argument('--window-size=390,844')
+          d=webdriver.Chrome(options=o);w=WebDriverWait(d,20)
+          try:
+              d.get('http://127.0.0.1:8000/')
+              w.until(lambda x: len(x.find_elements('css selector','#vowelPreset option'))>=5)
+              d.find_element('id','casualModeBtn').click();time.sleep(.3)
+              assert d.find_element('id','learningModeBtn').text=='📘 学習'
+              assert d.find_element('id','researchModeBtn').text=='🔬 研究'
+              assert 'もっと知りたくなったら「📘 学習」へ！' in d.find_element('css selector','.casual-tip').text
+              d.find_element('id','learningModeBtn').click();time.sleep(.2)
+              assert d.find_element('id','learningModeBtn').text=='📘 学習'
+              assert d.find_element('id','researchModeBtn').text=='🔬 研究'
+              d.find_element('id','researchModeBtn').click();time.sleep(.2)
+              assert d.find_element('id','learningModeBtn').text=='📘 学習'
+              assert d.find_element('id','researchModeBtn').text=='🔬 研究'
+              print('MODE_LABEL_BROWSER_OK')
+          finally:
+              d.quit()
+          PY
+
+      - name: Commit validated fix and remove helper
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Restore learning and research mode labels [skip netlify]'
+          git rm .github/workflows/fix-mode-labels-20260917.yml
+          git commit -m 'Remove mode-label helper [skip netlify]'
+          git push
