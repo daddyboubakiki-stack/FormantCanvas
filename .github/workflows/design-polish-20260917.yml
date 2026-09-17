@@ -1,0 +1,152 @@
+name: One-shot Formantasia design polish
+
+on:
+  push:
+    branches: [design-polish-20260917]
+    paths:
+      - 'tools/design_polish_patch.py'
+      - '.github/workflows/design-polish-20260917.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply narrow UI design patch
+        run: python tools/design_polish_patch.py
+
+      - name: Static validation
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          html=Path('index.html').read_text(encoding='utf-8')
+          assert html.count('class="canvas-hero"') == 1
+          assert html.count('id="canvasEmptyHint"') == 1
+          assert 'body[data-ui-mode="casual"] .mode-btn.active { background:#a85f71; color:#fff; }' in html
+          assert 'grid-template-rows:auto auto' in html
+          assert 'class="public-preview-banner research-only"' in html
+          assert 'class="public-preview-compact"' in html
+          assert '<span class="casual-only">ことば</span>' in html
+          assert '<span class="casual-only">だれの声？</span>' in html
+          assert '<span class="casual-only">どの音？</span>' in html
+          assert "gctx.fillStyle = uiMode==='casual' ? '#fffdf9' : '#fbfcff';" in html
+
+          hero_start=html.index('<section class="canvas-hero"')
+          hero_end=html.index('</section>', hero_start)
+          hero=html[hero_start:hero_end]
+          assert 'class="selector-bar"' in hero
+          assert 'class="canvas-card"' in hero
+          assert 'beginner-compare' not in hero
+
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,flags=re.S)
+          assert scripts
+          Path('/tmp/formantasia.js').write_text(scripts[-1],encoding='utf-8')
+
+          state=Path('PROJECT_STATE.md').read_text(encoding='utf-8')
+          decisions=Path('DECISIONS.md').read_text(encoding='utf-8')
+          assert 'Snapshot date: 2026-09-17' in state
+          assert '## D-011 — Make the canvas workspace the visual hero' in decisions
+          print('STATIC_DESIGN_POLISH_OK')
+          PY
+          node --check /tmp/formantasia.js
+
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+
+      - name: Browser smoke test desktop and mobile
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1280,1000')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          driver=webdriver.Chrome(options=opts)
+          wait=WebDriverWait(driver,20)
+
+          def css(el,prop):
+              return driver.execute_script('return getComputedStyle(arguments[0]).getPropertyValue(arguments[1])',el,prop)
+
+          try:
+              driver.get('http://127.0.0.1:8000/')
+              wait.until(lambda d: len(d.find_elements('css selector','#vowelPreset option'))>=5)
+
+              compact=driver.find_element('css selector','.public-preview-compact')
+              banner=driver.find_element('css selector','.public-preview-banner')
+              assert compact.is_displayed()
+              assert not banner.is_displayed()
+
+              labels=driver.find_elements('css selector','.selector-bar .mini-control label')
+              assert [x.text for x in labels] == ['ことば','だれの声？','どの音？']
+
+              hero=driver.find_element('css selector','.canvas-hero')
+              selector=driver.find_element('css selector','.selector-bar')
+              canvas=driver.find_element('css selector','.canvas-card')
+              compare=driver.find_element('id','beginnerCompareWrap')
+              assert driver.execute_script('return arguments[0].contains(arguments[1])',hero,selector)
+              assert driver.execute_script('return arguments[0].contains(arguments[1])',hero,canvas)
+              assert not driver.execute_script('return arguments[0].contains(arguments[1])',hero,compare)
+              assert css(selector,'position').strip() == 'sticky'
+
+              driver.find_element('id','clearAll').click()
+              hint=driver.find_element('id','canvasEmptyHint')
+              assert 'is-visible' in hint.get_attribute('class')
+              assert hint.is_displayed()
+
+              driver.find_element('id','learningModeBtn').click()
+              assert compact.is_displayed()
+              assert not banner.is_displayed()
+              labels=driver.find_elements('css selector','.selector-bar .mini-control label')
+              assert [x.text.replace(' auto','') for x in labels] == ['言語','話者','母音']
+
+              driver.find_element('id','researchModeBtn').click()
+              assert banner.is_displayed()
+              assert not compact.is_displayed()
+
+              driver.find_element('id','casualModeBtn').click()
+              driver.set_window_size(390,844)
+              wait.until(lambda d: css(selector,'position').strip() == 'fixed')
+              controls=driver.find_elements('css selector','.selector-bar .mini-control select')
+              lang,voice,vowel=controls
+              transport=driver.find_element('id','transportBtn')
+              assert abs(lang.rect['y']-voice.rect['y']) < 8
+              assert vowel.rect['y'] > lang.rect['y'] + 25
+              assert transport.rect['y'] > lang.rect['y'] + 25
+              labels=driver.find_elements('css selector','.selector-bar .mini-control label')
+              assert css(labels[0],'font-size').strip() == '11px'
+              assert css(lang,'font-size').strip() == '12px'
+
+              severe=[x for x in driver.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              assert not severe, severe
+              print('BROWSER_DESIGN_POLISH_OK')
+          finally:
+              driver.quit()
+          PY
+
+      - name: Ensure only intended product files changed
+        run: |
+          changed="$(git diff --name-only | sort)"
+          printf '%s\n' "$changed"
+          test "$changed" = $'DECISIONS.md\nPROJECT_STATE.md\nindex.html'
+
+      - name: Remove one-shot helpers and commit validated result
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm tools/design_polish_patch.py .github/workflows/design-polish-20260917.yml
+          git add index.html PROJECT_STATE.md DECISIONS.md
+          git commit -m 'Polish Formantasia visual hierarchy [skip netlify]'
+          git push origin HEAD:design-polish-20260917
