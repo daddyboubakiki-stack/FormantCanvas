@@ -27,48 +27,49 @@ jobs:
           if marker in html:
               print('Patch already present.')
           else:
-              css = r'''
-
-  /* Casual guardian research note — 2026-09-17
-     Keep research transparency for adults without interrupting children's play. */
-  body[data-ui-mode="casual"] .public-preview-compact {
-    display:none!important;
-  }
-  .casual-guardian-note {
-    display:none;
-    margin:14px auto 0;
-    max-width:780px;
-    padding:0 4px;
-    color:var(--muted);
-    font-size:12px;
-    line-height:1.7;
-  }
-  body[data-ui-mode="casual"] .casual-guardian-note {
-    display:block;
-  }
-  .casual-guardian-note summary {
-    width:max-content;
-    max-width:100%;
-    cursor:pointer;
-    font-weight:800;
-    color:#766b68;
-  }
-  .casual-guardian-note p {
-    margin:8px 0 0;
-  }
-'''
+              css = '\n'.join([
+                  '',
+                  '  /* Casual guardian research note — 2026-09-17',
+                  "     Keep research transparency for adults without interrupting children's play. */",
+                  '  body[data-ui-mode="casual"] .public-preview-compact {',
+                  '    display:none!important;',
+                  '  }',
+                  '  .casual-guardian-note {',
+                  '    display:none;',
+                  '    margin:14px auto 0;',
+                  '    max-width:780px;',
+                  '    padding:0 4px;',
+                  '    color:var(--muted);',
+                  '    font-size:12px;',
+                  '    line-height:1.7;',
+                  '  }',
+                  '  body[data-ui-mode="casual"] .casual-guardian-note {',
+                  '    display:block;',
+                  '  }',
+                  '  .casual-guardian-note summary {',
+                  '    width:max-content;',
+                  '    max-width:100%;',
+                  '    cursor:pointer;',
+                  '    font-weight:800;',
+                  '    color:#766b68;',
+                  '  }',
+                  '  .casual-guardian-note p {',
+                  '    margin:8px 0 0;',
+                  '  }',
+              ]) + '\n'
               if '</style>' not in html:
                   raise SystemExit('No </style> marker found')
               html = html.replace('</style>', css + '\n</style>', 1)
 
-              note = r'''
-  <details class="casual-guardian-note">
-    <summary>保護者・先生の方へ</summary>
-    <p>
-      Formantasiaは教育・実験用の開発中アプリです。プリセットには、公表された研究データと、文献をもとにアプリ内でモデル化した値が含まれます。根拠や出典は🔬研究モードで確認できます。
-    </p>
-  </details>
-'''
+              note = '\n'.join([
+                  '  <details class="casual-guardian-note">',
+                  '    <summary>保護者・先生の方へ</summary>',
+                  '    <p>',
+                  '      Formantasiaは教育・実験用の開発中アプリです。プリセットには、公表された研究データと、文献をもとにアプリ内でモデル化した値が含まれます。根拠や出典は🔬研究モードで確認できます。',
+                  '    </p>',
+                  '  </details>',
+                  '',
+              ])
               sig = re.search(r'(?m)^\s*<[^>]*class=["\'][^"\']*site-signature[^"\']*["\'][^>]*>', html)
               if not sig:
                   raise SystemExit('Could not locate site-signature element')
