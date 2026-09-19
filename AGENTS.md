@@ -4,14 +4,12 @@ This file is the standing **Formantasia-specific** instruction manual for AI cod
 
 Before changing code or research data, read:
 
-1. `GLOBAL_APP_PRINCIPLES.md` — the entrypoint for all current and future app projects.
-2. `DEVELOPMENT_METHOD.md` — the shared AI co-development method and global priority rules.
-3. `VISUAL_SENSORY_DESIGN.md` — the shared visual/sensory craft protocol for UI, art direction, motion, low-stimulation design, typography, and guarded-autonomy sound/font decisions.
-4. `PROJECT_STATE.md` — the current snapshot and known risks.
-5. `DECISIONS.md` — important design and research decisions and their rationale.
-6. `README.md` — the public product description.
+1. The canonical shared rules in [DaddyBoubakiki-Development-Method](https://github.com/daddyboubakiki-stack/DaddyBoubakiki-Development-Method), beginning with `GLOBAL_APP_PRINCIPLES.md`.
+2. `PROJECT_STATE.md` — the current snapshot and known risks.
+3. `DECISIONS.md` — important design and research decisions and their rationale.
+4. `README.md` — the public product description.
 
-`GLOBAL_APP_PRINCIPLES.md`, `DEVELOPMENT_METHOD.md`, and `VISUAL_SENSORY_DESIGN.md` are cross-project rules. This file adds Formantasia-specific invariants and safety rules; it does not silently weaken the shared principles.
+The shared development rules now live in the dedicated `DaddyBoubakiki-Development-Method` repository. The same-named Markdown files retained in this repository are pointer files only. This `AGENTS.md` adds Formantasia-specific invariants and safety rules; it does not silently weaken the shared principles.
 
 ---
 
