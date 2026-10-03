@@ -4,12 +4,12 @@ This file is the standing **Formantasia-specific** instruction manual for AI cod
 
 Before changing code or research data, read:
 
-1. The canonical shared rules in [DaddyBoubakiki-Development-Method](https://github.com/daddyboubakiki-stack/DaddyBoubakiki-Development-Method), beginning with `GLOBAL_APP_PRINCIPLES.md`.
+1. The [operations entry point](https://github.com/daddyboubakiki-stack/DaddyBoubakiki-Development-Method/blob/main/OPERATIONS_START_HERE.md), then the [canonical Core rules](https://github.com/daddyboubakiki-stack/AI-App-Builder-Kit-Public/tree/main/product/full/rules) and relevant [workshop Overlay](https://github.com/daddyboubakiki-stack/DaddyBoubakiki-Development-Method/blob/main/CHIBI_OVERLAY.md).
 2. `PROJECT_STATE.md` — the current snapshot and known risks.
 3. `DECISIONS.md` — important design and research decisions and their rationale.
 4. `README.md` — the public product description.
 
-The shared development rules now live in the dedicated `DaddyBoubakiki-Development-Method` repository. The same-named Markdown files retained in this repository are pointer files only. This `AGENTS.md` adds Formantasia-specific invariants and safety rules; it does not silently weaken the shared principles.
+Shared Core rules live in `AI-App-Builder-Kit-Public/product/full/rules/`; workshop Overlay and operations entry points live in `DaddyBoubakiki-Development-Method`. The same-named Markdown files retained here are pointers only. This `AGENTS.md` adds Formantasia-specific invariants and safety rules; it does not silently weaken the shared principles. Read the dated 2026-10-03 observation in PROJECT_STATE; earlier snapshots are historical.
 
 ---
 

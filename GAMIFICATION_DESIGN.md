@@ -1,11 +1,9 @@
-# ゲーミフィケーション設計原則 — 共通正本への案内
+# ゲーミフィケーション共通原則 — 正本への案内
 
-この共通ルールの正本は、次の専用リポジトリへ移動しました。
+Status: CURRENT（参照のみ） / 2026-10-03確認
 
-**DaddyBoubakiki-Development-Method**
+- [現行の正本・入口](https://github.com/daddyboubakiki-stack/AI-App-Builder-Kit-Public/blob/main/product/full/rules/GAMIFICATION_PROTOCOL.md)
+- [工房Overlay](https://github.com/daddyboubakiki-stack/DaddyBoubakiki-Development-Method/blob/main/CHIBI_OVERLAY.md)
+- Formantasia固有: [AGENTS.md](AGENTS.md)、[PROJECT_STATE.md](PROJECT_STATE.md)、[DECISIONS.md](DECISIONS.md)
 
-https://github.com/daddyboubakiki-stack/DaddyBoubakiki-Development-Method/blob/main/GAMIFICATION_DESIGN.md
-
-FormantCanvas / Formantasia 固有のルールは、このリポジトリの `AGENTS.md`、`PROJECT_STATE.md`、`DECISIONS.md` を参照してください。
-
-このファイルには共通ルール本文を重複保存しません。今後の更新は正本側で行います。
+共通ルール本文をここへコピーしません。旧GLOBAL_APP_PRINCIPLES / DEVELOPMENT_METHODの工房内移行資料を現行Coreの正本として使用しません。
