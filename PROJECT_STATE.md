@@ -138,7 +138,7 @@ remote branchの判定は確認時のmainとの比較とPR記録に基づきま�
 | main | ACTIVE | 1d7c2d4 |
 | `casual-age8-copy-20260917` | COMPLETED / DELETE_CANDIDATE | ahead 0 / behind 14; mainの祖先（ahead 0） |
 | `casual-child-copy-20260917` | COMPLETED / DELETE_CANDIDATE | ahead 0 / behind 26; mainの祖先（ahead 0） |
-| `casual-language-audit-20260917` | MERGED_EQUIVALENT / DELETE_CANDIDATE | ahead 2 / behind 26; tree差分なし |
+| `casual-language-audit-20260917` | UNKNOWN | ahead 2 / behind 26; GitHub compareの分岐点→headはfiles 0。main tree同一の証明ではなく、等価性・削除を保留。 |
 | `casual-parent-preview-20260917` | UNKNOWN | ahead 4 / behind 26; 確証不足 |
 | `casual-parent-preview-v2-20260917` | COMPLETED / DELETE_CANDIDATE | ahead 0 / behind 19; mainの祖先（ahead 0） |
 | `codex/inspect-formantcanvas-repository-and-summarize` | COMPLETED / DELETE_CANDIDATE | ahead 0 / behind 89; mainの祖先（ahead 0）・PR merged |
@@ -190,7 +190,7 @@ PRのmerge・close・force update、既存branchへの書き込み・削除は�
 - LEFT_UNTOUCHED: 研究数値、出典、evidence、CSV/JSON、index、Python tools、CI、SEO、全feature branchとPR。
 
 削除候補はこの記録のbranch分類と下記に限定し、自動削除しません。
-- DELETE_CANDIDATES: main祖先のbranchと分岐点比の実質差分なしbranchは表の削除候補。削除しない。
+- DELETE_CANDIDATES: main祖先のbranchは表の削除候補。分岐点比の差分なしbranchはmainとの等価性を未確定として削除保留。
 - DELETE_CANDIDATES: Articulation Lab・cute系branchはUNKNOWN/PR_OPENのまま保護。
 
 ## 検証
