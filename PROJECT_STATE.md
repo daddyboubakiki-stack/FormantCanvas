@@ -126,7 +126,7 @@ Formantasia（旧FormantCanvas）。F1/F2/F3軌跡・合成・根拠表示の教
 
 - 共通参照がDevelopment-Methodの移行元資料を正本として案内していた（今回修正）。
 - 本番originの記録が作品集と不一致。NEEDS_USER_REVIEW。SEO/アプリ設定は今回変更しない。
-- open PR #2 Hillenbrand / #4 Japanese VV / #5 Articulation Labは未マージ。PRのmergeableは取得時unknown。
+- open PR #2 Hillenbrand / #4 Japanese VV / #5 Articulation Labは未マージ。取得時mergeable=true / cleanだが、研究根拠・保護資産・実装QAの完了とは別。
 - FormantCanvas内Articulation Lab枝と別ベロちゃんrepoの関係・保護資産の同等性を未確定のままmergeしない。
 
 ## Branch / PR
