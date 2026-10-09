@@ -1,0 +1,49 @@
+name: Integrate Hillenbrand trajectories
+
+on:
+  push:
+    branches:
+      - feat/hillenbrand-trajectories
+    paths:
+      - tools/patch_hillenbrand_integration.py
+      - .github/workflows/integrate-hillenbrand.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch app
+        run: python tools/patch_hillenbrand_integration.py
+
+      - name: Syntax-check inline JavaScript
+        shell: python
+        run: |
+          from pathlib import Path
+          import re, subprocess
+          html = Path('index.html').read_text(encoding='utf-8')
+          scripts = re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', html, flags=re.S|re.I)
+          if not scripts:
+              raise SystemExit('No inline script found')
+          Path('/tmp/formantcanvas-inline.js').write_text('\n'.join(scripts), encoding='utf-8')
+          subprocess.run(['node', '--check', '/tmp/formantcanvas-inline.js'], check=True)
+
+      - name: Commit integrated app
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No integration changes."
+            exit 0
+          fi
+          git commit -m "Integrate Hillenbrand 1995 adult diphthong trajectories"
+          git push origin HEAD:${GITHUB_REF_NAME}
