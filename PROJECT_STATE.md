@@ -57,7 +57,7 @@ Current research-note principles include:
 - empirical, borrowed, and app-modeled information should remain visibly distinguishable;
 - display-only straight lines for monophthongs are not to be misrepresented as measured time-series trajectories.
 
-The current app text identifies Hillenbrand et al. (1995) public 10% trajectories as a future integration candidate rather than as already integrated trajectory data.
+The original 2026-09-17 snapshot described Hillenbrand et al. (1995) public 10% trajectories as a future integration candidate. As of the 2026-10-09 integration branch (`feat/hillenbrand-port-20261009`, not yet on main), research mode offers derived 10–80% F1–F3 group means for adult male/female /eɪ/ /oʊ/ only; 0–10% / 80–100% are app-modeled holds, child (10–12 y) data are deliberately unused, and `tools/verify_hillenbrand_1995.py` re-checks every value against the source `bigdata.dat`.
 
 ## Recent repository-level decisions / changes
 
