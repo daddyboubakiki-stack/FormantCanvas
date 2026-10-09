@@ -2231,11 +2231,13 @@
         const h=HILLENBRAND_1995[voice][key], pts=h.points;
         setHillenbrandTrajectory(key);
         setMeta({
-          title:`American English /${EN_DIPH_IPA[key]}/ — ${voiceTypeEl.options[voiceTypeEl.selectedIndex].text} · Hillenbrand 1995 trajectory`,
+          title:`American English /${EN_DIPH_IPA[key]}/ — ${voice==='male'?'成人男性':'成人女性'} · Hillenbrand 1995 trajectory`,
           confidence:'A · 同一資料8実測時点',level:'a',
           summary:`Hillenbrand et al. (1995) bigdata.dat の同一話者群から、durationと10–80%（10%刻み）のF1–F3をFormantasiaで再集計した群平均です（n=${h.n}）。`,
           evidence:[
             {item:'duration',status:'empirical',detail:`${Math.round(h.duration*1000)} ms（Hillenbrand 1995; 群平均）`},
+            {item:'話者群',status:'empirical',detail:`Hillenbrand 1995 の${voice==='male'?'成人男性':'成人女性'} n=${h.n}（各話者1トークン）。`},
+            {item:'話者の年齢・地域',status:'unknown',detail:'このアプリには未収録。話者メニューの「25–50歳」は Lee 2014 プリセット用の表示で、この軌跡の話者群の年齢範囲ではありません。'},
             {item:'F1 8時点',status:'empirical',detail:`10–80% = ${pts.map(p=>fmtHz(p.F1)).join(' / ')} Hz`},
             {item:'F2 8時点',status:'empirical',detail:`10–80% = ${pts.map(p=>fmtHz(p.F2)).join(' / ')} Hz`},
             {item:'F3 8時点',status:'empirical',detail:`10–80% = ${pts.map(p=>fmtHz(p.F3)).join(' / ')} Hz`},
