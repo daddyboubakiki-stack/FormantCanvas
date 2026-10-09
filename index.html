@@ -311,6 +311,10 @@
   .preset-state.custom .preset-state-text { color:#596174; }
   .modified-note { display:none; }
   .reset-preset { display:none; padding:6px 9px; font-size:11px; background:#fff; color:#805400; border-color:#e8c777; margin-left:auto; }
+  .reset-preset:disabled { color:#8a91a0; border-color:#d8dce5; background:#fafbfc; cursor:not-allowed; }
+  .evidence-switch { margin:-4px 0 12px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:8px 10px; border:1px solid #cfe0ff; border-radius:10px; background:#f3f7ff; color:#2f4a7a; font-size:12px; font-weight:700; line-height:1.5; }
+  .evidence-switch[hidden] { display:none; }
+  .evidence-switch-btn { margin-left:auto; padding:6px 10px; font-size:12px; background:#fff; color:#2f5fb3; border-color:#a9c4f5; }
 
   .references { margin:16px 0 30px; padding:16px 18px; background:#fff; border:1px solid var(--border); border-radius:18px; color:#394050; font-size:12px; line-height:1.6; }
   .references summary { cursor:pointer; font-weight:800; color:var(--text); font-size:14px; }
@@ -787,6 +791,10 @@
       <button class="reset-preset" id="resetPresetBtn" type="button" title="F1–F3・F0・帯域幅モード・Manual Q・再生時間をプリセット初期状態に戻します。最大周波数と手ブレ補正は保持します。">↶ プリセットに戻す</button>
     </div>
     <div class="prov-summary" id="provSummary">この線が、どこまで文献値でどこからモデルなのかを表示します。</div>
+    <div class="evidence-switch" id="evidenceSwitch" hidden>
+      <span id="evidenceSwitchText"></span>
+      <button class="evidence-switch-btn" id="evidenceSwitchBtn" type="button" aria-controls="bestEvidenceToggle"></button>
+    </div>
 
     <div class="evidence-wrap" id="evidenceWrap">
       <h3>わかっていること / まだ足りないデータ</h3>
@@ -902,6 +910,9 @@
   const presetStateText = document.getElementById('presetStateText');
   const modifiedNote = document.getElementById('modifiedNote');
   const resetPresetBtn = document.getElementById('resetPresetBtn');
+  const evidenceSwitch = document.getElementById('evidenceSwitch');
+  const evidenceSwitchText = document.getElementById('evidenceSwitchText');
+  const evidenceSwitchBtn = document.getElementById('evidenceSwitchBtn');
   const showEvidenceToggle = document.getElementById('showEvidenceToggle');
   const transportBtn = document.getElementById('transportBtn');
   const casualModeBtn = document.getElementById('casualModeBtn');
@@ -1386,7 +1397,10 @@
     provReuse.innerHTML=meta.reuse || 'Published numeric values; citation required.';
     provRefs.innerHTML=meta.refs || '—';
     modifiedNote.style.display='none';
-    resetPresetBtn.style.display='none';
+    const isPreset=(meta.level||'custom')!=='custom';
+    resetPresetBtn.style.display=isPreset ? 'inline-block' : 'none';
+    resetPresetBtn.disabled=true;
+    updateEvidenceSwitch();
     updateLearningPanel();
     if((meta.level||'custom')==='custom'){
       presetState.className='preset-state custom';
@@ -1406,6 +1420,7 @@
       presetStateText.style.display='none';
       modifiedNote.style.display='inline';
       resetPresetBtn.style.display='inline-block';
+      resetPresetBtn.disabled=false;
       updateLearningPanel();
     } else if(!currentMeta){
       setMeta({title:'Custom drawing',confidence:'Custom',level:'custom',summary:'手描きした独自データです。文献値としての主張はありません。',evidence:[{item:'F1–F3',status:'canvas',detail:'ユーザーが手描きした値'}],source:'User-drawn formant tracks.',trajectory:'No literature claim is made for the current trajectory.',reuse:'User-created data.',refs:'—'});
@@ -1974,6 +1989,17 @@
       if(label) label.textContent='5点実測F1/F2を使う（Jacewicz 2011・WI成人男性）';
     }
     if(!applicable && bestEvidenceToggle.checked) bestEvidenceToggle.checked=false;
+    updateEvidenceSwitch();
+  }
+
+  // Same control as the Research tools checkbox, surfaced where the evidence is read.
+  function updateEvidenceSwitch(){
+    const available=presetLanguageEl.value==='en' && regionalEvidenceWrap.style.display!=='none';
+    evidenceSwitch.hidden=!available;
+    if(!available) return;
+    const source=(regionalEvidenceWrap.querySelector('span')?.textContent || '').replace('を使う','');
+    evidenceSwitchText.textContent=bestEvidenceToggle.checked ? `📈 実測の時系列で表示中：${source}` : `📈 この母音には実測の時系列データがあります：${source}`;
+    evidenceSwitchBtn.textContent=bestEvidenceToggle.checked ? '通常のプリセット表示に戻す' : '実測の軌跡で表示する';
   }
 
   function fmtHz(v){ return Number.isInteger(v)?String(v):Number(v).toFixed(1); }
@@ -2324,7 +2350,11 @@
     updateRegionalEvidenceVisibility();
     applyPreset(presetLanguageEl.value, vowelPresetEl.value);
   });
-  bestEvidenceToggle.addEventListener('change',()=>{ if(presetLanguageEl.value==='en') applyPreset(); });
+  bestEvidenceToggle.addEventListener('change',()=>{ if(presetLanguageEl.value==='en') applyPreset(); updateEvidenceSwitch(); });
+  evidenceSwitchBtn.addEventListener('click',()=>{
+    bestEvidenceToggle.checked=!bestEvidenceToggle.checked;
+    bestEvidenceToggle.dispatchEvent(new Event('change'));
+  });
   resetPresetBtn.addEventListener('click',()=>{
     if(!lastLoadedPreset) return;
     const preservedView={ maxHz:maxHzEl.value, stabilize:stabilizeEl.value };
