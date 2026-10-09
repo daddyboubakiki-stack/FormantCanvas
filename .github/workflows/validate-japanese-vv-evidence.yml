@@ -1,0 +1,27 @@
+name: Validate Japanese VV evidence
+
+on:
+  push:
+    branches:
+      - feat/japanese-vv-evidence-audit
+    paths:
+      - 'data/japanese_vv_evidence_manifest.json'
+      - 'tools/validate_japanese_vv_evidence.py'
+      - '.github/workflows/validate-japanese-vv-evidence.yml'
+  pull_request:
+    paths:
+      - 'data/japanese_vv_evidence_manifest.json'
+      - 'tools/validate_japanese_vv_evidence.py'
+      - '.github/workflows/validate-japanese-vv-evidence.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate evidence manifest
+        run: python tools/validate_japanese_vv_evidence.py
