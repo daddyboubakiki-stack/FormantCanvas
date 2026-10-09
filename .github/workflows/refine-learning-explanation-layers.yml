@@ -1,0 +1,114 @@
+name: Refine learning explanation layers
+
+on:
+  push:
+    branches: [feat/beginner-vowel-compare-ui]
+    paths:
+      - 'tools/refine_learning_explanation_layers.py'
+      - '.github/workflows/refine-learning-explanation-layers.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply layered explanations
+        run: python tools/refine_learning_explanation_layers.py
+      - name: Validate JavaScript and structure
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path('index.html').read_text(encoding='utf-8')
+          assert 'Layered learning explanation v1' in html
+          for label in ['ひとことで','触ってみよう','もう少し正確に']:
+              assert label in html
+          assert "one:'フォルマントの「山の太さ」を表す値です。'" in html
+          assert "one:'フォルマントの「山のとがり具合」を表す数字です。'" in html
+          assert 'learningExplainPrecise' in html
+          scripts=re.findall(r'<script(?:\\s[^>]*)?>(.*?)</script>',html,flags=re.S)
+          Path('/tmp/formantasia.js').write_text(scripts[-1],encoding='utf-8')
+          PY
+          node --check /tmp/formantasia.js
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+      - name: Browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1280,1000')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          driver=webdriver.Chrome(options=opts)
+          wait=WebDriverWait(driver,20)
+          try:
+              driver.get('http://127.0.0.1:8000/')
+              driver.find_element('id','learningModeBtn').click()
+
+              # Bandwidth lower card: friendly entry, experiment prompt, precise layer, full references.
+              driver.find_element('css selector','.learning-topic[data-learn-topic="bandwidth"]').click()
+              wait.until(lambda d: '山の太さ' in d.find_element('id','learningExplainText').get_attribute('textContent'))
+              one=driver.find_element('id','learningExplainText').get_attribute('textContent')
+              trial=driver.find_element('id','learningExplainExample').get_attribute('textContent')
+              precise=driver.find_element('id','learningExplainPrecise').get_attribute('textContent')
+              refs=driver.find_element('id','learningExplainSources')
+              labels=[x.text for x in driver.find_elements('css selector','.learning-explain-label')]
+              print('BANDWIDTH_ONE',one)
+              print('BANDWIDTH_TRY',trial)
+              print('BANDWIDTH_PRECISE',precise)
+              print('LAYER_LABELS',labels)
+              assert '山の太さ' in one
+              assert '響き方' in trial or '帯域幅' in trial
+              assert '中心となる周波数' in precise and '帯域幅' in precise
+              assert labels[:3]==['ひとことで','触ってみよう','もう少し正確に']
+              assert len(refs.find_elements('css selector','a'))==2
+
+              # The round bandwidth info button stays compact: only one-line + one extra sentence + short refs.
+              info=driver.find_element('css selector','.info-dot[data-learn-topic="bandwidth"]')
+              info.click()
+              pop=driver.find_element('id','learningInfoPopover')
+              wait.until(lambda d: 'visible' in pop.get_attribute('class'))
+              pop_text=pop.get_attribute('textContent')
+              print('BANDWIDTH_POPOVER',pop_text)
+              assert 'ひとことで' in pop_text and 'もう少し' in pop_text
+              assert '山の太さ' in pop_text
+              assert '小さいほど細く鋭い山' in pop_text
+              assert '中心となる周波数だけでなく' not in pop_text
+              assert 'Praat Manual' in pop_text
+
+              # Q uses the same easy-to-precise progression.
+              driver.find_element('css selector','.learning-topic[data-learn-topic="q"]').click()
+              wait.until(lambda d: '山のとがり具合' in d.find_element('id','learningExplainText').get_attribute('textContent'))
+              q_precise=driver.find_element('id','learningExplainPrecise').get_attribute('textContent')
+              assert 'Q=F/B' in q_precise
+
+              severe=[x for x in driver.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              print('FINAL_SEVERE_BROWSER_LOGS',severe)
+              assert not severe, severe
+              print('LAYERED_LEARNING_EXPLANATIONS_OK')
+          finally:
+              driver.quit()
+          PY
+          cat /tmp/formantasia-server.log
+      - name: Commit generated index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No generated index changes.'
+          else
+            git commit -m 'Layer learning explanations from simple to precise'
+            git push
+          fi

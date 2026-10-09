@@ -1,0 +1,111 @@
+name: Improve learning info popovers
+
+on:
+  push:
+    branches: [feat/beginner-vowel-compare-ui]
+    paths:
+      - 'tools/improve_learning_info_popovers.py'
+      - '.github/workflows/improve-learning-info-popovers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch learning info controls
+        run: python tools/improve_learning_info_popovers.py
+
+      - name: Validate structure and JavaScript syntax
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path('index.html').read_text(encoding='utf-8')
+          assert 'id=\'learningInfoPopover\'' in html
+          assert 'LEARNING_POPOVER_MS=10000' in html
+          assert 'width:27px; height:27px' in html
+          assert '<button class="info-dot learning-only"' in html
+          assert 'scrollIntoView' not in html[html.find("document.querySelectorAll('[data-learn-topic]')"):html.find("function setUIMode")]
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,flags=re.S)
+          Path('/tmp/formantasia.js').write_text(scripts[-1],encoding='utf-8')
+          PY
+          node --check /tmp/formantasia.js
+
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+
+      - name: Browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1280,1000')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          driver=webdriver.Chrome(options=opts)
+          wait=WebDriverWait(driver,20)
+          try:
+              driver.get('http://127.0.0.1:8000/')
+              driver.find_element('id','learningModeBtn').click()
+              info=wait.until(lambda d: d.find_element('css selector','.info-dot[data-learn-topic="f0"]'))
+              size=driver.execute_script('const r=arguments[0].getBoundingClientRect(); return [r.width,r.height,getComputedStyle(arguments[0]).borderRadius];',info)
+              print('INFO_DOT_SIZE',size)
+              assert size[0] >= 26 and size[1] >= 26 and abs(size[0]-size[1]) < 0.5
+
+              info.click()
+              pop=driver.find_element('id','learningInfoPopover')
+              wait.until(lambda d: 'visible' in pop.get_attribute('class'))
+              wait.until(lambda d: 'F0' in d.execute_script("return document.querySelector('#learningInfoPopover .learning-popover-title').textContent"))
+              title=driver.execute_script("return document.querySelector('#learningInfoPopover .learning-popover-title').textContent")
+              body=driver.execute_script("return document.querySelector('#learningInfoPopover .learning-popover-text').textContent")
+              print('POPOVER_TITLE',title)
+              assert 'F0' in title and '声帯' in body
+              assert info.get_attribute('aria-expanded')=='true'
+
+              # Existing lower learning card remains synchronized.
+              lower_title=driver.execute_script("return document.querySelector('#learningExplainTitle').textContent")
+              assert 'F0' in lower_title
+
+              # Same button toggles the popover closed immediately.
+              info.click()
+              wait.until(lambda d: 'visible' not in pop.get_attribute('class'))
+              assert info.get_attribute('aria-expanded')=='false'
+
+              # Re-open, then switching modes must close it.
+              info.click()
+              wait.until(lambda d: 'visible' in pop.get_attribute('class'))
+              driver.find_element('id','researchModeBtn').click()
+              wait.until(lambda d: 'visible' not in pop.get_attribute('class'))
+
+              severe=[x for x in driver.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              print('FINAL_SEVERE_BROWSER_LOGS',severe)
+              assert not severe, severe
+              print('LEARNING_INFO_POPOVER_SMOKE_OK')
+          finally:
+              driver.quit()
+          PY
+          cat /tmp/formantasia-server.log
+
+      - name: Commit generated index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No generated index changes.'
+          else
+            git commit -m 'Improve learning info buttons and popovers'
+            git push
+          fi

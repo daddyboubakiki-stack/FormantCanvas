@@ -3,14 +3,37 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Formant Canvas — Play · Learn · Research (Research Preview)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Formantasia（フォルマンタジア）— 声をえがくフォルマント・音声学キャンバス</title>
+<meta name="description" content="Formantasia（フォルマンタジア）は、F1・F2・F3のフォルマント軌跡を描いて音を聴き、母音や音声学を学べる教育・実験用Webアプリです。" />
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+<meta name="application-name" content="Formantasia" />
+<link rel="canonical" href="https://formantasia.netlify.app/" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://formantasia.netlify.app/" />
+<meta property="og:title" content="Formantasia（フォルマンタジア）— 声をえがくキャンバス" />
+<meta property="og:description" content="F1・F2・F3を描いて聴く、子どもから大人まで楽しめるフォルマント・音声学Webアプリ。" />
+<meta name="twitter:card" content="summary" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Formantasia",
+  "alternateName": "フォルマンタジア",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "url": "https://formantasia.netlify.app/",
+  "inLanguage": ["ja", "en"],
+  "description": "F1・F2・F3のフォルマント軌跡を描いて音を聴き、母音や音声学を学べる教育・実験用Webアプリ。"
+}
+</script>
 <style>
   :root {
     --bg: #f6f7fb;
     --panel: rgba(255,255,255,.9);
     --text: #1d2230;
-    --muted: #747b8c;
+    --muted: #667085;
     --grid: #d9deea;
     --border: #d8ddea;
     --accent: #111827;
@@ -38,6 +61,8 @@
 
   .header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:14px; }
   .title h1 { margin:0; font-size: clamp(24px,4vw,38px); letter-spacing:-.04em; }
+  .brand-reading { margin-top:2px; color:var(--muted); font-size:12px; font-weight:700; letter-spacing:.04em; }
+  .brand-tagline { margin-top:4px; color:var(--muted); font-size:13px; font-weight:700; letter-spacing:.01em; }
   .title p { margin:7px 0 0; color:var(--muted); line-height:1.5; }
   .badge { flex:0 0 auto; font-size:12px; font-weight:700; background:#fff; border:1px solid var(--border); border-radius:999px; padding:7px 10px; box-shadow:0 5px 20px rgba(20,30,55,.05); }
   .header-actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; justify-content:flex-end; }
@@ -48,16 +73,16 @@
   body[data-ui-mode="casual"] .research-only,
   body[data-ui-mode="casual"] .learning-only,
   body[data-ui-mode="casual"] .learning-plus { display:none!important; }
-  body[data-ui-mode="casual"] .casual-only { display:initial; }
+  body[data-ui-mode="casual"] .casual-only { display:revert; }
   body[data-ui-mode="learning"] .casual-only,
   body[data-ui-mode="learning"] .research-only { display:none!important; }
-  body[data-ui-mode="learning"] .learning-only { display:initial; }
+  body[data-ui-mode="learning"] .learning-only { display:revert; }
   body[data-ui-mode="research"] .casual-only,
   body[data-ui-mode="research"] .learning-only { display:none!important; }
   body[data-ui-mode="casual"] .settings { grid-template-columns:repeat(3,minmax(0,1fr)); }
   body[data-ui-mode="learning"] .settings { grid-template-columns:repeat(5,minmax(0,1fr)); }
   body[data-ui-mode="casual"] .canvas-top { padding-top:9px; padding-bottom:9px; }
-  .casual-tip { margin-top:12px; padding:10px 13px; background:rgba(255,255,255,.75); border:1px dashed #d9deea; border-radius:14px; color:#697184; font-size:12px; text-align:center; }
+  .casual-tip { margin:12px auto 0; padding:0 8px; max-width:760px; color:#697184; font-size:12px; line-height:1.7; text-align:center; overflow-wrap:break-word; }
 
 
   .toolbar, .settings, .bottom { background:var(--panel); border:1px solid var(--border); border-radius:18px; box-shadow:0 10px 35px rgba(30,42,75,.06); backdrop-filter: blur(10px); }
@@ -71,7 +96,7 @@
   }
   .selector-bar::before {
     content:'Voice preset'; grid-column:1 / -1; font-size:11px; font-weight:800;
-    letter-spacing:.08em; text-transform:uppercase; color:#9097a6; margin:0 0 -2px 2px;
+    letter-spacing:.08em; text-transform:uppercase; color:#667085; margin:0 0 -2px 2px;
   }
   body[data-ui-mode="casual"] .selector-bar::before { content:'あそぶ音'; text-transform:none; letter-spacing:.03em; }
   body[data-ui-mode="learning"] .selector-bar::before { content:'音を選んで、しくみを学ぶ'; text-transform:none; letter-spacing:.03em; }
@@ -95,7 +120,26 @@
     background:var(--panel); border:1px solid var(--border); border-radius:18px;
     box-shadow:0 10px 35px rgba(30,42,75,.05); backdrop-filter:blur(10px);
   }
-  .advanced-panel::before { content:'Research tools'; flex:1 1 100%; color:#9097a6; font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin:0 2px -2px; }
+  .advanced-panel::before { content:'Research tools'; flex:1 1 100%; color:#667085; font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin:0 2px -2px; }
+  .mode-export-panel {
+    margin-top:12px; padding:12px 14px; display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center;
+    background:var(--panel); border:1px solid var(--border); border-radius:18px;
+    box-shadow:0 10px 35px rgba(30,42,75,.05); backdrop-filter:blur(10px);
+  }
+  .mode-export-copy { flex:1 1 280px; min-width:0; }
+  .mode-export-copy strong { display:block; font-size:13px; margin-bottom:3px; }
+  .mode-export-copy p { margin:0; color:var(--muted); font-size:11px; line-height:1.55; }
+  .mode-export-panel .io-group { flex:0 1 auto; }
+  .casual-export-panel {
+    display:none; margin-top:12px; padding:12px 14px; align-items:center; gap:12px;
+    background:linear-gradient(180deg,#ffffff,#f7fbff); border:1px solid var(--border); border-radius:18px;
+    box-shadow:0 10px 35px rgba(30,42,75,.05);
+  }
+  body[data-ui-mode="casual"] .casual-export-panel { display:flex; }
+  .casual-export-copy { flex:1 1 220px; min-width:0; }
+  .casual-export-copy strong { display:block; font-size:13px; margin-bottom:3px; }
+  .casual-export-copy p { margin:0; color:var(--muted); font-size:11px; line-height:1.55; }
+  .casual-download-btn { min-height:46px; padding:10px 15px; white-space:nowrap; }
   .check-wrap { display:flex; align-items:center; gap:8px; min-height:38px; padding:8px 10px; border:1px solid var(--border); background:#fff; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; user-select:none; }
   .check-wrap input { width:18px; height:18px; accent-color:#111827; }
   .io-group { display:flex; flex-wrap:wrap; gap:8px; }
@@ -104,10 +148,13 @@
   button { border:1px solid var(--border); background:#fff; color:var(--text); border-radius:12px; padding:9px 12px; cursor:pointer; font-weight:700; transition:.15s ease; touch-action:manipulation; }
   button:hover { transform:translateY(-1px); box-shadow:0 4px 14px rgba(20,30,55,.08); }
   button:active { transform:translateY(0); }
+  button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible {
+    outline:3px solid #1d4ed8; outline-offset:3px;
+  }
   button.active { color:#fff; border-color:transparent; }
-  .track-btn[data-track="F1"].active { background:var(--f1); }
-  .track-btn[data-track="F2"].active { background:var(--f2); }
-  .track-btn[data-track="F3"].active { background:var(--f3); }
+  .track-btn[data-track="F1"].active { background:#c92f4e; }
+  .track-btn[data-track="F2"].active { background:#2563eb; }
+  .track-btn[data-track="F3"].active { background:#7c3aed; }
   .eraser.active { background:#343946; color:#fff; border-color:#343946; }
   .play { background:var(--play); color:#fff; border-color:var(--play); }
   .stop { background:#fff4f4; color:#bf3030; border-color:#ffd2d2; }
@@ -161,11 +208,70 @@
   .learning-explain h3 { margin:0 0 5px; font-size:14px; }
   .learning-explain p { margin:0; color:#4c5567; font-size:12px; line-height:1.65; }
   .learning-example { margin-top:7px!important; padding-top:7px; border-top:1px dashed #ccd4e0; color:#667085!important; }
-  .info-dot {
-    display:inline-grid; place-items:center; width:17px; height:17px; margin-left:4px; border-radius:50%;
-    border:1px solid #bdc7d7; color:#5a6780; background:#fff; font-size:10px; font-weight:900; cursor:pointer; vertical-align:middle;
+  /* Layered learning explanation v1 */
+  .learning-explain-block { margin-top:9px; }
+  .learning-explain-block:first-of-type { margin-top:7px; }
+  .learning-explain-label {
+    display:inline-flex; align-items:center; margin-bottom:4px; padding:3px 7px;
+    border-radius:999px; background:#e9eef8; color:#43516a; font-size:9.5px; font-weight:900;
   }
-  .info-dot:hover { background:#eef3fa; }
+  .learning-explain-block.try .learning-explain-label { background:#edf8f3; color:#35624e; }
+  .learning-explain-block.precise .learning-explain-label { background:#f3f0fa; color:#5b4d75; }
+  .learning-explain-block.try { padding:9px 10px; border-radius:11px; background:#fbfdfc; border:1px solid #e1eee7; }
+  .learning-explain-block.precise { padding-top:9px; border-top:1px dashed #ccd4e0; }
+  .learning-explain-block.precise p { color:#5a6475; }
+  .learning-popover-kicker {
+    display:inline-block; margin:7px 0 3px; padding:2px 6px; border-radius:999px;
+    background:#eef2f8; color:#657087; font-size:9px; font-weight:900;
+  }
+  .learning-popover-title + .learning-popover-kicker { margin-top:2px; }
+  .learning-popover-example { margin-top:0!important; padding-top:0!important; border-top:0!important; }
+
+  /* Sourced learning glossary v1 */
+  .learning-source { margin-top:10px; padding-top:9px; border-top:1px solid #e1e6ef; color:#667085; font-size:10.5px; line-height:1.58; }
+  .learning-source-heading { display:block; margin-bottom:5px; color:#4d576b; font-size:10.5px; font-weight:900; }
+  .learning-source-list { margin:0; padding-left:18px; }
+  .learning-source-list li { margin:4px 0; padding-left:1px; }
+  .learning-source a, .learning-popover-source a { color:#315fc4; text-decoration:none; font-weight:700; }
+  .learning-source a:hover, .learning-popover-source a:hover { text-decoration:underline; }
+  .learning-source-sep { margin:0 4px; color:#a0a7b4; }
+  .learning-citation-note { margin-top:5px!important; color:#667085!important; font-size:9.5px!important; line-height:1.45!important; }
+  .info-dot {
+    display:inline-grid; place-items:center; width:27px; height:27px; min-width:27px; min-height:27px;
+    margin:-5px 0 -5px 5px; padding:0; border-radius:50%; border:1px solid #aebbd0;
+    color:#465673; background:#fff; font-size:13px; line-height:1; font-weight:900; cursor:pointer;
+    vertical-align:middle; box-shadow:0 2px 7px rgba(36,54,88,.10); transform:none!important;
+  }
+  .info-dot:hover { background:#eef3fa; border-color:#8fa1be; box-shadow:0 4px 10px rgba(36,54,88,.14); }
+  .info-dot:focus-visible { outline:3px solid #1d4ed8; outline-offset:3px; }
+  .info-dot[aria-expanded="true"] { background:#e7eefb; border-color:#7f94b8; color:#253b61; }
+
+  .learning-popover {
+    position:fixed; z-index:120; width:min(320px,calc(100vw - 24px)); padding:12px 44px 12px 14px;
+    border:1px solid #d5ddeb; border-radius:15px; background:rgba(255,255,255,.98);
+    box-shadow:0 16px 42px rgba(28,42,71,.18); backdrop-filter:blur(12px);
+    opacity:0; transform:translateY(5px) scale(.985); pointer-events:none;
+    transition:opacity .22s ease, transform .22s ease; color:var(--text);
+  }
+  .learning-popover.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .learning-popover-close {
+    position:absolute; top:8px; right:8px; width:30px; height:30px; min-width:30px; min-height:30px;
+    display:grid; place-items:center; padding:0; border-radius:50%; border:1px solid #cfd7e5;
+    background:#fff; color:#344054; font-size:20px; line-height:1; font-weight:700; box-shadow:none;
+  }
+  .learning-popover-close:hover { background:#eef3fa; transform:none; box-shadow:none; }
+  .learning-popover-title { display:block; margin:0 0 5px; font-size:13px; }
+  .learning-popover-text, .learning-popover-example { margin:0; font-size:11.5px; line-height:1.6; color:#515c70; }
+  .learning-popover-example { margin-top:7px; padding-top:7px; border-top:1px dashed #d2d9e5; color:#687489; }
+  .learning-popover-source { margin-top:8px; padding-top:7px; border-top:1px solid #e1e6ef; color:#667085; font-size:9.8px; line-height:1.5; }
+  .learning-popover-deep {
+    margin-top:9px; padding:6px 9px; border-radius:10px; border:1px solid #d8e0ed;
+    background:#f7f9fc; color:#44516a; font-size:10.5px; font-weight:800; box-shadow:none;
+  }
+  .learning-popover-deep:hover { background:#eef3fa; transform:none; box-shadow:none; }
+  @media (prefers-reduced-motion: reduce) {
+    .learning-popover { transition:none; }
+  }
 
   .provenance-card { margin:12px 0; padding:14px 16px; background:#fff; border:1px solid var(--border); border-radius:18px; box-shadow:0 10px 35px rgba(30,42,75,.05); }
   .prov-head { display:flex; align-items:center; flex-wrap:wrap; gap:9px; margin-bottom:8px; }
@@ -211,6 +317,7 @@
   .references ol { padding-left:22px; }
   .references li { margin:8px 0; }
   .research-note { margin-top:10px; padding:10px 12px; border-radius:12px; background:#f6f8fc; color:#5d6575; }
+  .site-signature { margin:18px 0 8px; text-align:center; color:#667085; font-size:11px; letter-spacing:.02em; }
 
   @media (max-width: 920px) {
     .settings { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -219,6 +326,46 @@
     .evidence-table th:nth-child(2), .evidence-table td:nth-child(2) { width:auto; }
     .evidence-table th, .evidence-table td { padding:7px 8px; }
     .evidence-table td:first-child { width:28%; }
+  }
+
+  /* Beginner vowel comparison experiment */
+  /* Unified same-vowel condition row */
+  .beginner-compare { margin:10px 0 14px; }
+  .compare-launch { display:none; }
+  .compare-toggle {
+    border:1px solid #d8dff0; background:#fff; color:var(--text); border-radius:999px;
+    padding:9px 15px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(34,53,94,.08);
+  }
+  .compare-toggle:hover { transform:translateY(-1px); }
+  .compare-panel {
+    margin-top:9px; border:1px solid #dfe5f2; background:linear-gradient(180deg,#fff,#f8faff);
+    border-radius:18px; padding:14px; box-shadow:0 8px 24px rgba(34,53,94,.08);
+  }
+  .compare-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:10px; }
+  .compare-head strong { font-size:15px; }
+  .compare-head p { margin:3px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+  .compare-tabs { display:none; }
+  .compare-tab { border:1px solid #d8dff0; background:#fff; border-radius:999px; padding:7px 11px; font-weight:800; cursor:pointer; }
+  .compare-tab.active { background:#202b45; border-color:#202b45; color:#fff; }
+  .compare-intro { margin:0 0 10px; font-size:12px; line-height:1.65; color:#505b72; }
+  .compare-choices { display:grid; grid-template-columns:repeat(5,minmax(118px,1fr)); gap:8px; overflow-x:auto; padding-bottom:3px; }
+  .compare-choice {
+    text-align:left; border:1px solid #dce3f1; background:#fff; border-radius:14px; padding:11px;
+    cursor:pointer; min-height:82px; display:flex; flex-direction:column; gap:6px; justify-content:center;
+  }
+  .compare-choice:hover { border-color:#aebbd8; transform:translateY(-1px); }
+  .compare-choice.active { outline:2px solid #6a7fae; border-color:#6a7fae; background:#f6f8ff; }
+  .compare-choice .kicker { font-size:10px; font-weight:900; color:#667085; letter-spacing:.03em; }
+  .compare-choice strong { font-size:14px; }
+  .compare-choice .desc { display:none; }
+  .compare-choice .metric { font-size:11px; font-weight:800; color:#34415f; }
+  .compare-choice .listen { font-size:11px; font-weight:900; color:#536b9e; }
+  .compare-note { margin:9px 0 0; font-size:10.5px; line-height:1.55; color:#667085; }
+  body[data-ui-mode="research"] .beginner-compare { display:block; }
+
+  @media (max-width: 720px) {
+    .compare-choices { grid-template-columns:repeat(5,minmax(118px,1fr)); }
+    .compare-choice { min-height:76px; }
   }
 
   @media (max-width: 820px) {
@@ -250,20 +397,172 @@
     .learning-head { flex-direction:column; }
     .advanced-panel .check-wrap, .advanced-panel .io-group { flex:1 1 100%; }
     .advanced-panel .io-group button { flex:1 1 auto; }
+    .mode-export-panel .io-group { flex:1 1 100%; }
+    .mode-export-panel .io-group button { flex:1 1 auto; }
+    .casual-export-panel { flex-direction:column; align-items:stretch; }
+    .casual-download-btn { width:100%; }
   }
+
+
+  /* Design polish v1 — 2026-09-17
+     Warm casual mode, canvas-as-hero hierarchy, mobile two-row controller,
+     readable type scale, and compact Research Preview. */
+  .public-preview-compact {
+    margin:0 0 10px; padding:7px 10px; border:1px solid rgba(216,221,234,.8);
+    border-radius:12px; background:rgba(255,255,255,.58); color:#667085;
+    font-size:12px; line-height:1.55;
+  }
+  .public-preview-compact summary { width:max-content; max-width:100%; cursor:pointer; font-weight:800; color:#697184; }
+  .public-preview-compact summary:hover { color:#404756; }
+  .public-preview-compact p { margin:7px 2px 2px; max-width:760px; }
+  body[data-ui-mode="research"] .public-preview-compact { display:none; }
+
+  .canvas-hero {
+    position:relative; margin:0 0 14px; border:1px solid var(--border); border-radius:24px;
+    background:#fff; box-shadow:0 18px 46px rgba(30,42,75,.10);
+    transition:box-shadow .18s ease, border-color .18s ease;
+  }
+  .canvas-hero .selector-bar {
+    margin:0; border:0; border-radius:23px 23px 0 0; border-bottom:1px solid var(--border);
+    box-shadow:none; background:rgba(255,255,255,.94); position:sticky; top:10px; z-index:45;
+  }
+  .canvas-hero .canvas-card { border:0; border-radius:0 0 23px 23px; box-shadow:none; overflow:hidden; }
+  .canvas-hero .canvas-top { background:rgba(249,250,253,.72); }
+  .canvas-hero .canvas-wrap { min-height:380px; }
+  .canvas-hero:focus-within { box-shadow:0 20px 52px rgba(30,42,75,.13); }
+
+  .canvas-empty-hint {
+    position:absolute; left:50%; top:50%; z-index:4; width:min(420px,78%);
+    transform:translate(-50%,-50%); text-align:center; color:#9b837d;
+    font-size:14px; font-weight:700; line-height:1.7; pointer-events:none;
+    opacity:0; visibility:hidden; transition:opacity .18s ease, transform .18s ease;
+  }
+  .canvas-empty-hint.is-visible { opacity:1; visibility:visible; transform:translate(-50%,-50%) scale(1); }
+  .canvas-empty-hint-mark { display:block; margin-bottom:5px; font-size:20px; opacity:.8; }
+
+  body[data-ui-mode="casual"] {
+    background:linear-gradient(180deg,#fdfbf7,#f8f4ee);
+  }
+  body[data-ui-mode="casual"] .toolbar,
+  body[data-ui-mode="casual"] .settings,
+  body[data-ui-mode="casual"] .bottom,
+  body[data-ui-mode="casual"] .selector-bar,
+  body[data-ui-mode="casual"] .casual-export-panel {
+    background:rgba(255,252,248,.94); border-color:#eadfda;
+    box-shadow:0 10px 32px rgba(112,82,68,.065);
+  }
+  body[data-ui-mode="casual"] .mode-switch { background:rgba(255,250,246,.96); border-color:#eadfda; }
+  body[data-ui-mode="casual"] .mode-btn.active { background:#a85f71; color:#fff; }
+  body[data-ui-mode="casual"] .canvas-hero {
+    border-color:#eadfda; background:#fffdf9; box-shadow:0 18px 46px rgba(112,82,68,.09);
+  }
+  body[data-ui-mode="casual"] .canvas-hero:focus-within { box-shadow:0 20px 52px rgba(112,82,68,.12); }
+  body[data-ui-mode="casual"] .canvas-hero .selector-bar {
+    background:rgba(255,252,248,.96); border-bottom-color:#eadfda;
+  }
+  body[data-ui-mode="casual"] .canvas-hero .canvas-card { background:#fffdf9; }
+  body[data-ui-mode="casual"] .canvas-hero .canvas-top { background:rgba(253,249,245,.82); }
+  body[data-ui-mode="casual"] .canvas-wrap { background:#fffdf9; }
+  body[data-ui-mode="casual"] .casual-tip { color:#7c6b68; }
+  body[data-ui-mode="casual"] .public-preview-compact {
+    background:rgba(255,252,248,.62); border-color:#eadfda; color:#7c706c;
+  }
+
+  /* Readability: explanatory and interactive text should not be metadata-sized. */
+  .mode-export-copy p, .casual-export-copy p { font-size:12px; line-height:1.6; }
+  .ev-key, .evidence-toggle { font-size:12px; }
+  .advanced-panel::before { font-size:11px; }
+  .reset-preset { padding:7px 10px; font-size:12px; }
+  .setting-note { font-size:11px; line-height:1.45; }
+  .compare-choice .kicker { font-size:11px; }
+  .compare-choice .metric, .compare-choice .listen { font-size:12px; }
+  .compare-note { font-size:11.5px; line-height:1.6; }
+  .learning-source, .learning-source-heading { font-size:11.5px; }
+  .learning-citation-note { font-size:10.5px!important; }
+  .learning-popover-kicker { font-size:10px; }
+  .learning-popover-text, .learning-popover-example { font-size:12px; }
+  .learning-popover-source { font-size:10.5px; }
+  .learning-popover-deep { font-size:11.5px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .canvas-hero, .canvas-empty-hint { transition:none; }
+  }
+
+  @media (max-width:820px) {
+    body { padding-bottom:210px; }
+    .mode-btn { padding:7px 10px; font-size:12px; white-space:nowrap; }
+    .canvas-hero { border-radius:20px; }
+    .canvas-hero .canvas-card { border-radius:19px; }
+    .canvas-hero .selector-bar {
+      position:fixed; left:10px; right:10px; top:auto; bottom:10px; z-index:50; margin:0 auto;
+      max-width:calc(1120px - 20px); padding:10px; border:1px solid var(--border); border-radius:18px;
+      grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr) 48px;
+      grid-template-rows:auto auto; gap:7px 8px;
+      box-shadow:0 14px 40px rgba(20,30,55,.20);
+    }
+    body[data-ui-mode="casual"] .canvas-hero .selector-bar { border-color:#eadfda; }
+    .canvas-hero .selector-bar::before { display:none; }
+    .canvas-hero .selector-bar .mini-control:nth-of-type(1) { grid-column:1; grid-row:1; }
+    .canvas-hero .selector-bar .mini-control:nth-of-type(2) { grid-column:2 / 4; grid-row:1; }
+    .canvas-hero .selector-bar .mini-control:nth-of-type(3) { grid-column:1 / 3; grid-row:2; }
+    .canvas-hero .selector-bar .selector-actions { grid-column:3; grid-row:2; align-self:end; }
+    .mini-control label { font-size:11px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .mini-control select { min-height:42px; padding:7px 9px; font-size:12px; }
+  }
+
+  @media (max-width:520px) {
+    .canvas-hero .selector-bar { left:8px; right:8px; bottom:8px; padding:9px; gap:6px 7px; }
+    .canvas-hero .transport-btn { width:44px; height:44px; min-width:44px; min-height:44px; }
+  }
+
+
+  /* Casual guardian research note — 2026-09-17
+     Keep research transparency for adults without interrupting children's play. */
+  body[data-ui-mode="casual"] .public-preview-compact {
+    display:none!important;
+  }
+  .casual-guardian-note {
+    display:none;
+    margin:14px auto 0;
+    max-width:780px;
+    padding:0 4px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.7;
+  }
+  body[data-ui-mode="casual"] .casual-guardian-note {
+    display:block;
+  }
+  .casual-guardian-note summary {
+    width:max-content;
+    max-width:100%;
+    cursor:pointer;
+    font-weight:800;
+    color:#766b68;
+  }
+  .casual-guardian-note p {
+    margin:8px 0 0;
+  }
+
 </style>
 </head>
 <body data-ui-mode="casual">
 <div class="app">
-  <div class="public-preview-banner" role="note" aria-label="Research preview notice">
+  <div class="public-preview-banner research-only" role="note" aria-label="Research preview notice">
     <span class="preview-pill">Research Preview</span>
     <strong>Development Version</strong>
-    <span>教育・実験用。プリセットには公表された文献値とCanvasによるモデル区間が含まれます。根拠の詳細は🔬研究モードで確認できます。</span>
+    <span>教育・実験用。プリセットには公表された文献値とアプリによるモデル区間が含まれます。この研究モードでは、各プリセットの根拠と近似方法を確認できます。</span>
   </div>
+  <details class="public-preview-compact">
+    <summary>Research Preview ⓘ</summary>
+    <p>Formantasiaは現在開発中の教育・実験用アプリです。プリセットには公表された文献値とアプリによるモデル区間が含まれます。詳しい根拠は🔬研究モードで確認できます。</p>
+  </details>
   <div class="header">
     <div class="title">
-      <h1>Formant Canvas</h1>
-      <p class="casual-only">線を描いて、声のひびきがどう変わるか聴いてみよう。むずかしい設定は隠してあります。</p>
+      <h1>Formantasia</h1>
+      <div class="brand-reading">フォルマンタジア</div>
+      <div class="brand-tagline">声をえがくキャンバス · Draw Your Voice</div>
+      <p class="casual-only">線を描いて、声のひびきがどう変わるか聴いてみよう。</p>
       <p class="learning-only">描いて、聴いて、意味を知るモード。F1・F2・F3や帯域幅、Qを触りながら学べます。</p>
       <p class="research-only">横＝時間、縦＝Hz。F1・F2・F3を手描きし、文献値・モデル区間・帯域幅まで確認できます。</p>
     </div>
@@ -276,36 +575,38 @@
     </div>
   </div>
 
-  <div class="toolbar">
-    <button class="track-btn active" data-track="F1"><span class="casual-only">F1 低め</span><span class="learning-plus">F1 を描く</span></button>
-    <button class="track-btn" data-track="F2"><span class="casual-only">F2 まんなか</span><span class="learning-plus">F2 を描く</span></button>
-    <button class="track-btn" data-track="F3"><span class="casual-only">F3 高め</span><span class="learning-plus">F3 を描く</span></button>
-    <button id="eraserBtn" class="eraser">消しゴム</button>
+  <div class="toolbar" role="group" aria-label="描画ツール">
+    <button class="track-btn active" data-track="F1" type="button" aria-pressed="true"><span class="casual-only">F1 低め</span><span class="learning-plus">F1 を描く</span></button>
+    <button class="track-btn" data-track="F2" type="button" aria-pressed="false"><span class="casual-only">F2 まんなか</span><span class="learning-plus">F2 を描く</span></button>
+    <button class="track-btn" data-track="F3" type="button" aria-pressed="false"><span class="casual-only">F3 高め</span><span class="learning-plus">F3 を描く</span></button>
+    <button id="eraserBtn" class="eraser" type="button" aria-pressed="false">消しゴム</button>
     <div class="spacer"></div>
     <button id="clearCurrent"><span class="casual-only">この線を消す</span><span class="learning-plus">現在の線を消す</span></button>
     <button id="clearAll" class="danger">全部消す</button>
   </div>
 
+  <section class="canvas-hero" aria-label="声をえがくキャンバス">
   <div class="selector-bar" aria-label="Voice preset controls">
     <div class="mini-control">
-      <label for="presetLanguage">言語</label>
+      <label for="presetLanguage"><span class="casual-only">ことば</span><span class="learning-plus">言語</span></label>
       <select id="presetLanguage">
         <option value="ja">日本語</option>
         <option value="en">English</option>
       </select>
     </div>
     <div class="mini-control">
-      <label for="voiceType">話者</label>
+      <label for="voiceType"><span class="casual-only">だれの声？</span><span class="learning-plus">話者</span></label>
       <select id="voiceType"></select>
     </div>
     <div class="mini-control">
-      <label for="vowelPreset">母音 <span class="research-only" style="font-size:10px;color:var(--muted)">auto</span></label>
+      <label for="vowelPreset"><span class="casual-only">どの音？</span><span class="learning-plus">母音 <span class="research-only" style="font-size:10px;color:var(--muted)">auto</span></span></label>
       <select id="vowelPreset"></select>
     </div>
     <div class="selector-actions" aria-label="再生・停止">
       <button id="transportBtn" class="transport-btn" type="button" title="再生" aria-label="再生" aria-pressed="false"><span class="transport-icon">▶</span></button>
     </div>
   </div>
+
 
   <div class="canvas-card">
     <div class="canvas-top">
@@ -316,7 +617,7 @@
         <i class="evidence-sep learning-plus" aria-hidden="true"></i>
         <span class="ev-key empirical learning-plus" title="文献から直接使っている測定値・群平均">● 実測</span>
         <span class="ev-key borrowed learning-plus" title="別条件・別研究・単母音などから借用した文献値">△ 借用</span>
-        <span class="ev-key modeled learning-plus" title="Canvasが補間・保持・時間方向へ表示した区間">┄ モデル</span>
+        <span class="ev-key modeled learning-plus" title="アプリが補間・保持・時間方向へ表示した区間">┄ モデル</span>
         <label class="evidence-toggle learning-plus" title="キャンバス上のデータ根拠表示を切り替えます"><input id="showEvidenceToggle" type="checkbox" checked />根拠表示</label>
       </div>
       <div><span class="casual-only">線を選んで、キャンバスを自由になぞってみよう。</span><span class="learning-only">●実測・△借用・┄モデルを見ながら、線と音の関係を確かめよう。</span><span class="research-only">線をクリックするとF1/F2/F3を選択。ドラッグすればそのまま編集できます。</span></div>
@@ -324,38 +625,64 @@
     <div class="canvas-wrap" id="canvasWrap">
       <canvas id="gridCanvas"></canvas>
       <canvas id="drawCanvas"></canvas>
+      <div id="canvasEmptyHint" class="canvas-empty-hint casual-only" aria-hidden="true">
+        <span class="canvas-empty-hint-mark">✏️</span>
+        <span>ここに線をかいて、声のひびきを聴いてみよう</span>
+      </div>
     </div>
   </div>
+  </section>
+
+  <section class="beginner-compare" id="beginnerCompareWrap" hidden aria-label="同じ母音のくらべ聴き">
+    <div class="compare-launch">
+      <button class="compare-toggle" id="compareToggleBtn" type="button" aria-expanded="false">🔬 同じ母音をくらべてみる</button>
+    </div>
+    <div class="compare-panel" id="comparePanel" hidden>
+      <div class="compare-head">
+        <div>
+          <strong id="compareTitle">同じ母音をくらべてみよう</strong>
+          <p>同じ母音を、条件だけ変えてワンタップで比較できます。</p>
+        </div>
+      </div>
+      <div class="compare-tabs" role="group" aria-label="比較テーマ">
+        <button class="compare-tab active" type="button" data-compare-theme="context">どこで言う？</button>
+        <button class="compare-tab" type="button" data-compare-theme="length">短い？長い？</button>
+      </div>
+      <p class="compare-intro" id="compareIntro"></p>
+      <div class="compare-choices" id="compareChoices"></div>
+      <p class="compare-note">※ 小さい差は耳だけでは分かりにくいことがあります。必要ならグラフと実測durationも一緒に確認できます。</p>
+    </div>
+  </section>
 
   <div class="settings">
     <div class="setting">
       <label><span>再生時間</span><strong id="durationValue">0.60 s</strong></label>
-      <input id="duration" type="range" min="0.15" max="8" step="0.001" value="0.600" />
+      <input id="duration" type="range" min="0.04" max="8" step="0.001" value="0.600" aria-label="再生時間" />
     </div>
     <div class="setting">
-      <label><span><span class="casual-only">声の高さ</span><span class="learning-plus">基本周波数 F0 <span class="info-dot learning-only" tabindex="0" role="button" data-learn-topic="f0" aria-label="F0の説明">i</span></span></span><strong id="f0Value">140 Hz</strong></label>
-      <input id="f0" type="range" min="70" max="500" step="1" value="140" />
+      <label><span><span class="casual-only">声の高さ</span><span class="learning-plus">基本周波数 F0 <button class="info-dot learning-only" type="button" data-learn-topic="f0" aria-label="F0を変えるとどうなる？" aria-expanded="false">i</button></span></span><strong id="f0Value">140 Hz</strong></label>
+      <input id="f0" type="range" min="70" max="500" step="1" value="140" aria-label="声の高さ・基本周波数 F0" />
     </div>
     <div class="setting research-only">
       <label><span>最大周波数</span><strong id="maxHzValue">4000 Hz</strong></label>
-      <input id="maxHz" type="range" min="2500" max="6000" step="250" value="4000" />
+      <input id="maxHz" type="range" min="2500" max="6000" step="250" value="4000" aria-label="最大周波数" />
     </div>
     <div class="setting learning-plus">
-      <label><span>帯域幅モード <span class="info-dot learning-only" tabindex="0" role="button" data-learn-topic="bandwidth" aria-label="帯域幅の説明">i</span></span><strong id="bandwidthModeValue">Empirical</strong></label>
-      <select id="bandwidthMode">
+      <label><span>帯域幅モード <button class="info-dot learning-only" type="button" data-learn-topic="bandwidth" aria-label="帯域幅モードを変えるとどうなる？" aria-expanded="false">i</button></span><strong id="bandwidthModeValue">Empirical</strong></label>
+      <select id="bandwidthMode" aria-label="帯域幅モード">
         <option value="empirical">Empirical bandwidth</option>
         <option value="manual">Manual Q</option>
       </select>
       <div class="setting-note" id="bandwidthInfo">日本語成人男性ではMokhtari–Tanaka (2000) のB1–B3平均を使用。</div>
     </div>
     <div class="setting learning-plus">
-      <label><span>Manual Q <span class="info-dot learning-only" tabindex="0" role="button" data-learn-topic="q" aria-label="Qの説明">i</span></span><strong id="qValue">Q 10</strong></label>
-      <input id="q" type="range" min="2" max="25" step="1" value="10" />
+      <label><span>Manual Q <button class="info-dot learning-only" type="button" data-learn-topic="q" aria-label="Qを変えるとどうなる？" aria-expanded="false">i</button></span><strong id="qValue">Q 10</strong></label>
+      <input id="q" type="range" min="2" max="25" step="1" value="10" aria-label="Manual Q" />
       <div class="setting-note">Empirical bandwidth時は無効。Qは各時点で F/B から自動計算。</div>
     </div>
     <div class="setting">
       <label><span>手ブレ補正</span><strong id="stabilizeValue">72%</strong></label>
-      <input id="stabilize" type="range" min="0" max="100" step="1" value="72" />
+      <input id="stabilize" type="range" min="0" max="100" step="1" value="72" aria-label="手ブレ補正" />
     </div>
   </div>
 
@@ -370,13 +697,36 @@
     <div class="hint research-only">※ 教育・実験用の簡易フォルマントシンセ。Empirical bandwidthではB1–B3を保持し、各時点のQをF/Bから自動計算します。WAVも同じ合成設定で48 kHz / 16-bit PCMレンダリングします。</div>
   </div>
 
-  <div class="casual-tip casual-only">✏️ F1・F2・F3を好きに曲げて、右下の丸い ▶ で聴き比べよう。学習モードにするとF1/F2/F3や音のしくみを確かめられます。</div>
+  <section class="mode-export-panel learning-plus" id="modeExportPanel" aria-label="保存・書き出し・読み込み">
+    <div class="mode-export-copy">
+      <strong><span class="learning-only">📥 保存・読み込み</span><span class="research-only">Export / import</span></strong>
+      <p class="learning-only">いまの音をWAV、F1〜F3のデータをCSV、Praat用スクリプトとして保存できます。CSVを読み込んで続きから触ることもできます。</p>
+      <p class="research-only">現在の合成音・F1〜F3軌跡を保存し、CSVデータを読み込めます。</p>
+    </div>
+    <div class="io-group">
+      <button id="downloadWavBtn" class="wav-download" title="現在の合成音を48 kHz / 16-bit PCM WAVで保存"><span class="learning-only">WAVを保存</span><span class="research-only">WAV書き出し</span></button>
+      <button id="exportPraat"><span class="learning-only">Praat用に保存</span><span class="research-only">Praatへ書き出し</span></button>
+      <button id="exportCsv"><span class="learning-only">CSVを保存</span><span class="research-only">CSV書き出し</span></button>
+      <button id="importCsvBtn"><span class="learning-only">CSVを読み込む</span><span class="research-only">CSV読込</span></button>
+      <input id="importCsv" type="file" accept=".csv,.txt" hidden />
+    </div>
+  </section>
+
+  <section class="casual-export-panel casual-only" id="casualExportPanel" aria-label="音を保存">
+    <div class="casual-export-copy">
+      <strong>できた音をのこしておこう 🎵</strong>
+      <p>いま作った音をWAVファイルでスマホやパソコンに保存できます。</p>
+    </div>
+    <button id="casualDownloadWavBtn" class="wav-download casual-download-btn" type="button" title="いま作った音をWAVファイルで保存">🔊 おとを保存する</button>
+  </section>
+
+  <div class="casual-tip casual-only">✏️ F1・F2・F3を好きに曲げて、▶ で聴き比べよう。学習モードでは、F1/F2/F3や音のしくみも確かめられます。</div>
 
   <section class="learning-card learning-only" id="learningCard" aria-label="音声学ミニ解説">
     <div class="learning-head">
       <div>
         <strong>📘 触ってわかる音声学</strong>
-        <p>用語を選ぶと短い説明が出ます。大きなQ&amp;Aは仕様が固まってから追加予定。</p>
+        <p>まずひとことでつかんで、触って確かめて、必要なら少し正確に。</p>
       </div>
       <span class="learning-preset-badge" id="learningPresetBadge">文献値を読み込み中…</span>
     </div>
@@ -385,14 +735,33 @@
       <button class="learning-topic active" type="button" data-learn-topic="f1">F1</button>
       <button class="learning-topic" type="button" data-learn-topic="f2">F2</button>
       <button class="learning-topic" type="button" data-learn-topic="f3">F3</button>
+      <button class="learning-topic" type="button" data-learn-topic="formant">フォルマント</button>
+      <button class="learning-topic" type="button" data-learn-topic="resonance">共鳴</button>
+      <button class="learning-topic" type="button" data-learn-topic="hz">Hz</button>
+      <button class="learning-topic" type="button" data-learn-topic="spectrogram">スペクトログラム</button>
+      <button class="learning-topic" type="button" data-learn-topic="sourcefilter">音源–フィルタ</button>
+      <button class="learning-topic" type="button" data-learn-topic="praat">Praat</button>
       <button class="learning-topic" type="button" data-learn-topic="bandwidth">Bandwidth</button>
       <button class="learning-topic" type="button" data-learn-topic="q">Q</button>
+      <button class="learning-topic" type="button" data-learn-topic="empirical">Empirical</button>
       <button class="learning-topic" type="button" data-learn-topic="evidence">● △ ┄</button>
     </div>
     <div class="learning-explain" aria-live="polite">
       <h3 id="learningExplainTitle">F1（第1フォルマント）</h3>
-      <p id="learningExplainText">声道の1番目の大きな共鳴です。</p>
-      <p class="learning-example" id="learningExplainExample">線を上下に動かして、音の変化を聴いてみよう。</p>
+      <div class="learning-explain-block one">
+        <span class="learning-explain-label">ひとことで</span>
+        <p id="learningExplainText">母音の「口の開き」に強く関わる、いちばん低いフォルマントです。</p>
+      </div>
+      <div class="learning-explain-block try">
+        <span class="learning-explain-label">触ってみよう</span>
+        <p id="learningExplainExample">F1の線だけ上下に動かして、聞こえ方を比べてみよう。</p>
+      </div>
+      <div class="learning-explain-block precise">
+        <span class="learning-explain-label">もう少し正確に</span>
+        <p id="learningExplainPrecise">F1は第1フォルマントの中心周波数です。母音の高さと強く関係しますが、舌の位置だけで一対一に決まる値ではありません。</p>
+      </div>
+      <div class="learning-source" id="learningExplainSources" aria-label="この用語の出典"></div>
+      <p class="learning-citation-note">本文は出典を踏まえたFormantasiaによる要約です。原文の直接引用ではありません。</p>
     </div>
   </section>
 
@@ -405,13 +774,6 @@
       <input id="bestEvidenceToggle" type="checkbox" />
       <span>5点実測F1/F2を使う（Jacewicz 2011・WI成人男性）</span>
     </label>
-    <div class="io-group">
-      <button id="downloadWavBtn" class="wav-download" title="現在の合成音を48 kHz / 16-bit PCM WAVで保存">WAV書き出し</button>
-      <button id="exportPraat">Praatへ書き出し</button>
-      <button id="exportCsv">CSV書き出し</button>
-      <button id="importCsvBtn">CSV読込</button>
-      <input id="importCsv" type="file" accept=".csv,.txt" hidden />
-    </div>
   </div>
 
   <div class="provenance-card research-only" id="provenanceCard">
@@ -457,14 +819,23 @@
       <li>Kasuya, H., Suzuki, H., & Kido, K. (1968). 年令，性別による日本語5母音のピッチ周波数とホルマント周波数の変化. <em>日本音響学会誌, 24</em>(6), 355–364. <a href="https://doi.org/10.20697/jasj.24.6_355" target="_blank" rel="noreferrer">doi:10.20697/jasj.24.6_355</a></li>
       <li>Lee, S., Potamianos, A., & Narayanan, S. (1999). Acoustics of children's speech: Developmental changes of temporal and spectral parameters. <em>Journal of the Acoustical Society of America, 105</em>(3), 1455–1468. <a href="https://doi.org/10.1121/1.426686" target="_blank" rel="noreferrer">doi:10.1121/1.426686</a></li>
       <li>Lee, S., Potamianos, A., & Narayanan, S. S. (2014). Developmental acoustic study of American English diphthongs. <em>Journal of the Acoustical Society of America, 136</em>(4), 1880–1894. <a href="https://doi.org/10.1121/1.4894799" target="_blank" rel="noreferrer">doi:10.1121/1.4894799</a></li>
-      <li>Mokhtari, P., &amp; Tanaka, K. (2000). <em>A Corpus of Japanese Vowel Formant Patterns</em>. Bulletin of the Electrotechnical Laboratory (ETL), 64, 57–66. Formant Canvas uses only derived aggregate B1–B3 statistics recomputed from the publicly downloadable 2,750-pattern data; the raw dataset is not embedded. <a href="https://isd.pu-toyama.ac.jp/~parham/sp_FormantDataETL.html" target="_blank" rel="noreferrer">project page</a></li>
+      <li>Mokhtari, P., &amp; Tanaka, K. (2000). <em>A Corpus of Japanese Vowel Formant Patterns</em>. Bulletin of the Electrotechnical Laboratory (ETL), 64, 57–66. Formantasia uses only derived aggregate B1–B3 statistics recomputed from the publicly downloadable 2,750-pattern data; the raw dataset is not embedded. <a href="https://isd.pu-toyama.ac.jp/~parham/sp_FormantDataETL.html" target="_blank" rel="noreferrer">project page</a></li>
+      <li>Yazawa, K., &amp; Kondo, M. (2019). Acoustic characteristics of Japanese short and long vowels: Formant displacement effect revisited. <em>Proceedings of ICPhS 2019</em>. Formantasiaの成人短長母音プリセットは、公開された Japanese Vowel Length Acoustic Data v3 の条件別派生平均を使用。 <a href="https://zenodo.org/records/15227304" target="_blank" rel="noreferrer">Zenodo dataset</a></li>
       <li>Hara, I. (2016). <em>An acoustic analysis of vowel sequences in Japanese</em> [Doctoral dissertation, Newcastle University]. <a href="http://hdl.handle.net/10443/3420" target="_blank" rel="noreferrer">Newcastle eTheses</a></li>
       <li>Jacewicz, E., Fox, R. A., & Salmons, J. (2011). Cross-generational vowel change in American English. <em>Language Variation and Change, 23</em>(1), 45–86. <a href="https://doi.org/10.1017/S0954394510000219" target="_blank" rel="noreferrer">doi:10.1017/S0954394510000219</a></li>
       <li>Zhang, M. (2022). <em>Prosodic influences on the acoustics of vowel sequences</em> [Doctoral dissertation, University at Buffalo, State University of New York]. <a href="https://miaozhang.org/mz_dissertation.pdf" target="_blank" rel="noreferrer">PDF</a></li>
       <li>Sun, J., & Hayashi, R. (2025). Acoustic, auditory and articulatory analysis of vowel sequences in Japanese by Chinese learners. <em>Journal of the Phonetic Society of Japan, 29</em>(1), 72–86. <a href="https://doi.org/10.24467/onseikenkyu.29.1_72" target="_blank" rel="noreferrer">doi:10.24467/onseikenkyu.29.1_72</a></li>
     </ol>
-    <div class="research-note"><strong>信頼レベル：</strong> A = 公表された数値平均を直接転記 / B = 実測アンカー＋合成補間、または複数資料を明示的に組み合わせたモデル / C = 成人データ等を借用した近似。<br><strong>暫定版の原則：</strong> 論文に公表された平均値・公開資料だけを使用。CID / North Texas 等の非公開または研究者間提供の可能性がある raw audio はこの版には含めていません。Mokhtari & Tanaka (2000) の成人男性帯域幅は、公開2,750-patternデータを独立再集計した母音別派生統計（B1–B3 mean/SD, n=550）だけを実装し、原raw行は同梱していません。キャンバス上では ●=実測、△=借用、┄=Canvasモデルとして視覚的に区別します。単母音の横線は実測時系列ではなくdisplay-onlyです。Hillenbrand et al. (1995) の公開10%軌跡は今後の統合候補です。</div>
+    <div class="research-note"><strong>信頼レベル：</strong> A = 公表された数値平均を直接転記 / B = 実測アンカー＋合成補間、または複数資料を明示的に組み合わせたモデル / C = 成人データ等を借用した近似。<br><strong>暫定版の原則：</strong> 論文に公表された平均値・公開資料だけを使用。CID / North Texas 等の非公開または研究者間提供の可能性がある raw audio はこの版には含めていません。Mokhtari & Tanaka (2000) の成人男性帯域幅は、公開2,750-patternデータを独立再集計した母音別派生統計（B1–B3 mean/SD, n=550）だけを実装し、原raw行は同梱していません。キャンバス上では ●=実測、△=借用、┄=アプリモデルとして視覚的に区別します。単母音の横線は実測時系列ではなくdisplay-onlyです。Hillenbrand et al. (1995) の公開10%軌跡は今後の統合候補です。</div>
   </details>
+  <details class="casual-guardian-note">
+    <summary>保護者・先生の方へ</summary>
+    <p>
+      Formantasiaは教育・実験用の開発中アプリです。プリセットには、公表された研究データと、文献をもとにアプリ内でモデル化した値が含まれます。根拠や出典は🔬研究モードで確認できます。
+    </p>
+  </details>
+  <footer class="site-signature">Formantasia · Daddy's little phonetics lab 🧪</footer>
+  <footer class="otayori-footer"><a href="https://chibichan-sketchbook.daddyboubakiki.workers.dev/otayori/?app=formantasia" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">おたよりポスト 📮（新しいタブ）</a></footer>
 </div>
 
 <script>
@@ -535,13 +906,24 @@
   const casualModeBtn = document.getElementById('casualModeBtn');
   const learningModeBtn = document.getElementById('learningModeBtn');
   const researchModeBtn = document.getElementById('researchModeBtn');
+  const beginnerCompareWrap = document.getElementById('beginnerCompareWrap');
+  const compareToggleBtn = document.getElementById('compareToggleBtn');
+  const comparePanel = document.getElementById('comparePanel');
+  const compareTitle = document.getElementById('compareTitle');
+  const compareIntro = document.getElementById('compareIntro');
+  const compareChoices = document.getElementById('compareChoices');
   const learningCard = document.getElementById('learningCard');
   const learningPresetBadge = document.getElementById('learningPresetBadge');
   const learningExplainTitle = document.getElementById('learningExplainTitle');
   const learningExplainText = document.getElementById('learningExplainText');
   const learningExplainExample = document.getElementById('learningExplainExample');
+  const learningExplainPrecise = document.getElementById('learningExplainPrecise');
   let learningTopic = 'f1';
   let uiMode = 'casual';
+  let compareTheme = 'context';
+  let compareOpen = false;
+  let compareBaseVowel = 'a';
+  let compareCurrentKey = null;
 
   function duration() { return Number(durationEl.value); }
   function maxHz() { return Number(maxHzEl.value); }
@@ -577,7 +959,7 @@
   const SYNTH_DEFAULTS = { q:10, duration:0.600 };
 
   // Mokhtari & Tanaka (2000): pooled adult-male Japanese bandwidths.
-  // Recomputed in Formant Canvas from all 2,750 publicly downloadable patterns:
+  // Recomputed in Formantasia from all 2,750 publicly downloadable patterns:
   // 5 speakers × 5 vowels × 22 words × 5 steady-state frames; n=550 per vowel.
   // Only derived aggregate means/SDs are embedded here; the raw 2,750-row dataset is NOT embedded.
   const JA_MT_BW = {
@@ -641,7 +1023,7 @@
       }).join(' / ') + '（Mokhtari–Tanaka 2000; n=550/母音）';
     }
     const pair=japanesePairForKey(key);
-    return `${pair[0]}→${pair[1]} の単母音B1–B3平均をV1/transition/V2に合わせてCanvasが補間（endpoint empirical / interior modeled）`;
+    return `${pair[0]}→${pair[1]} の単母音B1–B3平均をV1/transition/V2に合わせてアプリが補間（endpoint empirical / interior modeled）`;
   }
   function updateBandwidthUI(){
     const available=empiricalBandwidthAvailable();
@@ -655,11 +1037,13 @@
     bandwidthInfo.textContent=empirical
       ? (JA_MT_BW[vowelPresetEl.value]
           ? 'Mokhtari–Tanaka (2000) の成人男性B1–B3平均。Qは各時点のF/B。'
-          : 'Mokhtari–Tanaka単母音B1–B3を両端に使い、VV内部はCanvas補間。')
+          : 'Mokhtari–Tanaka単母音B1–B3を両端に使い、VV内部はアプリ補間。')
       : (available?'Manual Qを使用。Empirical bandwidthへ切替可能。':'この話者群の実測帯域幅は未収録のためManual Q。');
   }
 
   function presetDuration(lang,key,voice=voiceTypeEl.value){
+    const yk=YK2019_PRESETS.get(key);
+    if(lang==='ja' && yk) return yk.duration_ms.mean/1000;
     if(lang==='en' && EN_DIPH[voice] && EN_DIPH[voice][key]) return EN_DIPH[voice][key].duration;
     return SYNTH_DEFAULTS.duration;
   }
@@ -811,6 +1195,36 @@
     }
   };
 
+  let YK2019_DATA = null;
+  let YK2019_PRESETS = new Map();
+
+  function ykContextLabel(p){ return p.context_label==='isolated_word'?'単独語':'文中'; }
+  function ykLengthLabel(p){ return p.length==='long'?'長':'短'; }
+  function ykOptionLabel(p){
+    const shortKana={i:'い',e:'え',a:'あ',o:'お',u:'う'};
+    const longKana={i:'いい',e:'ええ',a:'ああ',o:'おお',u:'うう'};
+    return p.length==='long' ? `/${p.vowel}ː/ ${longKana[p.vowel]}` : `/${p.vowel}/ ${shortKana[p.vowel]}`;
+  }
+  function ykMatchingPreset(source, sex){
+    if(!source || !YK2019_DATA) return null;
+    return YK2019_DATA.presets.find(p=>p.sex===sex && p.context_label===source.context_label && p.length===source.length && p.vowel===source.vowel) || null;
+  }
+
+  async function loadYazawaKondoData(){
+    try{
+      const response=await fetch('data/yazawa_kondo_2019_adult_presets.json',{cache:'force-cache'});
+      if(!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data=await response.json();
+      if(!data || !Array.isArray(data.presets) || data.presets.length!==40) throw new Error('expected 40 presets');
+      YK2019_DATA=data;
+      YK2019_PRESETS=new Map(data.presets.map(p=>[p.id,p]));
+      if(presetLanguageEl.value==='ja') buildPresetOptions(vowelPresetEl.value);
+      updateBeginnerCompareVisibility();
+    }catch(err){
+      console.warn('Yazawa–Kondo presets could not be loaded:',err);
+    }
+  }
+
   function cloneTarget(v){ return {F1:v.F1,F2:v.F2,F3:v.F3}; }
 
   function buildVoiceOptions(preferred=null){
@@ -829,15 +1243,95 @@
   function buildPresetOptions(preferred=null){
     const lang=presetLanguageEl.value;
     const data=PRESETS[lang];
-    const keep=preferred || vowelPresetEl.value;
+    let desired=preferred || vowelPresetEl.value;
+    const oldYk=YK2019_PRESETS.get(desired);
+    if(oldYk && oldYk.sex!==voiceTypeEl.value){
+      const translated=ykMatchingPreset(oldYk,voiceTypeEl.value);
+      if(translated) desired=translated.id;
+    }
+    if(lang==='ja' && oldYk) desired=oldYk.vowel;
     vowelPresetEl.innerHTML='';
-    const mono=document.createElement('optgroup'); mono.label='単母音';
+    const mono=document.createElement('optgroup');
+    mono.label=lang==='ja'?'持続母音（Kasuya 1968）':'単母音';
     data.mono.forEach(([value,label])=>{ const o=document.createElement('option'); o.value=value; o.textContent=label; mono.appendChild(o); });
     const diph=document.createElement('optgroup'); diph.label=lang==='ja'?'母音連続 (VV)':'二重母音';
     data.diph.forEach(([value,label])=>{ const o=document.createElement('option'); o.value=value; o.textContent=label; diph.appendChild(o); });
-    vowelPresetEl.append(mono,diph);
-    const all=[...data.mono,...data.diph].map(x=>x[0]);
-    vowelPresetEl.value=all.includes(keep)?keep:data.mono[0][0];
+    const researchJapanese=lang==='ja' && uiMode==='research';
+    if(lang==='ja' && !researchJapanese) vowelPresetEl.append(mono);
+    else vowelPresetEl.append(mono,diph);
+    const all=(lang==='ja' && !researchJapanese ? data.mono : [...data.mono,...data.diph]).map(x=>x[0]);
+
+    // Yazawa-Kondo same-vowel conditions live in the comparison row, not the dropdown.
+    vowelPresetEl.value=all.includes(desired)?desired:data.mono[0][0];
+  }
+
+  const BASIC_JA_VOWELS=['i','e','a','o','u'];
+  const BASIC_JA_KANA={i:'い',e:'え',a:'あ',o:'お',u:'う'};
+
+  function compareYkPreset(vowel,context,length){
+    if(!YK2019_DATA) return null;
+    return YK2019_DATA.presets.find(p=>p.sex===voiceTypeEl.value && p.vowel===vowel && p.context_label===context && p.length===length) || null;
+  }
+
+  function currentCompareVowel(){
+    const selected=vowelPresetEl.value;
+    if(BASIC_JA_VOWELS.includes(selected)) return selected;
+    const yk=YK2019_PRESETS.get(selected);
+    if(yk) return yk.vowel;
+    return BASIC_JA_VOWELS.includes(compareBaseVowel)?compareBaseVowel:'a';
+  }
+
+  function compareDurationLabel(preset){
+    return preset ? `${Math.round(preset.duration_ms.mean)} ms` : '—';
+  }
+
+  function compareChoiceCard(key,title,metric){
+    const active=compareCurrentKey===key ? ' active' : '';
+    return `<button class="compare-choice${active}" type="button" data-compare-key="${key}" aria-pressed="${compareCurrentKey===key}"><strong>${title}</strong><span class="metric">${metric}</span><span class="listen">▶ 聴く</span></button>`;
+  }
+
+  function renderBeginnerCompare(){
+    if(!beginnerCompareWrap || beginnerCompareWrap.hidden || !YK2019_DATA) return;
+    compareBaseVowel=currentCompareVowel();
+    const v=compareBaseVowel, kana=BASIC_JA_KANA[v];
+    compareTitle.textContent=`「${kana}」の条件を聴き比べ`;
+    compareIntro.textContent='同じ母音のまま、発話条件だけを切り替えます。カードを押すとその条件をすぐ再生します。';
+
+    const isolatedShort=compareYkPreset(v,'isolated_word','short');
+    const isolatedLong=compareYkPreset(v,'isolated_word','long');
+    const sentenceShort=compareYkPreset(v,'carrier_sentence','short');
+    const sentenceLong=compareYkPreset(v,'carrier_sentence','long');
+    compareChoices.innerHTML=[
+      compareChoiceCard(v,'持続','Kasuya 1968 · 静的平均'),
+      isolatedShort ? compareChoiceCard(isolatedShort.id,'単独語・短',compareDurationLabel(isolatedShort)) : '',
+      isolatedLong ? compareChoiceCard(isolatedLong.id,'単独語・長',compareDurationLabel(isolatedLong)) : '',
+      sentenceShort ? compareChoiceCard(sentenceShort.id,'文中・短',compareDurationLabel(sentenceShort)) : '',
+      sentenceLong ? compareChoiceCard(sentenceLong.id,'文中・長',compareDurationLabel(sentenceLong)) : ''
+    ].join('');
+
+    compareChoices.querySelectorAll('[data-compare-key]').forEach(btn=>btn.addEventListener('click',()=>{
+      const key=btn.dataset.compareKey;
+      compareCurrentKey=key;
+      stop();
+      applyPreset('ja',key);
+      renderBeginnerCompare();
+      transportBtn.click();
+    }));
+  }
+
+  function updateBeginnerCompareVisibility(){
+    if(!beginnerCompareWrap) return;
+    const applicable=uiMode!=='casual' && presetLanguageEl.value==='ja' && ['male','female'].includes(voiceTypeEl.value) && Boolean(YK2019_DATA);
+    beginnerCompareWrap.hidden=!applicable;
+    if(!applicable){
+      comparePanel.hidden=true;
+      return;
+    }
+    compareOpen=true;
+    compareBaseVowel=currentCompareVowel();
+    comparePanel.hidden=false;
+    compareToggleBtn.setAttribute('aria-expanded','true');
+    renderBeginnerCompare();
   }
 
   const EVIDENCE_LABELS = {
@@ -845,9 +1339,9 @@
     partial:['△ 文献を参考','ev-partial'],
     borrowed:['△ 成人値を借用','ev-borrowed'],
     hybrid:['△ 別資料を併用','ev-hybrid'],
-    synthetic:['⚠ Canvasで合成','ev-synthetic'],
+    synthetic:['⚠ アプリで合成','ev-synthetic'],
     unknown:['？ 未取得','ev-unknown'],
-    canvas:['◇ Canvas設定','ev-canvas']
+    canvas:['◇ アプリ設定','ev-canvas']
   };
 
   function renderEvidence(rows=[]){
@@ -879,7 +1373,7 @@
           ? {item:'B1–B3（帯域幅）',status:'empirical',detail:bandwidthEvidenceText()}
           : {item:'Q（フォルマントの鋭さ）',status:'canvas',detail:`Manual Q ${Number(qEl.value)}（音声合成用デフォルト。実測帯域幅値ではありません）`},
         usingEmpiricalBandwidth()
-          ? {item:'Qの計算',status:'canvas',detail:'各時点で Qk = Fk / Bk をCanvasが自動計算。VV内部のBは単母音endpoint間のモデル補間です。'}
+          ? {item:'Qの計算',status:'canvas',detail:'各時点で Qk = Fk / Bk をアプリが自動計算。VV内部のBは単母音endpoint間のモデル補間です。'}
           : {item:'帯域幅',status:'unknown',detail:'このモードでは実測B1–B3を使用せず、bandwidth = F / Manual Q として合成します。'}
       );
     }
@@ -919,8 +1413,14 @@
 
   function setActiveTrack(name){
     activeTrack=name; mode='draw';
-    document.querySelectorAll('.track-btn').forEach(b=>b.classList.toggle('active', b.dataset.track===name));
-    document.getElementById('eraserBtn').classList.remove('active');
+    document.querySelectorAll('.track-btn').forEach(b=>{
+      const selected=b.dataset.track===name;
+      b.classList.toggle('active',selected);
+      b.setAttribute('aria-pressed',String(selected));
+    });
+    const eraserBtn=document.getElementById('eraserBtn');
+    eraserBtn.classList.remove('active');
+    eraserBtn.setAttribute('aria-pressed','false');
     render();
   }
 
@@ -997,7 +1497,7 @@
 
   function drawGrid(){
     gctx.clearRect(0,0,cssW,cssH);
-    gctx.fillStyle = '#fbfcff';
+    gctx.fillStyle = uiMode==='casual' ? '#fffdf9' : '#fbfcff';
     gctx.fillRect(0,0,cssW,cssH);
 
     const durationSec = duration();
@@ -1013,7 +1513,7 @@
       gctx.strokeStyle = hz===0 ? '#adb5c6' : '#e3e7ef';
       gctx.beginPath(); gctx.moveTo(0,y+.5); gctx.lineTo(cssW,y+.5); gctx.stroke();
       if (hz>0 && y>6) {
-        gctx.fillStyle = '#81889a';
+        gctx.fillStyle = '#667085';
         gctx.fillText(hz + ' Hz', 8, y+5);
       }
     }
@@ -1024,7 +1524,7 @@
       gctx.strokeStyle = t===0 ? '#adb5c6' : '#edf0f5';
       gctx.beginPath(); gctx.moveTo(x+.5,0); gctx.lineTo(x+.5,cssH); gctx.stroke();
       if (x < cssW-36) {
-        gctx.fillStyle = '#81889a';
+        gctx.fillStyle = '#667085';
         gctx.fillText(t.toFixed(t%1?1:0)+' s', x+6, cssH-20);
       }
     }
@@ -1174,7 +1674,7 @@
         dctx.beginPath(); dctx.moveTo(x0,0); dctx.lineTo(x0,cssH); dctx.stroke();
       }
       if(x1-x0>44){
-        dctx.fillStyle='rgba(89,97,116,.72)';
+        dctx.fillStyle='#596174';
         dctx.fillText(z.label,x0+6,7);
       }
     }
@@ -1194,7 +1694,15 @@
     dctx.restore();
   }
 
+  function updateCanvasEmptyHint(){
+    const hint=document.getElementById('canvasEmptyHint');
+    if(!hint) return;
+    const empty=tracks.F1.length===0 && tracks.F2.length===0 && tracks.F3.length===0;
+    hint.classList.toggle('is-visible',empty);
+  }
+
   function render(){
+    updateCanvasEmptyHint();
     drawGrid();
     dctx.clearRect(0,0,cssW,cssH);
     const showEvidence=Boolean(uiMode!=='casual' && currentEvidence && (showEvidenceToggle && showEvidenceToggle.checked));
@@ -1357,8 +1865,10 @@
   });
   document.getElementById('eraserBtn').addEventListener('click',()=>{
     mode='erase';
-    document.querySelectorAll('.track-btn').forEach(b=>b.classList.remove('active'));
-    document.getElementById('eraserBtn').classList.add('active');
+    document.querySelectorAll('.track-btn').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+    const eraserBtn=document.getElementById('eraserBtn');
+    eraserBtn.classList.add('active');
+    eraserBtn.setAttribute('aria-pressed','true');
     render();
   });
 
@@ -1438,6 +1948,8 @@
 
   function getPresetSpec(lang,key){
     if(lang==='ja'){
+      const yk=YK2019_PRESETS.get(key);
+      if(yk) return {type:'yk',preset:yk};
       if(JA_MONO[voiceTypeEl.value][key]) return {type:'mono',target:getJapaneseTarget(key)};
       return {type:'jvv',pair:japanesePairForKey(key)};
     }
@@ -1570,10 +2082,53 @@
     return ev;
   }
 
+  function applyYazawaKondoPreset(preset){
+    const d=duration();
+    const ev=emptyVisualEvidence();
+    for(const name of ['F1','F2','F3']){
+      const field=`${name}_hz`;
+      const measured=preset.trajectory.map(pt=>({p:pt.position_normalized,hz:pt[field]}));
+      const first=measured[0], last=measured[measured.length-1];
+      tracks[name]=[
+        {t:0,hz:first.hz},
+        ...measured.map(pt=>({t:d*pt.p,hz:pt.hz})),
+        {t:d,hz:last.hz}
+      ];
+      addEvidencePath(ev,name,[{p:0,hz:first.hz},{p:first.p,hz:first.hz}],'modeled');
+      addEvidencePath(ev,name,measured,'empirical');
+      addEvidencePath(ev,name,[{p:last.p,hz:last.hz},{p:1,hz:last.hz}],'modeled');
+      [0,Math.floor((measured.length-1)/2),measured.length-1].forEach(i=>addEvidenceMarker(ev,name,measured[i].p,measured[i].hz,'empirical','Yazawa–Kondo 2019'));
+    }
+    currentEvidence=ev;
+    const midpoint=preset.midpoint_hz;
+    const midpointSd=preset.midpoint_sd_across_speaker_means_hz;
+    const context=ykContextLabel(preset), length=ykLengthLabel(preset);
+    const vowelLabel=preset.length==='long'?`/${preset.vowel}ː/`:`/${preset.vowel}/`;
+    setMeta({
+      title:`Japanese ${vowelLabel} — ${context}・${length} — ${voiceTypeEl.options[voiceTypeEl.selectedIndex].text}`,
+      confidence:'A · 公開実測データの話者均衡平均',level:'a',
+      summary:`Yazawa & Kondo (2019) の公開CSVから、8話者×各10発話を話者均衡で再集計。再生時間と中央20–80%のF1–F3軌跡は、この発話条件の実測値に基づきます。`,
+      evidence:[
+        {item:'Duration',status:'empirical',detail:`${preset.duration_ms.mean.toFixed(1)} ms（話者平均間SD ${preset.duration_ms.sd_across_speaker_means.toFixed(1)} ms; 8話者, 80 tokens）`},
+        {item:'F1 midpoint',status:'empirical',detail:`${fmtHz(midpoint.F1)} Hz（話者平均間SD ${fmtHz(midpointSd.F1)} Hz）`},
+        {item:'F2 midpoint',status:'empirical',detail:`${fmtHz(midpoint.F2)} Hz（話者平均間SD ${fmtHz(midpointSd.F2)} Hz）`},
+        {item:'F3 midpoint',status:'empirical',detail:`${fmtHz(midpoint.F3)} Hz（話者平均間SD ${fmtHz(midpointSd.F3)} Hz）`},
+        {item:'F1–F3 時系列',status:'empirical',detail:'母音区間の中央20–80%を30点で測定した公開値を、各話者内10発話→8話者等重みで平均。'},
+        {item:'0–20% / 80–100%',status:'synthetic',detail:'公開データの30点測定範囲外。再生のため最初/最後の実測点を一定値で延長しており、実測軌跡とは主張しません。'}
+      ],
+      source:'Yazawa & Kondo (2019), Japanese Vowel Length Acoustic Data v3. Formantasiaが公開 JPLongShortVowels.csv から sex × context × vowel length × vowel ごとに話者均衡平均を再計算。',
+      trajectory:'中央20–80%の30点は公開測定値の派生平均。0–20%と80–100%のみ、音声合成を成立させるため端の実測平均値を水平に保持しています。',
+      reuse:'Formantasiaには元の3,200行を埋め込まず、条件別に再集計した派生平均と話者平均間SDを収録しています。利用時は元研究とZenodoデータセットを引用してください。',
+      refs:'<a href="https://zenodo.org/records/15227304" target="_blank" rel="noreferrer">Yazawa & Kondo dataset — Zenodo 15227304</a>'
+    });
+  }
+
   function applyPreset(lang=presetLanguageEl.value,key=vowelPresetEl.value){
     applyPresetAudioDefaults(lang,key);
     const spec=getPresetSpec(lang,key), voice=voiceTypeEl.value;
-    if(spec.type==='mono'){
+    if(spec.type==='yk'){
+      applyYazawaKondoPreset(spec.preset);
+    } else if(spec.type==='mono'){
       currentEvidence=buildVisualEvidence(lang,key,voice);
       Object.entries(spec.target).forEach(([name,hz])=>setTrackConstant(name,hz));
       const target=spec.target;
@@ -1583,21 +2138,21 @@
           confidence:voice==='male'?'B · 実測平均×2資料':'A · 文献の実測平均',level:voice==='male'?'b':'a',
           summary:voice==='male'
             ? `F1–F3はKasuya et al. (1968) の群平均（${fmtTarget(target)}）、合成帯域幅B1–B3はMokhtari & Tanaka (2000) の別コーパス成人男性平均です。`
-            : `F1–F3の基準値は文献の群平均です（${fmtTarget(target)}）。時間方向の水平線は、静的な値を見やすくするためのCanvas上の表示です。`,
+            : `F1–F3の基準値は文献の群平均です（${fmtTarget(target)}）。時間方向の水平線は、静的な値を見やすくするためのキャンバス上の表示です。`,
           evidence:[
             {item:'F1',status:'empirical',detail:`${fmtHz(target.F1)} Hz（Kasuya et al. 1968 の群平均）`},
             {item:'F2',status:'empirical',detail:`${fmtHz(target.F2)} Hz（Kasuya et al. 1968 の群平均）`},
             {item:'F3',status:'empirical',detail:`${fmtHz(target.F3)} Hz（Kasuya et al. 1968 の群平均）`},
-            {item:'時間方向の線',status:'canvas',detail:'文献は静的な母音値。Canvasでは同じ値を時間全体に水平表示。'}
+            {item:'時間方向の線',status:'canvas',detail:'文献は静的な母音値。アプリでは同じ値を時間全体に水平表示。'}
           ],
           source:voice==='male'
-            ? 'F1–F3は粕谷・鈴木・城戸（1968）Table 2。B1–B3はMokhtari & Tanaka (2000) 公開2,750 patternsからFormant Canvasで再集計した成人男性の母音別平均（n=550/母音）。'
+            ? 'F1–F3は粕谷・鈴木・城戸（1968）Table 2。B1–B3はMokhtari & Tanaka (2000) 公開2,750 patternsからFormantasiaで再集計した成人男性の母音別平均（n=550/母音）。'
             : 'F1–F3は粕谷・鈴木・城戸（1968）Table 2 の公表済み群平均値。',
           trajectory:voice==='male'
             ? 'F1–F3は静的値を水平表示。Empirical bandwidthではB1–B3も時間一定とし、各時点でQ=F/Bを計算します。'
             : '静的な母音値を、ユーザーが設定したduration全体に一定値として表示しています。F0は別の合成パラメータです。',
           reuse:voice==='male'
-            ? 'Mokhtari–Tanaka原2,750行はアプリに同梱せず、Formant Canvasが再集計した派生統計値だけを収録。明示的なCC系ライセンスは確認できないため、raw datasetの再配布はしていません。'
+            ? 'Mokhtari–Tanaka原2,750行はアプリに同梱せず、Formantasiaが再集計した派生統計値だけを収録。明示的なCC系ライセンスは確認できないため、raw datasetの再配布はしていません。'
             : '公表済みの数値結果のみを新しいデータ構造へ転記。表のレイアウトや図そのものは複製していません。',
           refs:voice==='male'?[REFS.kasuya,REFS.mokhtari].join(' · '):REFS.kasuya
         });
@@ -1605,7 +2160,7 @@
         setMeta({
           title:`American English /${key}/ — ${voiceTypeEl.options[voiceTypeEl.selectedIndex].text}`,
           confidence:'A · 文献の実測平均',level:'a',
-          summary:`F1–F3の基準値は年齢・性別別の文献平均です（${fmtTarget(target)}）。時間方向の水平線はCanvas上の表示です。`,
+          summary:`F1–F3の基準値は年齢・性別別の文献平均です（${fmtTarget(target)}）。時間方向の水平線はキャンバス上の表示です。`,
           evidence:[
             {item:'F1',status:'empirical',detail:`${fmtHz(target.F1)} Hz（Lee et al. 1999）`},
             {item:'F2',status:'empirical',detail:`${fmtHz(target.F2)} Hz（Lee et al. 1999）`},
@@ -1631,26 +2186,26 @@
         {item:'F2 V1→V2',status:'partial',detail:`${fmtHz(ctxFrom.F2)} → ${fmtHz(ctxTo.F2)} Hz（Hara 2016; 語内VVの文脈平均。/${key}/専用値ではない）`},
         {item:'F3 V1→V2',status:'hybrid',detail:`${fmtHz(monoFrom.F3)} → ${fmtHz(monoTo.F3)} Hz（Kasuya 1968 の単母音平均を併用）`},
         {item:'時間割合',status:'empirical',detail:'V1 30.2% / transition 30.4% / V2 39.4%（Hara 2016; 成人・語内VV平均）'},
-        {item:'transitionの曲がり方',status:'synthetic',detail:'実測の連続軌跡ではなく、Canvasがsmoothstepで滑らかに補間。'},
+        {item:'transitionの曲がり方',status:'synthetic',detail:'実測の連続軌跡ではなく、アプリがsmoothstepで滑らかに補間。'},
         {item:`/${key}/の完全なF1–F3軌跡`,status:'unknown',detail:'この話者群・この母音連続に対応する完全な時系列値は本プリセットに未収録。'}
       ] : [
         {item:'F1 V1→V2',status:'partial',detail:`${fmtHz(monoFrom.F1)} → ${fmtHz(monoTo.F1)} Hz（Kasuya 1968 の子ども単母音平均を代用）`},
         {item:'F2 V1→V2',status:'partial',detail:`${fmtHz(monoFrom.F2)} → ${fmtHz(monoTo.F2)} Hz（Kasuya 1968 の子ども単母音平均を代用）`},
         {item:'F3 V1→V2',status:'partial',detail:`${fmtHz(monoFrom.F3)} → ${fmtHz(monoTo.F3)} Hz（Kasuya 1968 の子ども単母音平均を代用）`},
         {item:'時間割合',status:'borrowed',detail:'V1 30.2% / transition 30.4% / V2 39.4%（Hara 2016 の成人データを借用）'},
-        {item:'transitionの曲がり方',status:'synthetic',detail:'子どもの実測軌跡ではなく、Canvasがsmoothstepで生成。'},
+        {item:'transitionの曲がり方',status:'synthetic',detail:'子どもの実測軌跡ではなく、アプリがsmoothstepで生成。'},
         {item:`子どもの /${key}/ 実測軌跡`,status:'unknown',detail:'現在のプリセットでは利用できる子どものsequence-specific連続データを使用していません。'}
       ];
       setMeta({
         title:`Japanese /${key}/ VV — ${voiceTypeEl.options[voiceTypeEl.selectedIndex].text}`,
         confidence:adult?'B · 文献値＋モデル':'C · 近似',level:adult?'b':'c',
         summary:adult
-          ? 'F1/F2の目標値と時間割合は文献を使っていますが、F3は別の単母音研究を併用し、transitionの曲線そのものはCanvasが生成しています。'
-          : '子どものF1–F3単母音値は文献から取れますが、子どものVV軌跡が足りないため、成人の時間構造を借りてtransitionをCanvasで生成しています。',
+          ? 'F1/F2の目標値と時間割合は文献を使っていますが、F3は別の単母音研究を併用し、transitionの曲線そのものはアプリが生成しています。'
+          : '子どものF1–F3単母音値は文献から取れますが、子どものVV軌跡が足りないため、成人の時間構造を借りてtransitionをアプリで生成しています。',
         evidence,
         whyApprox:adult
           ? `/${key}/そのものの完全なF1–F3時系列を1つの研究から得ていないためです。Hara (2016) のVV文脈F1/F2と時間割合、Kasuya et al. (1968) のF3を組み合わせ、transition内部は滑らかに補間しています。`
-          : `子どもの /${key}/ を時間経過に沿って測ったsequence-specific軌跡を、現在のプリセットでは使用していないためです。開始・終了の目標には子どもの単母音平均を使い、時間配分は成人Hara (2016)を借用し、その間の動きはCanvasが生成しています。`,
+          : `子どもの /${key}/ を時間経過に沿って測ったsequence-specific軌跡を、現在のプリセットでは使用していないためです。開始・終了の目標には子どもの単母音平均を使い、時間配分は成人Hara (2016)を借用し、その間の動きはアプリが生成しています。`,
         source:adult
           ? (voice==='male'
               ? 'F1/F2はHara (2016) の語内VV文脈平均、F3はKasuya et al. (1968)、B1–B3 endpointはMokhtari & Tanaka (2000) の成人男性単母音平均。'
@@ -1717,16 +2272,16 @@
         setMeta({
           title:`American English /${EN_DIPH_IPA[key]}/ — ${voiceTypeEl.options[voiceTypeEl.selectedIndex].text}`,
           confidence:'B · 実測endpoint＋モデル',level:'b',
-          summary:`durationとF1–F3の開始・終了値は文献の群平均です。ただし、その間の曲線は実測の20点系列ではなくCanvasが補間しています。`,
+          summary:`durationとF1–F3の開始・終了値は文献の群平均です。ただし、その間の曲線は実測の20点系列ではなくアプリが補間しています。`,
           evidence:[
             {item:'duration',status:'empirical',detail:`${Math.round(d.duration*1000)} ms（Lee 2014）`},
             {item:'F1 onset→offset',status:'empirical',detail:`${fmtHz(d.from.F1)} → ${fmtHz(d.to.F1)} Hz（Lee 2014）`},
             {item:'F2 onset→offset',status:'empirical',detail:`${fmtHz(d.from.F2)} → ${fmtHz(d.to.F2)} Hz（Lee 2014）`},
             {item:'F3 onset→offset',status:'empirical',detail:`${fmtHz(d.from.F3)} → ${fmtHz(d.to.F3)} Hz（Lee 2014）`},
-            {item:'onsetとoffsetの間',status:'synthetic',detail:'Canvasがsmoothstepで補間。論文の内部20点軌跡そのものではありません。'},
+            {item:'onsetとoffsetの間',status:'synthetic',detail:'アプリがsmoothstepで補間。論文の内部20点軌跡そのものではありません。'},
             {item:'公表された20点群平均系列',status:'unknown',detail:'現在のアプリには未収録。'}
           ],
-          whyApprox:'Lee et al. (2014) からdurationとonset/offsetは直接使えますが、研究で解析された時間正規化軌跡の群平均数値系列を現在のアプリでは使用していないためです。そのため中間部分だけCanvasが滑らかに補間します。',
+          whyApprox:'Lee et al. (2014) からdurationとonset/offsetは直接使えますが、研究で解析された時間正規化軌跡の群平均数値系列を現在のアプリでは使用していないためです。そのため中間部分だけアプリが滑らかに補間します。',
           source:'durationとF1–F3 onset/offsetはLee et al. (2014), Tables II–V の年齢・性別別群平均。',
           trajectory:'中間のF1–F3は公表endpoint間をsynthetic smoothstepで補間。研究内部の20点軌跡そのものではありません。F0は別のユーザー制御合成パラメータです。',
           reuse:'公表済み数値のみ使用。CIDのraw recordingsは含みません。',
@@ -1757,6 +2312,8 @@
     applyPreset(presetLanguageEl.value, vowelPresetEl.value);
   });
   voiceTypeEl.addEventListener('change',()=>{
+    const previousPreset=vowelPresetEl.value;
+    buildPresetOptions(previousPreset);
     const cfg=VOICE_DEFAULTS[presetLanguageEl.value][voiceTypeEl.value];
     f0El.value=cfg.f0;
     if(Number(maxHzEl.value)<cfg.minMaxHz) maxHzEl.value=cfg.minMaxHz;
@@ -1786,46 +2343,240 @@
   const LEARNING_TOPICS = {
     f0: {
       title:'F0（基本周波数）',
-      text:'声帯の振動の基本的な速さです。主に「声の高さ」の感じに関係します。フォルマントF1〜F3とは別のものです。',
-      example:()=>`いまのF0は ${Math.round(Number(f0El.value))} Hz。スライダーを動かして、母音らしさをなるべく保ったまま高さがどう変わるか聴いてみよう。`
+      one:'声の高さの土台になる、声帯の振動の速さです。',
+      more:'数字が大きいほど、基本的には高い声に聞こえます。F1〜F3とは別のものです。',
+      tryIt:()=>`いまのF0は ${Math.round(Number(f0El.value))} Hz。スライダーを動かして、母音らしさをなるべく保ったまま高さだけがどう変わるか聴いてみよう。`,
+      precise:'周期的な声帯振動の基本的な繰り返し周波数をF0と呼びます。Hzで表し、知覚されるピッチと強く関係しますが、声道の共鳴を表すF1〜F3とは異なる量です。',
+      sources:[
+        {label:'Praat Manual — frequency',url:'https://www.fon.hum.uva.nl/praat/manual/frequency.html'},
+        {label:'Oxford — Source–Filter Theory',url:'https://doi.org/10.1093/acrefore/9780199384655.013.894'}
+      ]
     },
     f1: {
       title:'F1（第1フォルマント）',
-      text:'声道の1番目の大きな共鳴です。母音では舌の高さ・口の開きと強く関係し、一般にF1が高いほど口が開いた母音になりやすいです。',
-      example:()=>{ const v=interpolate('F1',duration()/2); return `中央付近のF1は ${v==null?'—':Math.round(v)+' Hz'}。F1の線だけ上下に動かして比較してみよう。`; }
+      one:'母音の「口の開き」に強く関わる、いちばん低いフォルマントです。',
+      more:'一般にF1が高いほど、口を大きく開いた母音になりやすいです。',
+      tryIt:()=>{ const v=interpolate('F1',duration()/2); return `中央付近のF1は ${v==null?'—':Math.round(v)+' Hz'}。F1の線だけ上下に動かして、母音の変化を聴いてみよう。`; },
+      precise:'F1は第1フォルマントの中心周波数です。母音の高さと逆方向に強く関係しますが、声道全体の共鳴の結果なので、舌の高さだけと一対一に対応する値ではありません。',
+      sources:[
+        {label:'MIT OCW 24.901 — Lecture 8',url:'https://ocw.mit.edu/courses/24-901-language-and-its-structure-i-phonology-fall-2010/resources/mit24_901f10_lec08/'},
+        {label:'Macquarie — Vocal Tract Resonance',url:'https://www.mq.edu.au/faculty-of-medicine-health-and-human-sciences/departments-and-schools/department-of-linguistics/our-research/phonetics-and-phonology/speech/acoustics/acoustic-theory-of-speech-production/vocal-tract-resonance'}
+      ]
     },
     f2: {
       title:'F2（第2フォルマント）',
-      text:'声道の2番目の大きな共鳴です。母音では舌の前後位置などと強く関係します。F1とF2の組み合わせが母音の聞こえを大きく左右します。',
-      example:()=>{ const v=interpolate('F2',duration()/2); return `中央付近のF2は ${v==null?'—':Math.round(v)+' Hz'}。F2だけを動かすと、母音の「前寄り／後ろ寄り」の感じがどう変わるか試せます。`; }
+      one:'母音の「前っぽさ／後ろっぽさ」に強く関わる、2番目のフォルマントです。',
+      more:'一般にF2が高いほど前寄り、低いほど後ろ寄りの母音になりやすいです。唇の丸めもF2に影響します。',
+      tryIt:()=>{ const v=interpolate('F2',duration()/2); return `中央付近のF2は ${v==null?'—':Math.round(v)+' Hz'}。F2だけを動かして、「前っぽい／後ろっぽい」聞こえ方がどう変わるか試そう。`; },
+      precise:'F2は第2フォルマントの中心周波数です。舌の前後位置や唇の丸めと強く関係しますが、F1と同じく声道全体の形から生じる共鳴なので、単一の調音器官だけで決まるわけではありません。',
+      sources:[
+        {label:'MIT OCW 24.901 — Lecture 8',url:'https://ocw.mit.edu/courses/24-901-language-and-its-structure-i-phonology-fall-2010/resources/mit24_901f10_lec08/'},
+        {label:'Macquarie — Vocal Tract Resonance',url:'https://www.mq.edu.au/faculty-of-medicine-health-and-human-sciences/departments-and-schools/department-of-linguistics/our-research/phonetics-and-phonology/speech/acoustics/acoustic-theory-of-speech-production/vocal-tract-resonance'}
+      ]
     },
     f3: {
       title:'F3（第3フォルマント）',
-      text:'3番目の大きな共鳴です。F1・F2ほど母音カテゴリを直接決める主役ではありませんが、声質や特定の音の特徴に関わります。',
-      example:()=>{ const v=interpolate('F3',duration()/2); return `中央付近のF3は ${v==null?'—':Math.round(v)+' Hz'}。F1/F2をそのままにしてF3だけ変え、音色の違いを探してみよう。`; }
+      one:'F1・F2より上にある、3番目のフォルマントです。',
+      more:'F1・F2ほど単純に母音の位置へ結びつけにくいですが、音の特徴や音色を考えるときに使われます。',
+      tryIt:()=>{ const v=interpolate('F3',duration()/2); return `中央付近のF3は ${v==null?'—':Math.round(v)+' Hz'}。F1/F2をそのままにしてF3だけ動かし、どのくらい聞こえ方が変わるか探してみよう。`; },
+      precise:'F3は第3フォルマントの中心周波数です。F1・F2とともに低い周波数側のスペクトル構造を記述しますが、その役割は音・話者・文脈によって異なるため、万能な「舌の○○を表す値」とは扱いません。',
+      sources:[
+        {label:'MIT OCW 24.901 — Lecture 8',url:'https://ocw.mit.edu/courses/24-901-language-and-its-structure-i-phonology-fall-2010/resources/mit24_901f10_lec08/'},
+        {label:'Praat Manual — Formant',url:'https://www.fon.hum.uva.nl/praat/manual/Formant.html'}
+      ]
+    },
+    formant: {
+      title:'フォルマント（formant）',
+      one:'声道が特に響きやすい周波数にできる「音の山」です。',
+      more:'低いほうからF1、F2、F3…と呼びます。母音らしさを作る重要な手がかりです。',
+      tryIt:'F1〜F3の線を1本ずつ動かしてみよう。同じF0でも、フォルマントを変えると母音の聞こえ方が変わります。',
+      precise:'声道の共鳴は音声のスペクトル包絡に特徴的なピークを作ります。フォルマントはその共鳴に対応する周波数として扱われ、Praatでは各フォルマントを中心周波数と帯域幅の組として時間ごとに表します。',
+      sources:[
+        {label:'Oxford Phonetics — Source-Filter Model',url:'https://www.phon.ox.ac.uk/jcoleman/source_filter'},
+        {label:'Praat Manual — Formant',url:'https://www.fon.hum.uva.nl/praat/manual/Formant.html'}
+      ]
+    },
+    resonance: {
+      title:'共鳴（resonance）',
+      one:'ある高さの音だけが、特に響きやすくなる性質です。',
+      more:'声道にもいくつか「響きやすい高さ」があり、その位置が変わると声の聞こえ方も変わります。',
+      tryIt:'F1〜F3を少し動かして、同じ声の高さでも響き方が変わるのを聴いてみよう。',
+      precise:'共鳴系は特定の周波数付近に強く応答します。声道は形に応じて複数の共鳴を持ち、音源スペクトルの一部を相対的に強めたり弱めたりします。これがフォルマントを理解する土台になります。',
+      sources:[
+        {label:'Oxford Phonetics — Source-Filter Model',url:'https://www.phon.ox.ac.uk/jcoleman/source_filter'},
+        {label:'Macquarie — Vocal Tract Resonance',url:'https://www.mq.edu.au/faculty-of-medicine-health-and-human-sciences/departments-and-schools/department-of-linguistics/our-research/phonetics-and-phonology/speech/acoustics/acoustic-theory-of-speech-production/vocal-tract-resonance'}
+      ]
+    },
+    hz: {
+      title:'Hz（ヘルツ）',
+      one:'「1秒に何回くり返すか」を表す、周波数の単位です。',
+      more:'たとえば140 Hzなら、1秒に140回くり返すという意味です。',
+      tryIt:()=>`いまのF0は ${Math.round(Number(f0El.value))} Hz。F0スライダーを動かして、数字と声の高さの変化を結びつけてみよう。`,
+      precise:'Hz（ヘルツ）は周波数のSI単位で、1 Hzは1秒あたり1周期に相当します。F0もフォルマント周波数もHzで表せますが、同じ単位でも表している物理的・音響的な役割は異なります。',
+      sources:[
+        {label:'NIST — SI Units: Time / Frequency',url:'https://www.nist.gov/pml/owm/si-units-time'},
+        {label:'Praat Manual — frequency',url:'https://www.fon.hum.uva.nl/praat/manual/frequency.html'}
+      ]
+    },
+    spectrogram: {
+      title:'スペクトログラム（spectrogram）',
+      one:'音を「時間 × 周波数」の地図にしたものです。',
+      more:'横に時間、縦に周波数をとり、濃い部分ほどそのあたりの音のエネルギーが強いことを表します。',
+      tryIt:'Praatで母音を録音してスペクトログラムを表示すると、フォルマントが帯のように見えます。Formantasiaでは、そのF1〜F3だけを線として直接扱っています。',
+      precise:'スペクトログラムは信号の周波数成分が時間とともにどう変化するかを表す時間–周波数表示です。表示の濃さや色は、各時間・周波数付近のエネルギーや強度を表します。',
+      sources:[
+        {label:'Praat Manual — Spectrogram',url:'https://www.fon.hum.uva.nl/praat/manual/Spectrogram.html'},
+        {label:'Praat Tutorial — Viewing a spectrogram',url:'https://www.fon.hum.uva.nl/praat/manual/Intro_3_1__Viewing_a_spectrogram.html'}
+      ]
+    },
+    sourcefilter: {
+      title:'音源–フィルタ理論（source–filter theory）',
+      one:'声を「音のもと」と「声道による加工」に分けて考えるモデルです。',
+      more:'ざっくり言えば、声帯が音の材料を作り、声道がその響きを整えます。',
+      tryIt:'F0だけを変えたあと、今度はF1〜F3だけを変えてみよう。「音源側」と「フィルタ側」の違いを耳で比べられます。',
+      precise:'音源–フィルタ理論では、音声を音源と声道フィルタの働きに分けて記述します。有声音では声帯振動が主要な音源となり、声道の共鳴がスペクトル包絡を形づくります。FormantasiaのF0／F1〜F3の対応は学習用の単純化で、実際の発声では相互作用もあります。',
+      sources:[
+        {label:'Oxford Research Encyclopedia — Source–Filter Theory',url:'https://doi.org/10.1093/acrefore/9780199384655.013.894'},
+        {label:'Praat Manual — Source-filter synthesis',url:'https://www.fon.hum.uva.nl/praat/manual/Source-filter_synthesis.html'}
+      ]
+    },
+    praat: {
+      title:'Praat（プラート）',
+      one:'声を録音して、見て、測って、加工できる音声学ソフトです。',
+      more:'ピッチ、フォルマント、スペクトログラムなどを調べるときによく使われます。',
+      tryIt:'Formantasiaの「Praatへ書き出し」を使うと、描いたF1〜F3の軌跡をPraat側でも扱えます。',
+      precise:'Praatは音声の録音・表示・分析・合成・加工などを行うためのソフトウェアです。University of Amsterdamで開発され、音声学・音韻論の研究や教育で広く利用されています。',
+      sources:[
+        {label:'Praat official site',url:'https://praat.org/'},
+        {label:'Praat Manual — Intro',url:'https://www.fon.hum.uva.nl/praat/manual/Intro.html'}
+      ]
     },
     bandwidth: {
       title:'Bandwidth（帯域幅）',
-      text:'フォルマントの共鳴の「山がどれくらい広いか」です。狭いほど共鳴が鋭く、広いほどなだらかになります。中心のF1/F2/F3が同じでも、音色は変わります。',
-      example:()=>usingEmpiricalBandwidth()
-        ? `いまは Empirical bandwidth。文献由来のB1〜B3を使い、QはF/Bから自動計算しています。`
-        : `いまは Manual Q ${Number(qEl.value)}。この場合は bandwidth = F ÷ Q として合成しています。`
+      one:'フォルマントの「山の太さ」を表す値です。',
+      more:'小さいほど細く鋭い山、大きいほど広くなだらかな山になります。',
+      tryIt:()=>usingEmpiricalBandwidth()
+        ? 'いまは文献由来の帯域幅を使っています。Manual Qへ切り替えると、「山の鋭さ」を自分で動かして聴き比べられます。'
+        : `いまは Manual Q ${Number(qEl.value)}。Qを動かして、フォルマントの位置を変えずに響き方がどう変わるか聴いてみよう。`,
+      precise:'各フォルマントには中心となる周波数だけでなく、その共鳴が周波数方向にどれくらい広がるかを表す帯域幅があります。帯域幅が狭いほど共鳴ピークは鋭く、広いほどなだらかになります。PraatのFormantデータも中心周波数と帯域幅を持ちます。',
+      sources:[
+        {label:'Praat Manual — Formant',url:'https://www.fon.hum.uva.nl/praat/manual/Formant.html'},
+        {label:'Praat Manual — smoothest formant tracks',url:'https://www.fon.hum.uva.nl/praat/manual/Formants__Extract_smoothest_part___.html'}
+      ]
     },
     q: {
-      title:'Q（共鳴の鋭さ）',
-      text:'共鳴がどれくらい鋭いかを表す指標です。Formant Canvasでは Q = F ÷ Bandwidth。Qが大きいほど狭く鋭い共鳴になります。',
-      example:()=>usingEmpiricalBandwidth()
-        ? 'Empirical bandwidthではQスライダーは使わず、各時点のFとBからQを自動計算します。Manual Qにすると自分で共通Qを試せます。'
-        : `いまは Q=${Number(qEl.value)}。Qを上げ下げして、同じフォルマント位置でも音色が変わるか聴き比べよう。`
+      title:'Q（quality factor）',
+      one:'フォルマントの「山のとがり具合」を表す数字です。',
+      more:'Qが大きいほど細く鋭く、小さいほど幅広い共鳴になります。',
+      tryIt:()=>usingEmpiricalBandwidth()
+        ? 'いまは文献由来の帯域幅からQを自動計算しています。Manual Qへ切り替えると、自分でQを動かせます。'
+        : `いまは Q=${Number(qEl.value)}。Qを上げ下げして、F1〜F3の位置を変えずに響き方だけがどう変わるか聴いてみよう。`,
+      precise:'Qは共鳴の鋭さを表す無次元の指標です。Formantasiaのband-passフィルタでは中心周波数Fと帯域幅BからQ=F/Bとして扱い、Qが高いほど帯域が狭くなります。',
+      sources:[
+        {label:'OpenStax University Physics — Resonance and Q',url:'https://openstax.org/books/university-physics-volume-2/pages/15-5-resonance-in-an-ac-circuit'},
+        {label:'Web Audio API — BiquadFilterNode',url:'https://webaudio.github.io/web-audio-api/#BiquadFilterNode'}
+      ]
+    },
+    empirical: {
+      title:'Empirical（実測・観測に基づく）',
+      one:'「実際に観察・測定したデータにもとづく」という意味です。',
+      more:'Formantasiaで Empirical と表示されるときは、研究や公開データで実際に測られた値に根拠があることを示します。',
+      tryIt:()=>usingEmpiricalBandwidth()
+        ? 'いまは Empirical bandwidth。文献由来の測定データから作った帯域幅の値を使っています。研究モードの ● 実測 表示も見てみよう。'
+        : '帯域幅モードを Empirical bandwidth に切り替えられる条件では、Manual Q と聴き比べてみよう。',
+      precise:'Empirical は、理論や仮定だけではなく、観察・測定されたデータに根拠があることを表します。Formantasiaでは、生の測定値そのものだけでなく、測定データから計算した群平均や再集計した派生値も含めて empirical と呼ぶ場合があります。empirical だからといって「万人にとって唯一の正解」や「個人差のない値」という意味ではありません。',
+      sources:[
+        {label:'National Research Council — Scientific Research in Education',url:'https://doi.org/10.17226/10236'}
+      ]
     },
     evidence: {
       title:'● 実測・△ 借用・┄ モデル',
-      text:'●は文献から直接使った数値、△は別条件や別研究から借りた値、破線はCanvasが補間・表示のために作った区間です。きれいな線の全部が実測とは限りません。',
-      example:()=>presetDirty
-        ? 'いまは編集済み。元プリセットの根拠が灰色のゴーストとして残るので、「文献・モデル」と「自分の編集」を比べられます。'
-        : 'プリセットを選び替えて、●の数や△・破線の割合がどう違うか見比べてみよう。'
+      one:'その線が「どこまで実測で、どこからアプリのモデルか」を示す印です。',
+      more:'●は採用した資料の値、△は別条件などから借りた値、破線はアプリが作った区間です。',
+      tryIt:()=>presetDirty
+        ? 'いまは編集済み。元プリセットの根拠が灰色のゴーストとして残るので、「文献・モデル」と「自分の編集」を比べてみよう。'
+        : 'プリセットを選び替えて、●・△・破線の割合がどう違うか見比べてみよう。',
+      precise:'●・△・破線はFormantasia独自の表示規約です。学界共通の記号ではありません。●は採用した文献・データセットから直接得た値、△は別条件や別研究から借用した値、破線は補間・合成などアプリがモデル化した区間を示します。',
+      sources:[{label:'Formantasia — Evidence表示規約（アプリ内定義）'}]
     }
   };
+
+  // Empirical glossary entry v1
+  const GLOSSARY_SOURCE_DETAILS = {
+    'https://doi.org/10.17226/10236': {
+      short:'National Research Council (2002)',
+      citation:'National Research Council. (2002). Scientific Research in Education. Washington, DC: The National Academies Press. https://doi.org/10.17226/10236'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/frequency.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “frequency.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://doi.org/10.1093/acrefore/9780199384655.013.894': {
+      short:'Tokuda (2021)',
+      citation:'Tokuda, I. (2021). The source–filter theory of speech. Oxford Research Encyclopedia of Linguistics. https://doi.org/10.1093/acrefore/9780199384655.013.894'
+    },
+    'https://ocw.mit.edu/courses/24-901-language-and-its-structure-i-phonology-fall-2010/resources/mit24_901f10_lec08/': {
+      short:'Kenstowicz (2010)',
+      citation:'Kenstowicz, M. (2010). Phonetics I: Acoustics of vowels, using Praat [Lecture 8 notes]. 24.901 Language and Its Structure I: Phonology. MIT OpenCourseWare, Massachusetts Institute of Technology.'
+    },
+    'https://www.mq.edu.au/faculty-of-medicine-health-and-human-sciences/departments-and-schools/department-of-linguistics/our-research/phonetics-and-phonology/speech/acoustics/acoustic-theory-of-speech-production/vocal-tract-resonance': {
+      short:'Macquarie Linguistics (2026)',
+      citation:'Macquarie University, Department of Linguistics. (2026, June 23). Vocal tract resonance.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Formant.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Formant.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://www.phon.ox.ac.uk/jcoleman/source_filter': {
+      short:'Oxford Phonetics',
+      citation:'University of Oxford, Phonetics Laboratory. (n.d.). The source-filter model of speech production. Retrieved 16 September 2026.'
+    },
+    'https://www.nist.gov/pml/owm/si-units-time': {
+      short:'NIST',
+      citation:'National Institute of Standards and Technology. (n.d.). SI units—Time. Retrieved 16 September 2026.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Spectrogram.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Spectrogram.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Intro_3_1__Viewing_a_spectrogram.html': {
+      short:'Praat Tutorial',
+      citation:'Praat Manual. (n.d.). “Intro 3.1. Viewing a spectrogram.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Source-filter_synthesis.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Source-filter synthesis.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://praat.org/': {
+      short:'Boersma et al. (2026)',
+      citation:'Boersma, P., Weenink, D., & Shchupak, A. (2026). Praat: doing phonetics by computer [Computer program]. Praat.org.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Intro.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Intro.” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://www.fon.hum.uva.nl/praat/manual/Formants__Extract_smoothest_part___.html': {
+      short:'Praat Manual',
+      citation:'Praat Manual. (n.d.). “Formants: Extract smoothest part...” Praat: doing phonetics by computer. Retrieved 16 September 2026.'
+    },
+    'https://openstax.org/books/university-physics-volume-2/pages/15-5-resonance-in-an-ac-circuit': {
+      short:'Ling et al. (2016)',
+      citation:'Ling, S. J., Moebs, W., & Sanny, J. (2016). University Physics Volume 2, §15.5 “Resonance in an AC Circuit.” OpenStax, Rice University.'
+    },
+    'https://webaudio.github.io/web-audio-api/#BiquadFilterNode': {
+      short:'Web Audio API',
+      citation:'Adenot, P., & Choi, H. (Eds.). (2024). Web Audio API 1.1, § BiquadFilterNode (First Public Working Draft, 5 November 2024). World Wide Web Consortium.'
+    }
+  };
+
+  function learningSourceInfo(source){
+    const detail=source && source.url ? GLOSSARY_SOURCE_DETAILS[source.url] : null;
+    return {
+      short:(detail && detail.short) || (source && source.label) || '出典',
+      citation:(detail && detail.citation) || (source && source.label) || '出典情報なし',
+      url:source && source.url ? source.url : ''
+    };
+  }
 
   function learningEvidenceLabel(){
     const level=currentMeta ? currentMeta.level : null || 'custom';
@@ -1835,14 +2586,71 @@
     return '自由描画';
   }
 
+  function appendLearningSourceLink(parent,source,text){
+    if(source.url){
+      const a=document.createElement('a');
+      a.href=source.url; a.target='_blank'; a.rel='noreferrer'; a.textContent=text;
+      parent.appendChild(a);
+    }else{
+      const span=document.createElement('span'); span.textContent=text; parent.appendChild(span);
+    }
+  }
+
+  function renderLearningReferences(container,item){
+    if(!container) return;
+    container.textContent='';
+    const sources=(item && item.sources) || [];
+    if(!sources.length){ container.hidden=true; return; }
+    container.hidden=false;
+    const heading=document.createElement('strong');
+    heading.className='learning-source-heading';
+    heading.textContent='出典・参考文献';
+    container.appendChild(heading);
+    const list=document.createElement('ol');
+    list.className='learning-source-list';
+    sources.forEach(source=>{
+      const li=document.createElement('li');
+      const info=learningSourceInfo(source);
+      appendLearningSourceLink(li,info,info.citation);
+      list.appendChild(li);
+    });
+    container.appendChild(list);
+  }
+
+  // Compact glossary source dedupe v1
+  function renderLearningSourceShort(container,item){
+    if(!container) return;
+    container.textContent='';
+    const sources=(item && item.sources) || [];
+    if(!sources.length){ container.hidden=true; return; }
+    container.hidden=false;
+    const prefix=document.createElement('span'); prefix.textContent='出典：'; container.appendChild(prefix);
+    const seen=new Set();
+    let rendered=0;
+    sources.forEach(source=>{
+      const info=learningSourceInfo(source);
+      if(seen.has(info.short)) return;
+      seen.add(info.short);
+      if(rendered){ const sep=document.createElement('span'); sep.className='learning-source-sep'; sep.textContent='·'; container.appendChild(sep); }
+      appendLearningSourceLink(container,info,info.short);
+      rendered++;
+    });
+  }
+
   function updateLearningPanel(){
     if(!learningExplainTitle) return;
     const item=LEARNING_TOPICS[learningTopic] || LEARNING_TOPICS.f1;
     learningExplainTitle.textContent=item.title;
-    learningExplainText.textContent=item.text;
-    learningExplainExample.textContent=typeof item.example==='function'?item.example():item.example;
+    learningExplainText.textContent=typeof item.one==='function'?item.one():item.one;
+    learningExplainExample.textContent=typeof item.tryIt==='function'?item.tryIt():item.tryIt;
+    learningExplainPrecise.textContent=typeof item.precise==='function'?item.precise():item.precise;
+    renderLearningReferences(learningExplainSources,item);
     if(learningPresetBadge) learningPresetBadge.textContent=learningEvidenceLabel();
-    document.querySelectorAll('[data-learn-topic].learning-topic').forEach(btn=>btn.classList.toggle('active',btn.dataset.learnTopic===learningTopic));
+    document.querySelectorAll('[data-learn-topic].learning-topic').forEach(btn=>{
+      const selected=btn.dataset.learnTopic===learningTopic;
+      btn.classList.toggle('active',selected);
+      btn.setAttribute('aria-pressed',String(selected));
+    });
   }
 
   function chooseLearningTopic(topic){
@@ -1851,19 +2659,144 @@
     updateLearningPanel();
   }
 
-  document.querySelectorAll('[data-learn-topic]').forEach(el=>{
-    const activate=()=>{
-      chooseLearningTopic(el.dataset.learnTopic);
-      if(el.classList.contains('info-dot') && learningCard) learningCard.scrollIntoView({behavior:'smooth',block:'nearest'});
-    };
-    el.addEventListener('click',activate);
-    if(el.classList.contains('info-dot')) el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activate(); } });
+  // Operation help is intentionally separate from glossary definitions.
+  // The round (i) answers "what happens if I change this control?";
+  // the lower learning card answers "what does this term mean?".
+  const CONTROL_HELP = {
+    f0: {
+      title:'基本周波数 F0',
+      lead:'声の高さが変わります。',
+      detail:()=>`上げる → 高い声 ／ 下げる → 低い声。いまは ${Math.round(Number(f0El.value))} Hz です。F1〜F3の線そのものは動きません。`,
+      deepLabel:'F0のしくみを詳しく'
+    },
+    bandwidth: {
+      title:'帯域幅モード',
+      lead:'声の「響きの鋭さ」を、文献値に任せるか自分で調整するかを切り替えます。',
+      detail:()=>usingEmpiricalBandwidth()
+        ? 'いまは Empirical bandwidth。文献由来の帯域幅を使い、Qは自動で決まります。Manual Qにすると下のQつまみを動かせます。'
+        : 'いまは Manual Q。下のQつまみで響きの鋭さを自分で変えられます。Empirical bandwidthにすると文献由来の値へ戻ります。',
+      deepLabel:'Bandwidthのしくみを詳しく'
+    },
+    q: {
+      title:'Manual Q',
+      lead:'声の響きが、キュッと鋭くなったり、ふわっと広がったりします。',
+      detail:()=>usingEmpiricalBandwidth()
+        ? 'いまは Empirical bandwidth なので、このつまみは自動計算になっていて動かせません。Manual Qへ切り替えると調整できます。'
+        : `Qを上げる → 鋭く ／ 下げる → 広くなだらかに。いまは Q=${Number(qEl.value)} です。`,
+      deepLabel:'Qのしくみを詳しく'
+    }
+  };
+
+  const learningInfoPopover=document.createElement('aside');
+  learningInfoPopover.id='learningInfoPopover';
+  learningInfoPopover.className='learning-popover';
+  learningInfoPopover.setAttribute('role','dialog');
+  learningInfoPopover.setAttribute('aria-modal','false');
+  learningInfoPopover.setAttribute('aria-labelledby','learningPopoverTitle');
+  learningInfoPopover.hidden=true;
+  learningInfoPopover.innerHTML='<button class="learning-popover-close" type="button" aria-label="閉じる">×</button><strong class="learning-popover-title" id="learningPopoverTitle"></strong><span class="learning-popover-kicker">ここを変えると？</span><p class="learning-popover-text"></p><p class="learning-popover-example"></p><button class="learning-popover-deep" type="button">📘 しくみを詳しく</button><div class="learning-popover-source"></div>';
+  document.body.appendChild(learningInfoPopover);
+  const learningPopoverClose=learningInfoPopover.querySelector('.learning-popover-close');
+  const learningPopoverTitle=learningInfoPopover.querySelector('.learning-popover-title');
+  const learningPopoverText=learningInfoPopover.querySelector('.learning-popover-text');
+  const learningPopoverExample=learningInfoPopover.querySelector('.learning-popover-example');
+  const learningPopoverSources=learningInfoPopover.querySelector('.learning-popover-source');
+  const learningPopoverDeep=learningInfoPopover.querySelector('.learning-popover-deep');
+  let learningPopoverAnchor=null;
+  let learningPopoverTopic=null;
+
+  function positionLearningPopover(){
+    if(!learningPopoverAnchor || !learningInfoPopover.classList.contains('visible')) return;
+    const r=learningPopoverAnchor.getBoundingClientRect();
+    const p=learningInfoPopover.getBoundingClientRect();
+    const gap=12, margin=12;
+    let left, top=r.top + r.height/2 - p.height/2;
+    const roomRight=window.innerWidth-r.right;
+    const roomLeft=r.left;
+    if(roomRight>=p.width+gap+margin){
+      left=r.right+gap;
+    }else if(roomLeft>=p.width+gap+margin){
+      left=r.left-p.width-gap;
+    }else{
+      left=r.left+r.width/2-p.width/2;
+      top=r.bottom+gap;
+      if(top+p.height>window.innerHeight-margin) top=r.top-p.height-gap;
+    }
+    left=Math.max(margin,Math.min(left,window.innerWidth-p.width-margin));
+    top=Math.max(margin,Math.min(top,window.innerHeight-p.height-margin));
+    learningInfoPopover.style.left=`${Math.round(left)}px`;
+    learningInfoPopover.style.top=`${Math.round(top)}px`;
+  }
+
+  function hideLearningPopover(){
+    if(learningPopoverAnchor) learningPopoverAnchor.setAttribute('aria-expanded','false');
+    learningPopoverAnchor=null;
+    learningPopoverTopic=null;
+    learningInfoPopover.classList.remove('visible');
+    learningInfoPopover.hidden=true;
+  }
+
+  function showLearningPopover(anchor,topic){
+    if(uiMode!=='learning' || !LEARNING_TOPICS[topic] || !CONTROL_HELP[topic]) return;
+    if(learningPopoverAnchor===anchor && learningInfoPopover.classList.contains('visible')){
+      hideLearningPopover();
+      return;
+    }
+    if(learningPopoverAnchor) learningPopoverAnchor.setAttribute('aria-expanded','false');
+    const item=LEARNING_TOPICS[topic];
+    const help=CONTROL_HELP[topic];
+    learningPopoverAnchor=anchor;
+    learningPopoverTopic=topic;
+    anchor.setAttribute('aria-expanded','true');
+    learningPopoverTitle.textContent=help.title;
+    learningPopoverText.textContent=typeof help.lead==='function'?help.lead():help.lead;
+    learningPopoverExample.textContent=typeof help.detail==='function'?help.detail():help.detail;
+    learningPopoverDeep.textContent=`📘 ${help.deepLabel || 'しくみを詳しく'}`;
+    renderLearningSourceShort(learningPopoverSources,item);
+    learningInfoPopover.hidden=false;
+    learningInfoPopover.classList.add('visible');
+    positionLearningPopover();
+    requestAnimationFrame(()=>{
+      positionLearningPopover();
+      learningPopoverClose.focus();
+    });
+  }
+
+  learningPopoverClose.addEventListener('click',()=>{
+    const anchor=learningPopoverAnchor;
+    hideLearningPopover();
+    if(anchor) anchor.focus();
   });
+
+  learningPopoverDeep.addEventListener('click',()=>{
+    const topic=learningPopoverTopic;
+    if(!topic) return;
+    chooseLearningTopic(topic);
+    hideLearningPopover();
+    if(learningCard) learningCard.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+
+  document.querySelectorAll('[data-learn-topic]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const topic=el.dataset.learnTopic;
+      chooseLearningTopic(topic);
+      if(el.classList.contains('info-dot')) showLearningPopover(el,topic);
+    });
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Escape' || learningInfoPopover.hidden) return;
+    const anchor=learningPopoverAnchor;
+    hideLearningPopover();
+    if(anchor) anchor.focus();
+  });
+  window.addEventListener('resize',positionLearningPopover);
+  window.addEventListener('scroll',positionLearningPopover,true);
 
   function setUIMode(next,options){
     options=options || {};
     const persist=options.persist !== false;
     uiMode = ['casual','learning','research'].includes(next) ? next : 'casual';
+    if(uiMode!=='learning') hideLearningPopover();
     document.body.dataset.uiMode=uiMode;
     const casual=uiMode==='casual', learning=uiMode==='learning', research=uiMode==='research';
     casualModeBtn.classList.toggle('active',casual);
@@ -1873,6 +2806,9 @@
     learningModeBtn.setAttribute('aria-pressed',String(learning));
     researchModeBtn.setAttribute('aria-pressed',String(research));
     if(persist){ try{ localStorage.setItem('formantCanvasUiMode',uiMode); }catch(e){} }
+    const previousPreset=vowelPresetEl.value;
+    buildPresetOptions(previousPreset);
+    updateBeginnerCompareVisibility();
     updateLearningPanel();
     resizeCanvases();
     render();
@@ -1880,6 +2816,18 @@
   casualModeBtn.addEventListener('click',()=>setUIMode('casual'));
   learningModeBtn.addEventListener('click',()=>setUIMode('learning'));
   researchModeBtn.addEventListener('click',()=>setUIMode('research'));
+
+  compareToggleBtn.addEventListener('click',()=>{
+    compareOpen=!compareOpen;
+    updateBeginnerCompareVisibility();
+  });
+  vowelPresetEl.addEventListener('change',()=>{
+    if(BASIC_JA_VOWELS.includes(vowelPresetEl.value)) compareBaseVowel=vowelPresetEl.value;
+    compareCurrentKey=null;
+    updateBeginnerCompareVisibility();
+  });
+  presetLanguageEl.addEventListener('change',()=>setTimeout(updateBeginnerCompareVisibility,0));
+  voiceTypeEl.addEventListener('change',()=>setTimeout(()=>{ compareCurrentKey=null; updateBeginnerCompareVisibility(); },0));
 
   function downloadText(filename,text,mime='text/plain'){
     const blob=new Blob([text],{type:mime+';charset=utf-8'});
@@ -1924,14 +2872,14 @@
     return new Blob([buffer],{type:'audio/wav'});
   }
 
-  async function downloadWav(){
+  async function downloadWav(triggerBtn){
     if(!tracks.F1.length || !tracks.F2.length || !tracks.F3.length){
       alert('F1・F2・F3を描くか、母音プリセットを選んでね。');
       return;
     }
-    const btn=document.getElementById('downloadWavBtn');
-    const old=btn.textContent;
-    btn.disabled=true; btn.textContent='書き出し中…';
+    const btn=triggerBtn || document.getElementById('downloadWavBtn');
+    const old=btn.innerHTML;
+    btn.disabled=true; btn.textContent=uiMode==='casual'?'保存中…':'書き出し中…';
     try{
       const sampleRate=48000;
       const dur=duration();
@@ -1944,27 +2892,27 @@
       const blob=encodeWav16Mono(rendered);
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
-      const filename=`FormantCanvas_${safeFilePart(presetLanguageEl.value)}_${safeFilePart(voiceTypeEl.value)}_${safeFilePart(vowelPresetEl.value)}_48k16.wav`;
+      const filename=`Formantasia_${safeFilePart(presetLanguageEl.value)}_${safeFilePart(voiceTypeEl.value)}_${safeFilePart(vowelPresetEl.value)}_48k16.wav`;
       a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),1000);
     }catch(err){
       console.error(err);
       alert('WAV書き出しに失敗しました: '+(err && err.message||err));
     }finally{
-      btn.disabled=false; btn.textContent=old;
+      btn.disabled=false; btn.innerHTML=old;
     }
   }
 
   function exportCSV(){
     const n=200;
-    const lines=[`# Formant Canvas v5`,`# ${(currentMeta && currentMeta.title)||'Custom'}`,`# ${(currentMeta && currentMeta.confidence)||'Custom'}`,`# ${(currentMeta && currentMeta.source ? currentMeta.source.replace(/<[^>]+>/g,'') : '')}`,'time_s,F0_Hz,F1_Hz,F2_Hz,F3_Hz'];
+    const lines=[`# Formantasia v5`,`# ${(currentMeta && currentMeta.title)||'Custom'}`,`# ${(currentMeta && currentMeta.confidence)||'Custom'}`,`# ${(currentMeta && currentMeta.source ? currentMeta.source.replace(/<[^>]+>/g,'') : '')}`,'time_s,F0_Hz,F1_Hz,F2_Hz,F3_Hz'];
     for(let i=0;i<=n;i++){
       const t=duration()*i/n;
       const f1=interpolate('F1',t), f2=interpolate('F2',t), f3=interpolate('F3',t);
       if([f1,f2,f3].some(v=>v==null)) continue;
       lines.push([t.toFixed(6),Number(f0El.value).toFixed(2),f1.toFixed(2),f2.toFixed(2),f3.toFixed(2)].join(','));
     }
-    downloadText('formant_canvas.csv',lines.join('\n'),'text/csv');
+    downloadText('formantasia.csv',lines.join('\n'),'text/csv');
   }
 
   function exportPraatScript(){
@@ -1973,12 +2921,12 @@
     }
     const n=100;
     const lines=[
-      '# Generated by Formant Canvas v5',
+      '# Generated by Formantasia v5',
       '# '+((currentMeta && currentMeta.title)||'Custom'),
       '# '+((currentMeta && currentMeta.confidence)||'Custom'),
       '# '+(((currentMeta && currentMeta.source)||'').replace(/<[^>]+>/g,'')),
       '# Run this script in Praat to create a FormantGrid.',
-      `Create FormantGrid: "FormantCanvas", 0, ${duration().toFixed(6)}, 3, 500, 1000, 60, 50`
+      `Create FormantGrid: "Formantasia", 0, ${duration().toFixed(6)}, 3, 500, 1000, 60, 50`
     ];
     for(let k=1;k<=3;k++){
       lines.push(`Remove formant points between: ${k}, 0, ${duration().toFixed(6)}`);
@@ -1995,7 +2943,7 @@
       });
     }
     lines.push('# The FormantGrid is now selected in the Objects window.');
-    downloadText('formant_canvas.praat',lines.join('\n'),'text/plain');
+    downloadText('formantasia.praat',lines.join('\n'),'text/plain');
   }
 
   function importCSVFile(file){
@@ -2178,7 +3126,8 @@
   }
 
   transportBtn.onclick=()=>{ if(audio) stop(); else play(); };
-  document.getElementById('downloadWavBtn').onclick=downloadWav;
+  document.getElementById('downloadWavBtn').onclick=e=>downloadWav(e.currentTarget);
+  document.getElementById('casualDownloadWavBtn').onclick=e=>downloadWav(e.currentTarget);
 
   function updateLabels(){
     durationValue.textContent=Number(durationEl.value).toFixed(Number(durationEl.value)<1?3:2)+' s';
@@ -2227,7 +3176,112 @@
   updateRegionalEvidenceVisibility();
   applyPreset('ja','i');
   render();
+  loadYazawaKondoData();
 })();
 </script>
+<script>
+/* Casual child-friendly select labels — 2026-09-17
+   Display-only wording: values, research data, and non-casual terminology stay unchanged. */
+(() => {
+  const languageSelect = document.getElementById('presetLanguage');
+  const voiceSelect = document.getElementById('voiceType');
+  if (!languageSelect || !voiceSelect) return;
+
+  const toCanonicalLanguage = (text) => text
+    .replace(/^にほんご/, '日本語')
+    .replace(/^えいご/, 'English');
+
+  const toCasualLanguage = (text) => text
+    .replace(/^日本語/, 'にほんご')
+    .replace(/^English/, 'えいご');
+
+  const toCanonicalVoice = (text) => text
+    .replace(/^おとな・男性/, '成人男性')
+    .replace(/^おとな・女性/, '成人女性');
+
+  const toCasualVoice = (text) => text
+    .replace(/^成人男性/, 'おとな・男性')
+    .replace(/^成人女性/, 'おとな・女性');
+
+  function rewriteOptions(select, canonicalize, casualize) {
+    const casual = document.body.dataset.uiMode === 'casual';
+    for (const option of select.options) {
+      const canonical = canonicalize(option.textContent || '');
+      const next = casual ? casualize(canonical) : canonical;
+      if (option.textContent !== next) option.textContent = next;
+    }
+  }
+
+  function applyCasualFriendlySelectLabels() {
+    rewriteOptions(languageSelect, toCanonicalLanguage, toCasualLanguage);
+    rewriteOptions(voiceSelect, toCanonicalVoice, toCasualVoice);
+  }
+
+  const optionObserver = new MutationObserver(() => applyCasualFriendlySelectLabels());
+  optionObserver.observe(languageSelect, { childList:true, subtree:true, characterData:true });
+  optionObserver.observe(voiceSelect, { childList:true, subtree:true, characterData:true });
+
+  const modeObserver = new MutationObserver((records) => {
+    if (records.some(record => record.attributeName === 'data-ui-mode')) {
+      applyCasualFriendlySelectLabels();
+    }
+  });
+  modeObserver.observe(document.body, { attributes:true, attributeFilter:['data-ui-mode'] });
+
+  applyCasualFriendlySelectLabels();
+  requestAnimationFrame(applyCasualFriendlySelectLabels);
+})();
+</script>
+
+<style>
+/* Casual age-8 language layer — 2026-09-17 */
+body[data-ui-mode="casual"] .selector-bar::before { content:'あそぶおと'; }
+  .otayori-footer{margin:20px 0 8px;text-align:center}
+  .otayori-footer a{display:inline-flex;align-items:center;min-height:44px;padding:10px 12px;color:inherit;text-underline-offset:4px;font-size:.9rem}
+  .otayori-footer a:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:6px}
+</style>
+<script>
+/* Casual age-8 language layer — 2026-09-17 */
+(()=>{
+  const b=document.body,$=s=>document.querySelector(s),id=x=>document.getElementById(x);
+  const tx=(e,t)=>{if(e&&e.textContent!==t)e.textContent=t}, at=(e,n,v)=>{if(e&&e.getAttribute(n)!==v)e.setAttribute(n,v)};
+  const canonLang=t=>t.replace(/^にほんご/,'日本語').replace(/^えいご/,'English');
+  const casualLang=t=>t.replace(/^日本語/,'にほんご').replace(/^English/,'えいご');
+  const canonVoice=t=>t.replace(/^おとな・男の人/,'成人男性').replace(/^おとな・女の人/,'成人女性').replace(/^おとな・男性/,'成人男性').replace(/^おとな・女性/,'成人女性').replace(/^こども（7〜12さい）/,'子ども（7–12歳・男女まとめ）');
+  const casualVoice=t=>t.replace(/^成人男性/,'おとな・男の人').replace(/^成人女性/,'おとな・女の人').replace(/^子ども（7–12歳・男女まとめ）/,'こども（7〜12さい）');
+  const canonJa=t=>{const m=t.match(/^([いえあおう])\s+\/(i|e|a|o|u)\/$/);return m?`/${m[2]}/ ${m[1]}`:t};
+  const casualJa=t=>{const m=t.match(/^\/(i|e|a|o|u)\/\s+([いえあおう])$/);return m?`${m[2]} /${m[1]}/`:t};
+  function opts(sel,canon,child){if(!sel)return;const c=b.dataset.uiMode==='casual';for(const o of sel.options){const base=canon(o.textContent||'');const next=c?child(base):base;if(o.textContent!==next)o.textContent=next}}
+  function apply(){
+    const c=b.dataset.uiMode==='casual';
+    tx($('.brand-tagline'),c?'こえをえがくキャンバス':'声をえがくキャンバス · Draw Your Voice');
+    tx($('.title > p.casual-only'),c?'せんをかいて、こえがどうかわるかきいてみよう。':'線を描いて、声のひびきがどう変わるか聴いてみよう。');
+    tx(id('learningModeBtn'),'📘 学習');tx(id('researchModeBtn'),'🔬 研究');
+    tx($('.track-btn[data-track="F1"] .casual-only'),c?'F1 ひくめ':'F1 低め');tx($('.track-btn[data-track="F3"] .casual-only'),c?'F3 たかめ':'F3 高め');
+    tx(id('eraserBtn'),c?'けしゴム':'消しゴム');tx($('#clearCurrent .casual-only'),c?'このせんをけす':'この線を消す');tx(id('clearAll'),c?'ぜんぶけす':'全部消す');
+    tx($('label[for="voiceType"] .casual-only'),c?'だれのこえ？':'だれの声？');tx($('label[for="vowelPreset"] .casual-only'),c?'どのおと？':'どの音？');
+    tx($('.canvas-top .casual-only'),c?'色をえらんで、キャンバスにせんをかいてみよう。':'線を選んで、キャンバスを自由になぞってみよう。');
+    tx($('#canvasEmptyHint span:last-child'),c?'ここにせんをかいて、おとをきいてみよう':'ここに線をかいて、声のひびきを聴いてみよう');
+    tx(id('duration')?.closest('.setting')?.querySelector('label > span'),c?'おとの ながさ':'再生時間');
+    tx(id('f0')?.closest('.setting')?.querySelector('.casual-only'),c?'こえの たかさ':'声の高さ');
+    tx(id('stabilize')?.closest('.setting')?.querySelector('label > span'),c?'せんの なめらかさ':'手ブレ補正');
+    tx($('.casual-export-copy strong'),c?'できたおとを のこそう 🎵':'できた音をのこしておこう 🎵');
+    tx($('.casual-export-copy p'),c?'つくったおとを、スマホやパソコンにほぞんできるよ。':'いま作った音をWAVファイルでスマホやパソコンに保存できます。');
+    tx(id('casualDownloadWavBtn'),c?'🔊 おとをほぞんする':'🔊 おとを保存する');at(id('casualDownloadWavBtn'),'title',c?'つくったおとをほぞんする':'いま作った音をWAVファイルで保存');
+    tx($('.casual-tip'),c?'✏️ F1・F2・F3のせんをうごかして、▶でおとをきいてみよう。もっと知りたくなったら「📘 学習」へ！':'✏️ F1・F2・F3を好きに曲げて、▶ で聴き比べよう。学習モードでは、F1/F2/F3や音のしくみも確かめられます。');
+    tx($('.site-signature'),c?'Formantasia · ちいさなこえのじっけんしつ 🧪':"Formantasia · Daddy's little phonetics lab 🧪");
+    at($('.toolbar'),'aria-label',c?'せんをかくどうぐ':'描画ツール');at($('.canvas-hero'),'aria-label',c?'こえをえがくキャンバス':'声をえがくキャンバス');
+    at(id('duration'),'aria-label',c?'おとの ながさ':'再生時間');at(id('f0'),'aria-label',c?'こえの たかさ':'声の高さ・基本周波数 F0');at(id('stabilize'),'aria-label',c?'せんの なめらかさ':'手ブレ補正');
+    const tr=id('transportBtn');if(tr){const play=tr.classList.contains('playing');at(tr,'aria-label',c?(play?'とめる':'おとをきく'):(play?'停止':'再生'));at(tr,'title',c?(play?'とめる':'おとをきく'):(play?'停止':'再生'))}
+    opts(id('presetLanguage'),canonLang,casualLang);opts(id('voiceType'),canonVoice,casualVoice);if(id('presetLanguage')?.value==='ja')opts(id('vowelPreset'),canonJa,casualJa);
+  }
+  new MutationObserver(rs=>{if(rs.some(r=>r.attributeName==='data-ui-mode'))apply()}).observe(b,{attributes:true,attributeFilter:['data-ui-mode']});
+  for(const x of ['presetLanguage','voiceType','vowelPreset']){const e=id(x);if(e)new MutationObserver(apply).observe(e,{childList:true,subtree:true,characterData:true})}
+  const tr=id('transportBtn');if(tr)new MutationObserver(apply).observe(tr,{attributes:true,attributeFilter:['class','title','aria-label']});
+  id('presetLanguage')?.addEventListener('change',()=>requestAnimationFrame(apply));id('voiceType')?.addEventListener('change',()=>requestAnimationFrame(apply));apply();requestAnimationFrame(apply);
+})();
+</script>
+
 </body>
 </html>
+

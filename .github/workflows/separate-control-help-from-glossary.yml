@@ -1,0 +1,121 @@
+name: Separate control help from glossary
+
+on:
+  push:
+    branches: [feat/beginner-vowel-compare-ui]
+    paths:
+      - 'tools/separate_control_help_from_glossary.py'
+      - '.github/workflows/separate-control-help-from-glossary.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply operation-help split
+        run: python tools/separate_control_help_from_glossary.py
+      - name: Validate JavaScript and structure
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path('index.html').read_text(encoding='utf-8')
+          assert 'const CONTROL_HELP' in html
+          assert "lead:'声の高さが変わります。'" in html
+          assert '帯域幅モードを変えるとどうなる？' in html
+          assert 'Qを変えるとどうなる？' in html
+          assert 'ここを変えると？' in html
+          assert 'learning-popover-deep' in html
+          # Lower glossary remains layered and sourced.
+          for label in ['ひとことで','触ってみよう','もう少し正確に','出典・参考文献']:
+              assert label in html
+          scripts=re.findall(r'<script(?:\\s[^>]*)?>(.*?)</script>',html,flags=re.S)
+          Path('/tmp/formantasia.js').write_text(scripts[-1],encoding='utf-8')
+          PY
+          node --check /tmp/formantasia.js
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+      - name: Browser smoke test
+        run: |
+          python -m http.server 8000 >/tmp/formantasia-server.log 2>&1 &
+          sleep 1
+          python - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          opts=Options(); opts.add_argument('--headless=new'); opts.add_argument('--no-sandbox'); opts.add_argument('--disable-dev-shm-usage'); opts.add_argument('--window-size=1280,1000')
+          opts.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+          d=webdriver.Chrome(options=opts); w=WebDriverWait(d,20)
+          try:
+              d.get('http://127.0.0.1:8000/')
+              d.find_element('id','learningModeBtn').click()
+
+              # F0 info button is operational help, not a definition.
+              d.find_element('css selector','.info-dot[data-learn-topic="f0"]').click()
+              pop=d.find_element('id','learningInfoPopover')
+              w.until(lambda x:'visible' in pop.get_attribute('class'))
+              text=pop.get_attribute('textContent')
+              print('F0_HELP',text)
+              assert 'ここを変えると？' in text
+              assert '声の高さが変わります' in text
+              assert '上げる → 高い声' in text and '下げる → 低い声' in text
+              assert '周期的な声帯振動' not in text
+
+              # Close and inspect bandwidth mode help.
+              d.find_element('css selector','.info-dot[data-learn-topic="f0"]').click()
+              d.find_element('css selector','.info-dot[data-learn-topic="bandwidth"]').click()
+              w.until(lambda x:'visible' in pop.get_attribute('class'))
+              text=pop.get_attribute('textContent')
+              print('BANDWIDTH_HELP',text)
+              assert '文献値に任せるか自分で調整するか' in text
+              assert 'Manual Q' in text
+              assert '共鳴ピークが周波数方向' not in text
+
+              # Q help describes what the knob does.
+              d.find_element('css selector','.info-dot[data-learn-topic="bandwidth"]').click()
+              d.find_element('css selector','.info-dot[data-learn-topic="q"]').click()
+              w.until(lambda x:'visible' in pop.get_attribute('class'))
+              text=pop.get_attribute('textContent')
+              print('Q_HELP',text)
+              assert 'キュッと鋭く' in text and 'ふわっと広がったり' in text
+              # Current default can be empirical, so either disabled-state or arrow directions are valid.
+              assert ('動かせません' in text) or ('Qを上げる → 鋭く' in text)
+              assert 'quality factor' not in text
+
+              # The glossary still contains the precise Q definition.
+              d.find_element('css selector','.learning-topic[data-learn-topic="q"]').click()
+              precise=d.find_element('id','learningExplainPrecise').get_attribute('textContent')
+              assert 'Q=F/B' in precise
+
+              # "しくみを詳しく" bridges to the glossary without bloating the popover.
+              d.find_element('css selector','.info-dot[data-learn-topic="f0"]').click()
+              w.until(lambda x:'visible' in pop.get_attribute('class'))
+              deep=d.find_element('css selector','#learningInfoPopover .learning-popover-deep')
+              assert 'F0のしくみを詳しく' in deep.get_attribute('textContent')
+              deep.click()
+              w.until(lambda x:'visible' not in pop.get_attribute('class'))
+              assert 'F0' in d.find_element('id','learningExplainTitle').get_attribute('textContent')
+
+              severe=[x for x in d.get_log('browser') if x.get('level')=='SEVERE' and 'favicon.ico' not in x.get('message','')]
+              print('FINAL_SEVERE_BROWSER_LOGS',severe)
+              assert not severe,severe
+              print('OPERATION_HELP_SPLIT_OK')
+          finally:
+              d.quit()
+          PY
+          cat /tmp/formantasia-server.log
+      - name: Commit generated index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No generated index changes.'
+          else
+            git commit -m 'Make info buttons operation-focused'
+            git push
+          fi
