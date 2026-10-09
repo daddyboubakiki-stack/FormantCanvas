@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "articulation-lab.vowel-target.v1",
+  "title": "VowelTarget",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "language", "label", "population", "acoustic", "provenance"],
+  "properties": {
+    "id": {"type": "string"},
+    "language": {"type": "string"},
+    "label": {"type": "string"},
+    "ipa": {"type": "string"},
+    "dialect": {"type": ["string", "null"]},
+    "population": {
+      "type": "object",
+      "required": ["ageGroup"],
+      "properties": {
+        "ageGroup": {"type": "string"},
+        "sexGroup": {"type": ["string", "null"]},
+        "region": {"type": ["string", "null"]},
+        "speakerCount": {"type": ["integer", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "context": {"type": ["string", "null"]},
+    "acoustic": {
+      "type": "object",
+      "required": ["valueType", "unit"],
+      "properties": {
+        "f1Hz": {"type": ["number", "null"]},
+        "f2Hz": {"type": ["number", "null"]},
+        "f3Hz": {"type": ["number", "null"]},
+        "valueType": {
+          "enum": [
+            "measured_token",
+            "measured_single_speaker_mean",
+            "measured_group_mean",
+            "measured_trajectory",
+            "model_prediction",
+            "pedagogical_model"
+          ]
+        },
+        "unit": {"const": "Hz"},
+        "normalization": {"type": ["string", "null"]},
+        "range": {"type": ["object", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "articulatory": {
+      "type": ["object", "null"],
+      "properties": {
+        "targetType": {"enum": ["point", "zone", "alternatives"]},
+        "evidenceType": {
+          "enum": [
+            "mri_based",
+            "ultrasound_based",
+            "ema_based",
+            "published_articulatory_description",
+            "synthesizer_configuration",
+            "pedagogical_model"
+          ]
+        },
+        "state": {"type": ["object", "null"]},
+        "zone": {"type": ["object", "null"]},
+        "alternatives": {"type": ["array", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["sourceId", "status"],
+      "properties": {
+        "sourceId": {"type": "string"},
+        "status": {"enum": ["verified", "provisional", "model_only", "not_for_normative_use"]},
+        "notes": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    }
+  }
+}

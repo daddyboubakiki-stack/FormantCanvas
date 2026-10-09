@@ -1,0 +1,35 @@
+name: Articulation Lab audio source inspect
+
+on:
+  push:
+    branches:
+      - design/articulation-lab-v0.1
+    paths:
+      - .github/workflows/articulation-audio-source-inspect.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Hillenbrand source bundle
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/h95
+          curl -L --fail --retry 3 \
+            'https://github.com/santiagobarreda/hillenbrand_et_al_1995/raw/refs/heads/main/h95-alldata.zip' \
+            -o /tmp/h95-all.zip
+          unzip -q /tmp/h95-all.zip -d /tmp/h95
+          echo '--- top-level ---'
+          find /tmp/h95 -maxdepth 2 -type f -printf '%p %s bytes\n' | sort | head -80
+          echo '--- nested archives ---'
+          find /tmp/h95 -type f \( -iname '*.zip' -o -iname '*.ZIP' \) -print
+          echo '--- timedata candidates ---'
+          find /tmp/h95 -type f -iname '*timedata*' -print -exec sh -c 'echo "### $1"; head -40 "$1"' _ {} \;
+          echo '--- README candidates ---'
+          find /tmp/h95 -type f -iname '*readme*' -print -exec sh -c 'echo "### $1"; head -80 "$1"' _ {} \;

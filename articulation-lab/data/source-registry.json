@@ -1,0 +1,69 @@
+{
+  "schema": "articulation-lab.source-registry.v1",
+  "sources": [
+    {
+      "id": "mvp_model_v0_1",
+      "role": ["temporary_acoustic_mapping", "temporary_articulatory_presets"],
+      "title": "Articulation Lab v0.1 pedagogical mapping",
+      "notes": "Internal demo model used only to make the first playable build responsive. It is not an empirical English or Japanese vowel norm, not a measured articulatory target, and not a unique inverse mapping from acoustics to anatomy.",
+      "status": "pedagogical_model"
+    },
+    {
+      "id": "hillenbrand1995",
+      "role": ["english_acoustic_targets", "english_dynamic_reference"],
+      "title": "Acoustic characteristics of American English vowels",
+      "authors": "Hillenbrand et al.",
+      "year": 1995,
+      "notes": "Use only recovered numeric values with population labels. Formant Canvas already has an audited adult male/female diphthong trajectory integration on a feature branch. Child data must not be mixed with younger Lee-style presets because Hillenbrand children are a different age cohort.",
+      "status": "verified_source"
+    },
+    {
+      "id": "hara2016",
+      "role": ["japanese_acoustic_targets", "japanese_vv_context_reference"],
+      "title": "Hara (2016) Japanese vowel / vowel-sequence acoustic data",
+      "year": 2016,
+      "url": "http://hdl.handle.net/10443/3420",
+      "notes": "Published tables provide contextual F1/F2 targets and timing/transition summaries. They do not provide a sequence-specific normalized-time measured trajectory. Suitable for labeled endpoint/context evidence, not for claiming empirical continuous VV motion.",
+      "status": "verified_source"
+    },
+    {
+      "id": "sun_hayashi2025",
+      "role": ["japanese_dynamic_reference", "japanese_articulatory_reference"],
+      "title": "Acoustic, Auditory and Articulatory Analysis of Vowel Sequences in Japanese by Chinese Learners",
+      "authors": "Sun & Hayashi",
+      "year": 2025,
+      "doi": "10.24467/onseikenkyu.29.1_72",
+      "notes": "Includes native Japanese speakers and ultrasound articulatory analysis. The public article describes 20 formant measurement points, but a reusable native-speaker group numeric trajectory series has not yet been recovered. Reference/evidence only until numeric provenance is available.",
+      "status": "reference_only"
+    },
+    {
+      "id": "pink_trombone_2017",
+      "role": ["synthesis_engine_reference"],
+      "title": "Pink Trombone",
+      "author": "Neil Thapen",
+      "year": 2017,
+      "url": "https://github.com/evykassirer/pink-trombone",
+      "license": "MIT",
+      "notes": "Candidate tract-synthesis backend/reference. Keep third-party-derived code isolated and preserve copyright/license notices.",
+      "status": "verified_source"
+    },
+    {
+      "id": "vocaltractlab",
+      "role": ["articulatory_model_reference", "interaction_reference"],
+      "title": "VocalTractLab",
+      "author": "Peter Birkholz and collaborators",
+      "url": "https://www.vocaltractlab.de/",
+      "notes": "Reference for articulatory parameterization and vocal-tract modeling. Do not copy GPL source into a differently licensed codebase without intentionally accepting the license implications.",
+      "status": "verified_source"
+    },
+    {
+      "id": "sounds_of_speech_iowa",
+      "role": ["education_ui_reference"],
+      "title": "Sounds of Speech",
+      "publisher": "University of Iowa",
+      "url": "https://soundsofspeech.uiowa.edu/",
+      "notes": "Reference for educational presentation of articulatory information. Treat visual/media assets according to their own rights; do not copy them into the app without permission/license review.",
+      "status": "reference_only"
+    }
+  ]
+}
