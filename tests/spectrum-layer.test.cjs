@@ -76,14 +76,17 @@ const elements = {
   spectrumLayerSource:{checked:false,addEventListener(){}},
   spectrumLayerFilter:{checked:true,addEventListener(){}},
   spectrumLayerOutput:{checked:true,addEventListener(){}},
-  spectrumLayerComponents:{checked:false,addEventListener(){}}
+  spectrumLayerComponents:{checked:false,addEventListener(){}},
+  spectrumCompareOther:{checked:false,addEventListener(){}},
+  spectrumModelNote:{textContent:''}
 };
+const modelRadios=[{value:'parallel',checked:true,addEventListener(){}},{value:'cascade',checked:false,addEventListener(){}}];
 const args = ['document','window','requestAnimationFrame','performance','duration',
   'maxHz','clamp','smoothSamples','usingEmpiricalBandwidth','qAt','qEl','f0El',
   'audio','playCursorT','uiMode'];
 const f0 = {value:'100'};
 const values = {
-  document:{getElementById:id=>elements[id]},
+  document:{getElementById:id=>elements[id],querySelectorAll:sel=>sel.includes('synthModel')?modelRadios:[]},
   window:{devicePixelRatio:2},requestAnimationFrame:()=>{},performance:{now:()=>1000},
   duration:()=>0.6,maxHz:()=>4000,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),
   smoothSamples:name=>Array(221).fill({F1:550,F2:1450,F3:2350}[name]),
@@ -91,7 +94,7 @@ const values = {
   f0El:f0,audio:null,playCursorT:null,uiMode:'learning'
 };
 const api = new Function(...args,
-  html.slice(start,end) + '\nreturn {spectrumBandpassResponse,spectrumComponentResponse,spectrumParallelResponse,renderSpectrumLab};'
+  html.slice(start,end) + '\nreturn {spectrumBandpassResponse,spectrumComponentResponse,spectrumParallelResponse,renderSpectrumLab,spectrumLowpassResponse,spectrumCascadeShape,cascadeLevelGain,lowpassQdB,activeSynthModel,spectrumModelResponse};'
 )(...args.map(k=>values[k]));
 const magnitude = h => Math.hypot(h.re,h.im);
 assert.ok(Math.abs(magnitude(api.spectrumBandpassResponse(550,550,8,48000))-1)<1e-7,
@@ -108,7 +111,7 @@ api.renderSpectrumLab();
 assert.match(elements.spectrumValues.textContent,/F0 100 Hz.*F1 550 Hz/);
 assert.equal(elements.spectrumTimeValue.textContent,'0.30 s');
 assert.equal(elements.spectrumTime['aria-valuetext'],'0.30秒','Slider announces seconds, not a bare percentage');
-assert.match(elements.spectrumPlot['aria-label'],/深い谷：F1とF2のあいだ 約\d+ Hz（-\d+ dB）、F2とF3のあいだ/,'Text alternative reports the valleys');
+assert.match(elements.spectrumPlot['aria-label'],/谷（いちばん低い所）：F1とF2のあいだ 約\d+ Hz（-\d+ dB）、F2とF3のあいだ/,'Text alternative reports the valleys');
 assert.match(elements.spectrumPlot['aria-label'],/いちばん強い倍音：第\d+倍音/,'Text alternative reports the strongest output harmonic');
 assert.ok(strokes>20,'Frequency response and output harmonics are drawn');
 assert.match(elements.spectrumPlot['aria-label'],/F1 550 Hz/);
@@ -149,6 +152,41 @@ values.smoothSamples=()=>Array(221).fill(null);
 const emptyApi=new Function(...args, html.slice(start,end)+'\nreturn {renderSpectrumLab};')(...args.map(k=>values[k]));
 emptyApi.renderSpectrumLab();
 assert.match(elements.spectrumPlot['aria-label'],/グラフは空です/,'Text alternative does not go stale when trajectories are missing');
+// --- Comparison prototype: series lowpass (all-pole approximation) ---
+assert.ok(html.includes('name="synthModel" value="parallel" checked'), 'Parallel model stays the default');
+assert.ok(html.includes('直列・全極近似（試作）') && html.includes('比較試作：直列・全極近似モデル（未採用）'), 'Prototype is labelled as an approximation, not adopted');
+assert.ok(html.includes('二重零点') && html.includes('実際の母音音声とのスペクトル比較は未実施'), 'Research lists the approximation limits and unverified realism');
+assert.ok(synthesis.includes("filter.type='lowpass'") && synthesis.includes('chainTail.connect(filter); chainTail=filter;'), 'Cascade path chains lowpass sections');
+assert.ok(synthesis.includes("sourceGain.connect(filter); filter.connect(gain); gain.connect(sum);"), 'Parallel wiring is unchanged');
+assert.ok(synthesis.includes('const qValue=cascade?lowpassQdB(q):q;'), 'Lowpass Q is converted to dB from the shared bandwidth');
+assert.ok(synthesis.includes('sum.gain.value=cascadeLevelGain(ctx.sampleRate)'), 'Synthesis uses the same level constant as the graph');
+assert.equal(api.activeSynthModel(),'parallel');
+assert.ok(Math.abs(api.lowpassQdB(10)-20)<1e-12,'Q 10 (B = F/10) maps to 20 dB');
+const lp=(f,F,Q)=>api.spectrumLowpassResponse(f,F,api.lowpassQdB(Q),48000);
+assert.ok(Math.abs(lp(0.001,750,10)-1)<1e-6,'Each lowpass section has unity DC gain');
+assert.ok(Math.abs(20*Math.log10(lp(750,750,10))-20)<0.05,'Lowpass peak gain equals Q (in dB) near f_c');
+// Klatt-type 2-pole resonator, used only as a reference for the all-pole approximation error.
+const klatt=(f,F,B)=>{const T=1/48000,C=-Math.exp(-2*Math.PI*B*T),Bc=2*Math.exp(-Math.PI*B*T)*Math.cos(2*Math.PI*F*T),A=1-Bc-C,w=2*Math.PI*f*T;
+  return A/Math.hypot(1-Bc*Math.cos(w)-C*Math.cos(2*w),Bc*Math.sin(w)+C*Math.sin(2*w));};
+const vowelA=[{hz:750,q:10,gain:1},{hz:1200,q:10,gain:.68},{hz:2600,q:10,gain:.42}];
+let maxErr=0;
+for(let f=20;f<=2600;f+=10){
+  const ref=vowelA.reduce((m,d)=>m*klatt(f,d.hz,d.hz/d.q),1);
+  maxErr=Math.max(maxErr,Math.abs(20*Math.log10(api.spectrumCascadeShape(f,vowelA,48000)/ref)));
+}
+assert.ok(maxErr<0.7,'Cascade lowpass stays within 0.7 dB of an all-pole reference up to 2.6 kHz (got '+maxErr.toFixed(2)+')');
+const depth=(model,defs)=>{const g=1;let min=Infinity;for(let f=defs[0].hz;f<=defs[1].hz;f++)min=Math.min(min,20*Math.log10(api.spectrumModelResponse(f,defs,48000,model,g)));
+  return 20*Math.log10(api.spectrumModelResponse(defs[0].hz,defs,48000,model,g))-min;};
+assert.ok(depth('cascade',vowelA)<depth('parallel',vowelA)-5,'Cascade valley between F1 and F2 is shallower than the parallel one');
+modelRadios[0].checked=false;modelRadios[1].checked=true;
+assert.equal(api.activeSynthModel(),'cascade');
+const g=api.cascadeLevelGain(48000);
+assert.ok(Number.isFinite(g) && g>0 && g<1,'Level constant is finite and attenuates the resonant cascade');
+assert.ok(html.includes('const yMax=showCascadeSections ?'),'Cascade section peaks are not clipped by the axis');
+values.uiMode='casual';
+const casualApi=new Function(...args, html.slice(start,end)+'\nreturn {activeSynthModel};')(...args.map(k=>values[k]));
+assert.equal(casualApi.activeSynthModel(),'parallel','Casual mode always uses the current parallel model');
+values.uiMode='learning';
 // Every inline script must still parse.
 const vm=require('node:vm');
 const scripts=[...html.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/g)]

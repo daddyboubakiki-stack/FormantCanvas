@@ -608,6 +608,13 @@
   .spectrum-model-body .spectrum-note { color:#5a6476; font-size:12px; }
   .spectrum-model-body a { color:#185c96; text-decoration:underline; text-underline-offset:2px; }
   @media (max-width:600px) { .spectrum-model-details > summary { font-size:12px; } .spectrum-math { font-size:11px; padding:8px; } }
+  .spectrum-model { margin:4px 0 10px; padding:9px 11px 6px; border:1px solid #e3dccd; border-radius:12px; background:#fff; }
+  .spectrum-model legend { padding:0 4px; font-size:12px; font-weight:800; color:#34425b; }
+  .spectrum-model-options { display:flex; flex-wrap:wrap; gap:6px 14px; }
+  .spectrum-model label { display:inline-flex; align-items:center; gap:7px; min-height:34px; font-size:12px; font-weight:700; color:#26334c; cursor:pointer; }
+  .spectrum-model input { width:16px; height:16px; margin:0; accent-color:#5b6b8f; }
+  .spectrum-model label:focus-within { outline:2px solid #3b82c4; outline-offset:2px; border-radius:6px; }
+  .spectrum-model .spectrum-caption { margin:2px 0 4px; }
   .spectrum-reading, .spectrum-predict { margin:12px 0 0; padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.75; color:#34425b; }
   .spectrum-reading { background:#f6f8fb; border:1px solid #e1e6ee; }
   .spectrum-predict { background:#fbf8f1; border:1px solid #eadfc9; }
@@ -712,6 +719,15 @@
     <summary>🔬 音のX線 <span class="spectrum-summary-sub">音源・合成フィルター・合成結果を重ねて観察</span></summary>
     <div class="spectrum-lab-body">
       <p class="spectrum-intro">同じ周波数軸で、倍音の位置とフィルターの働きをくらべよう。レイヤーは自由に切り替えられるよ。</p>
+      <fieldset class="spectrum-model" id="spectrumModelGroup">
+        <legend>合成モデル（比較試作）</legend>
+        <div class="spectrum-model-options">
+          <label><input type="radio" name="synthModel" value="parallel" checked />並列（現行）</label>
+          <label><input type="radio" name="synthModel" value="cascade" />直列・全極近似（試作）</label>
+          <label><input type="checkbox" id="spectrumCompareOther" />もう一方を灰色で重ねる</label>
+        </div>
+        <p class="spectrum-caption" id="spectrumModelNote" aria-live="polite">3つのフィルターの出力を足し合わせる現行モデル。グラフ・再生・WAVはこのモデルで合成されます。</p>
+      </fieldset>
       <div class="spectrum-toggles" role="group" aria-label="グラフの表示・非表示">
         <label class="spectrum-toggle"><input id="spectrumLayerSource" type="checkbox" aria-controls="spectrumPlot" /><i class="spectrum-swatch source" aria-hidden="true"></i>音源の倍音</label>
         <label class="spectrum-toggle"><input id="spectrumLayerFilter" type="checkbox" aria-controls="spectrumPlot" checked /><i class="spectrum-swatch filter" aria-hidden="true"></i>合成フィルター特性</label>
@@ -746,9 +762,9 @@
         </ol>
         <details class="spectrum-answer">
           <summary>答え合わせ</summary>
-          <p>1. 「い」のほうがずっと深くなる。「い」はF1とF2が大きく離れていて、そのあいだでは両方のフィルターがもともと弱いうえに、出てくる波の向きがほぼ正反対になるからだよ（下の「レモン形の谷」の説明も読んでね）。</p>
+          <p>1. 「い」のほうがずっと深くなる。「い」はF1とF2が大きく離れていて、そのあいだでは両方のフィルターがもともと弱いからだよ。並列（現行）モデルでは、さらに出てくる波の向きがほぼ正反対になって打ち消し合う（下の「レモン形の谷」の説明も読んでね）。</p>
           <p>2. F1（長い破線）とF2（一点鎖線）が交わる近く。2つの強さが同じくらいで向きが逆だと、足したときにいちばん打ち消し合うんだ。</p>
-          <p class="spectrum-note">もっと試すなら：帯域幅モードを「Manual Q」にして、Qを小さくすると谷はどうなるかな？</p>
+          <p class="spectrum-note">もっと試すなら：帯域幅モードを「Manual Q」にして、Qを小さくすると谷はどうなるかな？ 合成モデルを「直列・全極近似（試作）」に切り替えると、谷の深さと形はどう変わるかな？</p>
         </details>
       </div>
 
@@ -815,6 +831,16 @@ L_out(k) = L_src(k)
           <h3>7. Q・時間変化と表示上の限界</h3>
           <p><strong>Manual Q</strong> では各分岐のQをスライダーの値に設定。<strong>Empirical bandwidth</strong> ではアプリに収録した帯域幅 B と対応する中心周波数から <code>Q = clamp(f_c / B, 0.2, 80)</code> を計算する。実際の合成処理は、F1〜F3の描画軌跡を平滑化し、<strong>220区間</strong>の <code>linearRampToValueAtTime</code> でフィルター中心周波数とQを時間変化させる。中心周波数は <code>80 Hz</code> 以上、<code>min(maxHz, F_s/2 - 200 Hz)</code> 以下に制限する。グラフの計算はこの周波数制限を適用していないため、80 Hz 未満を描いた場合のみ合成音と差が生じうる。</p>
           <p>master gain は冒頭と末尾で指数変化し、持続部は <code>0.75</code>。この時変系を単一の時間不変伝達関数で完全に記述することはできない。「音のX線」は選択時刻のパラメータを固定した<strong>定常近似</strong>であり、過渡応答・attack/release・実録音・声道の物理形状を直接示すものではない。再生していないときのグラフ計算は <code>F_s = 48000 Hz</code> を仮定し、再生中は AudioContext の値を使用するため、実環境で差が生じうる。</p>
+          <h3>8. 比較試作：直列・全極近似モデル（未採用）</h3>
+          <p>「直列・全極近似（試作）」を選ぶと、同じ音源・同じ F1–F3 軌跡・同じ帯域幅 <code>B = f_c / Q</code> で、3本の <code>BiquadFilterNode</code>（<code>type = "lowpass"</code>）を<strong>直列</strong>に接続して合成する。グラフ・再生・WAV が同じモデルに切り替わる。lowpass の Q は dB 単位なので、帯域幅をそろえるために次の換算を使う。</p>
+          <pre class="spectrum-math" aria-label="直列モデルの係数と伝達関数">Q_dB = 20 log10(f_c / B)
+α = sin(ω₀) / (2 · 10^(Q_dB/20))
+b₀ = b₂ = (1 − cos ω₀)/2   b₁ = 1 − cos ω₀
+a₀ = 1 + α   a₁ = −2 cos ω₀   a₂ = 1 − α
+
+H_cas(z) = G · H_LP1(z) · H_LP2(z) · H_LP3(z)</pre>
+          <p><code>G</code> は聴き比べ用の音量合わせの定数で、再生時間の中央時刻における倍音の RMS が並列モデルと等しくなるように1音ごとに決める（グラフも同じ <code>G</code> を使う）。</p>
+          <p><strong>近似上の限界</strong>：(1) lowpass は z = −1（ナイキスト周波数）に二重零点をもつため、厳密な全極モデルではない。Klatt 型の2極共鳴器（B = f/10）との比較では、0〜2.6 kHz で差 0.6 dB 以内、4 kHz で −1.8 dB、6 kHz で −4.2 dB（Chromium で計算）。(2) F4 以上の共鳴や高次極の補正を含まないため、高い周波数は弱めに出る。(3) Q が小さい（目安 4 未満）と、山の位置と −3 dB 帯域幅が f_c・B からずれる。(4) 実際の母音音声とのスペクトル比較は未実施であり、どちらのモデルが実際の声に近いかはまだ検証していない。</p>
           <p class="spectrum-note">出典：<a href="https://www.w3.org/TR/webaudio/#BiquadFilterNode" target="_blank" rel="noopener noreferrer">W3C Web Audio API — BiquadFilterNode</a>。実装：<a href="https://github.com/daddyboubakiki-stack/FormantCanvas/blob/main/index.html" target="_blank" rel="noopener noreferrer">scheduleSynthesis / spectrumBandpassResponse（GitHub）</a>。ここに記した係数はWeb Audioの定義、固定ゲイン・接続・更新方法は本アプリの実装に対応する。</p>
         </div>
       </details>
@@ -1902,6 +1928,50 @@ L_out(k) = L_src(k)
     const h=spectrumBandpassResponse(freq,def.hz,def.q,sampleRate);
     return Math.hypot(h.re,h.im)*def.gain*0.62;
   }
+  // Comparison prototype (not adopted): an all-pole *approximation* from three Web Audio lowpass
+  // biquads in series. Lowpass Q is in dB, so the shared bandwidth B=F/Q maps to Q_dB=20·log10(F/B).
+  const spectrumModelInputs = [...document.querySelectorAll('input[name="synthModel"]')];
+  const spectrumCompareOther = document.getElementById('spectrumCompareOther');
+  const spectrumModelNote = document.getElementById('spectrumModelNote');
+  function activeSynthModel(){
+    if(uiMode==='casual') return 'parallel';
+    const picked=spectrumModelInputs.find(r=>r.checked);
+    return picked && picked.value==='cascade' ? 'cascade' : 'parallel';
+  }
+  function lowpassQdB(q){ return 20*Math.log10(Math.max(0.001,q)); }
+  function spectrumLowpassResponse(freq,center,qDb,sampleRate){
+    const w0=2*Math.PI*center/sampleRate;
+    const alpha=Math.sin(w0)/(2*Math.pow(10,qDb/20));
+    const c0=Math.cos(w0);
+    const b0=(1-c0)/2, b1=1-c0, b2=b0, a0=1+alpha, a1=-2*c0, a2=1-alpha;
+    const w=2*Math.PI*freq/sampleRate;
+    const nr=b0+b1*Math.cos(w)+b2*Math.cos(2*w), ni=-(b1*Math.sin(w)+b2*Math.sin(2*w));
+    const dr=a0+a1*Math.cos(w)+a2*Math.cos(2*w), di=-(a1*Math.sin(w)+a2*Math.sin(2*w));
+    const den=Math.hypot(dr,di);
+    return den<1e-12 ? 0 : Math.hypot(nr,ni)/den;
+  }
+  function spectrumCascadeSection(freq,def,sampleRate){
+    return spectrumLowpassResponse(freq,def.hz,lowpassQdB(def.q),sampleRate);
+  }
+  function spectrumCascadeShape(freq,defs,sampleRate){
+    return defs.reduce((m,def)=>m*spectrumCascadeSection(freq,def,sampleRate),1);
+  }
+  // Equal-loudness listening: one constant per sound, so the cascade's harmonic RMS at mid-duration
+  // equals the parallel model's. scheduleSynthesis and the graph use the same constant.
+  function cascadeLevelGain(sampleRate){
+    const defs=spectrumDefinitionsAt(duration()/2);
+    if(!defs.every(d=>Number.isFinite(d.hz))) return 1;
+    const f0=Number(f0El.value);
+    let par=0,cas=0;
+    for(let n=1;n*f0<sampleRate/2;n++){
+      par+=(spectrumParallelResponse(n*f0,defs,sampleRate)/n)**2;
+      cas+=(spectrumCascadeShape(n*f0,defs,sampleRate)/n)**2;
+    }
+    return cas>0 ? Math.sqrt(par/cas) : 1;
+  }
+  function spectrumModelResponse(freq,defs,sampleRate,model,levelGain){
+    return model==='cascade' ? levelGain*spectrumCascadeShape(freq,defs,sampleRate) : spectrumParallelResponse(freq,defs,sampleRate);
+  }
   function spectrumDefinitionsAt(t){
     const index=Math.min(220,Math.max(0,t/Math.max(0.001,duration())*220));
     return [['F1',1],['F2',0.68],['F3',0.42]].map(([name,gain])=>{
@@ -1925,6 +1995,15 @@ L_out(k) = L_src(k)
     spectrumTime.setAttribute('aria-valuetext',t.toFixed(2)+'秒');
     spectrumComponentLegend.hidden=!spectrumLayers.components.checked;
     spectrumBreakdownNote.hidden=!spectrumLayers.components.checked;
+    const model=activeSynthModel();
+    const otherModel=model==='cascade'?'parallel':'cascade';
+    const modelLabel={parallel:'並列（現行）',cascade:'直列・全極近似（試作）'};
+    spectrumModelNote.textContent=model==='cascade'
+      ? '3つの共鳴フィルターを順につなぐ試作モデル（全極モデルの近似）。谷は打ち消し合いではなく、2つの山のすそのあいだとしてできます。グラフ・再生・WAVはこのモデルで合成され、音量は聴き比べのため並列モデルにそろえています。'
+      : '3つのフィルターの出力を足し合わせる現行モデル。フォルマントのあいだに打ち消し合いによる深い谷（レモン形の谷）ができやすい。グラフ・再生・WAVはこのモデルで合成されます。';
+    spectrumBreakdownNote.textContent=model==='cascade'
+      ? 'F1・F2・F3の各共鳴フィルター単独の応答を、線種を変えて重ねています。直列では、3本の線のdBを足し、音量合わせの定数を加えると橙色の線になります（位相は関係しません）。'
+      : 'F1・F2・F3の各フィルター単独の応答（分岐ごとのゲインを反映）を、線種を変えて重ねています。橙色は位相を含めて合成した応答なので、3本の曲線を高さだけ足したものではありません。';
     const defs=spectrumDefinitionsAt(t);
     const valid=defs.every(v=>Number.isFinite(v.hz));
     spectrumValues.textContent=valid
@@ -1945,11 +2024,14 @@ L_out(k) = L_src(k)
     const pw=Math.max(1,width-left-right),ph=Math.max(1,height-top-bottom);
     const limit=maxHz();
     const x=f=>left+f/limit*pw;
-    const y=db=>top+(3-clamp(db,-60,3))/63*ph;
+    // Cascade sections peak near +Q_dB; widen the top of the axis so they are not clipped flat.
+    const showCascadeSections=valid && model==='cascade' && spectrumLayers.components.checked;
+    const yMax=showCascadeSections ? Math.max(3,Math.ceil((Math.max(...defs.map(d=>lowpassQdB(d.q)))+3)/10)*10) : 3;
+    const y=db=>top+(yMax-clamp(db,-60,yMax))/(yMax+60)*ph;
     const dB=amp=>20*Math.log10(Math.max(1e-8,amp));
     ctx.font='11px system-ui, sans-serif';
     ctx.textBaseline='middle';
-    for(const db of [-60,-40,-20,0]){
+    for(const db of [-60,-40,-20,0,20,40].filter(v=>v<=yMax).concat(yMax>3 && yMax%20 ? [yMax] : [])){
       ctx.strokeStyle='#e8ebf1';ctx.lineWidth=1;ctx.setLineDash([3,4]);
       ctx.beginPath();ctx.moveTo(left,y(db));ctx.lineTo(width-right,y(db));ctx.stroke();
       ctx.fillStyle='#596579';ctx.textAlign='right';ctx.fillText(String(db),left-6,y(db));
@@ -1969,11 +2051,13 @@ L_out(k) = L_src(k)
       return;
     }
     const sampleRate=audio?.ctx?.sampleRate || 48000;
+    const levelGain=cascadeLevelGain(sampleRate);
+    const response=(freq,which=model)=>spectrumModelResponse(freq,defs,sampleRate,which,levelGain);
     const harmonics=[];
     const f0=Number(f0El.value);
     for(let n=1;n*f0<=limit;n++){
       const hz=n*f0,sourceDb=-20*Math.log10(n);
-      harmonics.push({hz,n,sourceDb,outputDb:sourceDb+dB(spectrumParallelResponse(hz,defs,sampleRate))});
+      harmonics.push({hz,n,sourceDb,outputDb:sourceDb+dB(response(hz))});
     }
     if(spectrumLayers.source.checked){
       ctx.strokeStyle='#3175b8';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);
@@ -1993,12 +2077,25 @@ L_out(k) = L_src(k)
         const steps=Math.max(120,Math.ceil(pw));
         for(let i=0;i<=steps;i++){
           const freq=limit*i/steps;
-          const xx=x(freq),yy=y(dB(spectrumComponentResponse(freq,def,sampleRate)));
+          const level=model==='cascade' ? spectrumCascadeSection(freq,def,sampleRate) : spectrumComponentResponse(freq,def,sampleRate);
+          const xx=x(freq),yy=y(dB(level));
           if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
         }
         ctx.stroke();
       }
       ctx.setLineDash([]);ctx.lineCap='butt';
+    }
+    if(spectrumCompareOther && spectrumCompareOther.checked){
+      ctx.strokeStyle='#767c88';ctx.lineWidth=1.6;ctx.setLineDash([]);
+      ctx.beginPath();
+      for(let i=0;i<=Math.max(120,Math.ceil(pw));i++){
+        const freq=limit*i/Math.max(120,Math.ceil(pw));
+        const xx=x(freq),yy=y(dB(response(freq,otherModel)));
+        if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+      }
+      ctx.stroke();
+      ctx.font='10px system-ui, sans-serif';ctx.textAlign='right';ctx.fillStyle='#5f6572';
+      ctx.fillText('灰色：'+modelLabel[otherModel],width-right,13);
     }
     if(spectrumLayers.filter.checked){
       ctx.strokeStyle='rgba(173,118,27,.27)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
@@ -2010,7 +2107,7 @@ L_out(k) = L_src(k)
       ctx.beginPath();
       for(let i=0;i<=Math.max(120,Math.ceil(pw));i++){
         const freq=limit*i/Math.max(120,Math.ceil(pw));
-        const xx=x(freq),yy=y(dB(spectrumParallelResponse(freq,defs,sampleRate)));
+        const xx=x(freq),yy=y(dB(response(freq)));
         if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
       }
       ctx.stroke();
@@ -2030,7 +2127,7 @@ L_out(k) = L_src(k)
       let best=null;
       for(let i=1;i<200;i++){
         const freq=lo+(hi-lo)*i/200;
-        const level=dB(spectrumParallelResponse(freq,defs,sampleRate));
+        const level=dB(response(freq));
         if(!best || level<best.level) best={freq,level};
       }
       if(best) valleys.push(defs[k].name+'と'+defs[k+1].name+'のあいだ 約'+Math.round(best.freq)+' Hz（'+Math.round(best.level)+' dB）');
@@ -2038,14 +2135,16 @@ L_out(k) = L_src(k)
     const strongest=harmonics.reduce((a,h)=>(!a || h.outputDb>a.outputDb)?h:a,null);
     const shown=[['source','音源の倍音'],['filter','合成フィルター特性'],['output','合成後の倍音'],['components','F1・F2・F3の内訳']]
       .filter(([key])=>spectrumLayers[key].checked).map(([,label])=>label);
-    canvas.setAttribute('aria-label','スペクトル図（'+t.toFixed(2)+'秒時点）。F0 '+Math.round(f0)+' Hz、'+defs.map(d=>d.name+' '+Math.round(d.hz)+' Hz').join('、')+'。'
-      +'合成フィルター特性の深い谷：'+valleys.join('、')+'。'
+    if(spectrumCompareOther && spectrumCompareOther.checked) shown.push(modelLabel[otherModel]+'モデルのフィルター特性（灰色）');
+    canvas.setAttribute('aria-label','スペクトル図（'+t.toFixed(2)+'秒時点、'+modelLabel[model]+'モデル）。F0 '+Math.round(f0)+' Hz、'+defs.map(d=>d.name+' '+Math.round(d.hz)+' Hz').join('、')+'。'
+      +'合成フィルター特性の谷（いちばん低い所）：'+valleys.join('、')+'。'
       +(strongest?'合成後にいちばん強い倍音：第'+strongest.n+'倍音（'+Math.round(strongest.hz)+' Hz）。':'')
       +'表示中：'+(shown.length?shown.join('・'):'なし')+'。');
   }
   spectrumLab.addEventListener('toggle',()=>requestAnimationFrame(renderSpectrumLab));
   spectrumTime.addEventListener('input',renderSpectrumLab);
   Object.values(spectrumLayers).forEach(box=>box.addEventListener('change',renderSpectrumLab));
+  [...spectrumModelInputs, spectrumCompareOther].forEach(input=>input && input.addEventListener('change',renderSpectrumLab));
   if(window.ResizeObserver) new ResizeObserver(()=>requestAnimationFrame(renderSpectrumLab)).observe(spectrumPlot.parentElement);
 
   function render(){
@@ -3318,9 +3417,19 @@ L_out(k) = L_src(k)
     sum.gain.value=0.62;
     const formantDefs=[['F1',1.00],['F2',0.68],['F3',0.42]];
     const filters={};
+    // Comparison prototype: the same source and trajectories through lowpass sections in series.
+    const cascade=activeSynthModel()==='cascade';
+    let chainTail=sourceGain;
 
     for(const [name,gainValue] of formantDefs){
       const filter=ctx.createBiquadFilter();
+      if(cascade){
+        filter.type='lowpass';
+        filter.Q.value=lowpassQdB(usingEmpiricalBandwidth()?qAt(name,0):Number(qEl.value));
+        chainTail.connect(filter); chainTail=filter;
+        filters[name]=filter;
+        continue;
+      }
       filter.type='bandpass';
       filter.Q.value=usingEmpiricalBandwidth()?qAt(name,0):Number(qEl.value);
       const gain=ctx.createGain();
@@ -3328,6 +3437,7 @@ L_out(k) = L_src(k)
       sourceGain.connect(filter); filter.connect(gain); gain.connect(sum);
       filters[name]=filter;
     }
+    if(cascade){ sum.gain.value=cascadeLevelGain(ctx.sampleRate); chainTail.connect(sum); }
 
     const master=ctx.createGain();
     const attack=Math.min(0.03,dur*0.2);
@@ -3348,13 +3458,14 @@ L_out(k) = L_src(k)
         const t=dur*i/N;
         const hz=clamp(vals[i],80,Math.min(maxHz(), ctx.sampleRate/2-200));
         const q=usingEmpiricalBandwidth()?qAt(name,t):Math.max(1,Number(qEl.value));
+        const qValue=cascade?lowpassQdB(q):q;
         const at=startAt+t;
         if(i===0){
           freqParam.setValueAtTime(hz,at);
-          qParam.setValueAtTime(q,at);
+          qParam.setValueAtTime(qValue,at);
         } else {
           freqParam.linearRampToValueAtTime(hz,at);
-          qParam.linearRampToValueAtTime(q,at);
+          qParam.linearRampToValueAtTime(qValue,at);
         }
       }
     }

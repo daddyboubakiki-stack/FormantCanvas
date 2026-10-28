@@ -255,3 +255,23 @@ PRのmerge・close・force update、既存branchへの書き込み・削除は�
 - Unchanged: `scheduleSynthesis`, WAV export, research trajectories, bandwidth data, citations and evidence labels. Check: the 75 presets render identically to main; WAV samples for 40 presets differ from main by at most 1 LSB, which is the same as main-vs-main run-to-run variation in Chromium's offline rendering (WAV bytes are not reproducible run to run, so byte-hash comparison is not a valid regression check).
 - Remaining: real-device mobile check, VoiceOver/NVDA, Safari/Firefox, Netlify preview (login-protected). The signal-flow diagram block still scrolls horizontally by ~26 px at 390 px width.
 - Proposals, not implemented: P2 items (restore observation time after playback, mark harmonics below −60 dB, apply the 80 Hz clamp in the graph, harmonic table) and a cascade/all-pole model comparison, which would change synthesis and therefore needs a separate owner-approved task.
+
+## 2026-10-28 — Comparison prototype: series all-pole approximation (branch `ccr-a8e393d9-9nfkoq`, stacked on PR #25)
+
+- Status: **comparison prototype, not adopted.** Agreed with the owner: keep PR #25 as Draft; build a minimal side-by-side comparison first; do not replace the current model.
+- What was added: a "合成モデル（比較試作）" radio in the Spectrum X-ray panel (Learning/Research) with two options, 並列（現行） (default) and 直列・全極近似（試作）. The graph, playback and WAV export all switch together; Casual mode always uses the parallel model. An optional grey overlay shows the other model's filter curve.
+- Cascade model: the same sawtooth source, F1–F3 trajectories, frequency clamp and bandwidth B = F/Q, run through three Web Audio `lowpass` biquads in series. Lowpass Q is in dB, so the code uses Q_dB = 20·log10(F/B). One level constant G per sound makes the harmonic RMS at mid-duration equal to the parallel model's, for fair listening; the graph uses the same G.
+- Verified (Chromium, headless):
+  - The W3C lowpass formula matches `getFrequencyResponse` to within 1e-5 dB.
+  - With Q ≥ 4, the −3 dB bandwidth is close to F/Q (750 Hz, Q 10: 77 Hz vs 75 Hz); at Q 1.5 the peak and bandwidth drift (1200 → 1059 Hz; 960 Hz vs 800 Hz).
+  - Compared with Klatt-type all-pole resonators: within 0.6 dB up to 2.6 kHz, −1.8 dB at 4 kHz, −4.2 dB at 6 kHz.
+  - The cascade WAV harmonic levels match the graph to within 0.02 dB, and the RMS level equals the parallel model's.
+  - Parallel WAV output for 40 presets is within 1 LSB of main.
+  - The F1–F2 valley (dB below the F1 peak) for parallel vs cascade at mid-time: ja male /a/ 11.9 vs 3.3, /i/ 46.1 vs 34.7; other groups /a/ 21–24 vs 10–13, /i/ 49–51 vs 39–42. In both models /i/ stays deeper than /a/, so the Learning prediction answer holds for both.
+- Observations for the owner's decision:
+  - The cascade has no phase-cancellation notches and a flat response below F1, so H1 is stronger.
+  - Its peak heights follow from formant frequencies and bandwidths rather than fixed branch gains.
+  - With only three formants and no higher-pole correction, it falls below −60 dB above roughly 3–3.5 kHz for /a/ (ja male). The parallel model instead keeps a −25 dB skirt there.
+  - Neither model was compared with recorded vowels.
+- Limits not addressed (by design): lowpass has a double zero at Nyquist (approximation, not strict all-pole); no F4/F5 or higher-pole correction; the loudness match is RMS at one time point, not perceptual loudness; the sawtooth source is unchanged.
+- Not done / unverified: comparison with recorded vowel spectra, real-device listening, Safari/Firefox, screen readers.
