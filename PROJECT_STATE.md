@@ -221,3 +221,13 @@ PRのmerge・close・force update、既存branchへの書き込み・削除は�
 - Mock-functional QA: 14 assertions pass in tests/spectrum-layer.test.cjs (math, controls, readouts, canvas render).
 - Remaining: real browser/UI/keyboard/screen-reader QA, mobile width, actual listening comparison and production preview verification. Do not merge or publicly deploy without user approval.
 - Next: inspect the Draft PR diff and any CI/preview evidence, then ask the owner to review visual accuracy and mobile layout.
+
+
+### 2026-10-28 follow-up — individual F1/F2/F3 filter response overlays
+
+- On the existing Draft PR #25, add the optional “F1・F2・F3の内訳を重ねる” toggle (OFF by default) inside the Spectrum X-ray panel.
+- Plot three thin semi-transparent dashed curves: F1 rose, F2 blue, F3 violet, matching the existing track-color semantics; show a compact legend only when enabled.
+- Each separate curve is the magnitude of that bandpass branch including its gain and the 0.62 common summing gain. This uses the same complex-response helper as the orange summed response; therefore the component magnitudes do **not** sum arithmetically into the orange curve.
+- Keep the orange combined response, the blue input harmonics, the green output harmonics, audio synthesis, existing formant trajectories, evidence labels, and all protected research values unchanged.
+- Static JS syntax and synthetic canvas/visibility tests passed (27 assertions, including branch gains and three individual colored curves).
+- Outstanding: visually inspect the refreshed Netlify PR preview on mobile, confirm native checkbox interaction and line visibility, and complete accessibility QA before owner-approved merge. No production release.
