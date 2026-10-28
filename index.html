@@ -544,6 +544,80 @@
     margin:8px 0 0;
   }
 
+
+  /* The X-ray view belongs to Learning/Research; the drawing canvas stays the hero. */
+  .spectrum-lab { margin:12px 0 0; padding:0 16px; background:#fffcf7; border:1px solid #e5ddcf; border-radius:17px; }
+  .spectrum-lab > summary { cursor:pointer; padding:14px 0; font-size:14px; font-weight:800; color:var(--text); }
+  .spectrum-lab > summary:focus-visible { outline:3px solid #3b82c4; outline-offset:4px; border-radius:4px; }
+  .spectrum-lab > summary .spectrum-summary-sub { margin-left:8px; font-size:12px; font-weight:500; color:#667085; }
+  .spectrum-lab-body { padding:0 0 16px; }
+  .spectrum-intro, .spectrum-caption { margin:3px 0 10px; color:#576273; font-size:12px; line-height:1.65; }
+  .spectrum-toggles { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:9px 0 11px; }
+  .spectrum-toggle { display:inline-flex; gap:7px; align-items:center; padding:8px 11px; border:1px solid #d6dce6; border-radius:999px; background:white; font-size:12px; font-weight:700; cursor:pointer; color:#26334c; }
+  /* Unchecked layers stay readable (WCAG 1.4.3); state is carried by the checkbox, dashed border and faded swatch. */
+  .spectrum-toggle:has(input:not(:checked)) { background:#f4f1ea; border-style:dashed; }
+  .spectrum-toggle:has(input:not(:checked)) .spectrum-swatch { opacity:.45; }
+  .spectrum-toggle:focus-within { outline:2px solid #3b82c4; outline-offset:2px; }
+  .spectrum-toggle input { width:16px; height:16px; margin:0; }
+  #spectrumLayerSource { accent-color:#3175b8; }
+  #spectrumLayerFilter { accent-color:#ad761b; }
+  #spectrumLayerOutput { accent-color:#137b68; }
+  #spectrumLayerComponents { accent-color:#78609b; }
+  .spectrum-breakdown { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; margin:-2px 0 11px; }
+  .spectrum-breakdown-toggle { display:inline-flex; align-items:center; gap:7px; padding:7px 10px; border:1px dashed #d6d2df; border-radius:10px; background:#faf9fd; font-size:12px; color:#38405a; font-weight:700; cursor:pointer; }
+  .spectrum-breakdown-toggle input { width:16px; height:16px; margin:0; }
+  .spectrum-breakdown-toggle:focus-within { outline:2px solid #3b82c4; outline-offset:2px; }
+  .spectrum-component-legend { display:flex; flex-wrap:wrap; gap:8px; font-size:11px; color:#48546a; }
+  .spectrum-component-legend[hidden], .spectrum-caption[hidden] { display:none; }
+  .spectrum-component-legend span { display:inline-flex; align-items:center; gap:4px; }
+  .spectrum-component-legend svg { display:block; overflow:visible; }
+  .spectrum-swatch { display:inline-block; width:17px; height:0; border-top:3px solid; }
+  .spectrum-swatch.source { border-top:2px dashed #3175b8; }
+  .spectrum-swatch.filter { border-top-color:#ad761b; }
+  .spectrum-swatch.output { border-top-color:#137b68; }
+  .spectrum-plot-wrap { background:white; border:1px solid #e4e7ed; border-radius:12px; overflow:hidden; }
+  canvas.spectrum-plot { display:block; position:static; inset:auto; width:100%; height:258px; touch-action:pan-y; }
+  .spectrum-time-control { display:flex; align-items:center; gap:11px; margin-top:11px; font-size:12px; font-weight:700; color:#34425b; }
+  .spectrum-time-control label { flex:0 0 auto; }
+  .spectrum-time-control input { flex:1; min-width:48px; height:24px; margin:0; accent-color:#6677ac; }
+  .spectrum-time-control output { flex:0 0 51px; text-align:right; font-variant-numeric:tabular-nums; }
+  .spectrum-values { margin:8px 0 0; font-size:12px; line-height:1.6; color:#34425b; font-variant-numeric:tabular-nums; }
+  .spectrum-caption { margin:9px 0 0; }
+  @media (max-width:600px) {
+    .spectrum-lab { padding:0 10px; }
+    .spectrum-lab > summary { font-size:13px; }
+    .spectrum-lab > summary .spectrum-summary-sub { display:block; margin:3px 0 0 19px; font-size:11px; }
+    .spectrum-toggles { gap:5px; }
+    .spectrum-toggle { padding:8px 7px; font-size:11px; gap:5px; }
+    canvas.spectrum-plot { height:235px; }
+  }
+
+
+  /* Spectrum X-ray explanations: concise Learning / reproducible Research. */
+  .spectrum-model-details { margin:12px 0 0; border-top:1px solid #e8e1d5; padding:0 2px; }
+  .spectrum-model-details > summary { cursor:pointer; padding:13px 0; font-size:13px; font-weight:750; color:#34425b; line-height:1.5; }
+  .spectrum-model-details > summary:focus-visible { outline:3px solid #347cba; outline-offset:3px; border-radius:4px; }
+  .spectrum-model-details > summary:hover { color:#235c8e; }
+  .spectrum-model-body { padding:0 0 14px; line-height:1.75; font-size:13px; color:#34425b; }
+  .spectrum-model-body p { margin:0 0 10px; }
+  .spectrum-model-body ol { padding-left:1.4em; margin:0 0 10px; }
+  .spectrum-model-body li { margin:5px 0; }
+  .spectrum-model-body h3 { font-size:13px; font-weight:800; color:#253047; margin:15px 0 5px; }
+  .spectrum-model-body h3:first-child { margin-top:0; }
+  .spectrum-math { display:block; overflow-x:auto; white-space:pre; line-height:1.7; font-size:12px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; background:#f7f5ef; color:#27364c; border-left:3px solid #c7a060; border-radius:5px; padding:9px 11px; margin:7px 0 10px; }
+  .spectrum-model-body .spectrum-note { color:#5a6476; font-size:12px; }
+  .spectrum-model-body a { color:#185c96; text-decoration:underline; text-underline-offset:2px; }
+  @media (max-width:600px) { .spectrum-model-details > summary { font-size:12px; } .spectrum-math { font-size:11px; padding:8px; } }
+  .spectrum-reading, .spectrum-predict { margin:12px 0 0; padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.75; color:#34425b; }
+  .spectrum-reading { background:#f6f8fb; border:1px solid #e1e6ee; }
+  .spectrum-predict { background:#fbf8f1; border:1px solid #eadfc9; }
+  .spectrum-reading p, .spectrum-predict p { margin:0 0 6px; }
+  .spectrum-predict ol { margin:4px 0 6px; padding-left:1.4em; }
+  .spectrum-predict li { margin:4px 0; }
+  .spectrum-reading .spectrum-note, .spectrum-predict .spectrum-note { color:#5a6476; font-size:12px; }
+  .spectrum-answer > summary { cursor:pointer; padding:6px 0; font-weight:750; color:#34425b; }
+  .spectrum-answer > summary:focus-visible { outline:3px solid #347cba; outline-offset:3px; border-radius:4px; }
+
 </style>
 </head>
 <body data-ui-mode="casual">
@@ -568,9 +642,9 @@
     </div>
     <div class="header-actions">
       <div class="mode-switch" role="group" aria-label="表示モード">
-        <button id="casualModeBtn" class="mode-btn active" type="button" aria-pressed="true">🌷 ゆるふわ</button>
         <button id="learningModeBtn" class="mode-btn" type="button" aria-pressed="false">📘 学習</button>
         <button id="researchModeBtn" class="mode-btn" type="button" aria-pressed="false">🔬 研究</button>
+        <button id="casualModeBtn" class="mode-btn active" type="button" aria-pressed="true">🌷 ゆるふわ</button>
       </div>
     </div>
   </div>
@@ -632,6 +706,120 @@
     </div>
   </div>
   </section>
+
+
+  <details id="spectrumLab" class="spectrum-lab learning-plus">
+    <summary>🔬 音のX線 <span class="spectrum-summary-sub">音源・合成フィルター・合成結果を重ねて観察</span></summary>
+    <div class="spectrum-lab-body">
+      <p class="spectrum-intro">同じ周波数軸で、倍音の位置とフィルターの働きをくらべよう。レイヤーは自由に切り替えられるよ。</p>
+      <div class="spectrum-toggles" role="group" aria-label="グラフの表示・非表示">
+        <label class="spectrum-toggle"><input id="spectrumLayerSource" type="checkbox" aria-controls="spectrumPlot" /><i class="spectrum-swatch source" aria-hidden="true"></i>音源の倍音</label>
+        <label class="spectrum-toggle"><input id="spectrumLayerFilter" type="checkbox" aria-controls="spectrumPlot" checked /><i class="spectrum-swatch filter" aria-hidden="true"></i>合成フィルター特性</label>
+        <label class="spectrum-toggle"><input id="spectrumLayerOutput" type="checkbox" aria-controls="spectrumPlot" checked /><i class="spectrum-swatch output" aria-hidden="true"></i>合成後の倍音</label>
+      </div>
+      <div class="spectrum-breakdown">
+        <label class="spectrum-breakdown-toggle"><input id="spectrumLayerComponents" type="checkbox" aria-controls="spectrumPlot" />F1・F2・F3の内訳を重ねる</label>
+        <div class="spectrum-component-legend" id="spectrumComponentLegend" hidden aria-label="各フィルターの色と線種"><span><svg width="22" height="6" aria-hidden="true"><line x1="0" y1="3" x2="22" y2="3" stroke="#b94e68" stroke-width="2" stroke-dasharray="10 4"/></svg>F1 長い破線</span><span><svg width="22" height="6" aria-hidden="true"><line x1="0" y1="3" x2="22" y2="3" stroke="#4178be" stroke-width="2" stroke-dasharray="8 3 2 3"/></svg>F2 一点鎖線</span><span><svg width="22" height="6" aria-hidden="true"><line x1="1" y1="3" x2="22" y2="3" stroke="#7859ad" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 4.5"/></svg>F3 点線</span></div>
+      </div>
+      <div class="spectrum-plot-wrap">
+        <canvas id="spectrumPlot" class="spectrum-plot" role="img" aria-label="音源の倍音・合成フィルター特性・合成後の倍音を比較するスペクトル図"></canvas>
+      </div>
+      <div class="spectrum-time-control">
+        <label for="spectrumTime">観察する時刻</label>
+        <input id="spectrumTime" type="range" min="0" max="100" step="1" value="50" aria-valuetext="0.30秒" />
+        <output id="spectrumTimeValue" for="spectrumTime">0.30 s</output>
+      </div>
+      <p class="spectrum-values" id="spectrumValues" aria-live="off">母音プリセットを選ぶか、F1〜F3を描いてみよう。</p>
+      <p class="spectrum-caption" id="spectrumBreakdownNote" hidden>F1・F2・F3の各フィルター単独の応答（分岐ごとのゲインを反映）を、線種を変えて重ねています。橙色は位相を含めて合成した応答なので、3本の曲線を高さだけ足したものではありません。</p>
+      <p class="spectrum-caption">計算による定常スペクトルの近似です（録音した声の分析ではありません）。合成器と同じ3本の並列バンドパスフィルターを使い、音量エンベロープと時間変化中の過渡応答は省いています。青・緑の棒は「音源の第1倍音＝0 dB」とした相対レベル、橙の線はフィルターの増幅率（dB）です。</p>
+
+      <div class="spectrum-reading learning-only" id="spectrumReadingGuide">
+        <p><strong>グラフの読み方：</strong>同じ周波数の位置で、<strong>緑の棒の高さ ＝ 青の棒の高さ ＋ 橙の線の高さ</strong>（どれもdB）。dBでは「何倍になるか」を足し算で表せるからだよ。「音源の倍音」をONにして確かめてみよう。</p>
+        <p class="spectrum-note">この目盛りは、音源のいちばん低い倍音を0 dBにそろえた<strong>相対値</strong>。実際に再生される音には、ほかの音量調整（一定の倍率）や、始まり・終わりのフェードも加わるので、音の大きさそのものではないよ。−60 dBより小さい部分は描いていません。</p>
+      </div>
+
+      <div class="spectrum-predict learning-only" id="spectrumPrediction">
+        <p><strong>🔎 予想してから確かめよう</strong></p>
+        <ol>
+          <li>母音を「あ」にして、F1とF2のあいだの谷を見よう。次に「い」に変えたら、この谷は<strong>深くなる？ 浅くなる？</strong>（英語の /ɑ/ と /i/ でも試せるよ）</li>
+          <li>「F1・F2・F3の内訳を重ねる」をONにする前に予想しよう。F1とF2のあいだの深い谷は、どの線とどの線が<strong>交わる近く</strong>にできるかな？</li>
+        </ol>
+        <details class="spectrum-answer">
+          <summary>答え合わせ</summary>
+          <p>1. 「い」のほうがずっと深くなる。「い」はF1とF2が大きく離れていて、そのあいだでは両方のフィルターがもともと弱いうえに、出てくる波の向きがほぼ正反対になるからだよ（下の「レモン形の谷」の説明も読んでね）。</p>
+          <p>2. F1（長い破線）とF2（一点鎖線）が交わる近く。2つの強さが同じくらいで向きが逆だと、足したときにいちばん打ち消し合うんだ。</p>
+          <p class="spectrum-note">もっと試すなら：帯域幅モードを「Manual Q」にして、Qを小さくすると谷はどうなるかな？</p>
+        </details>
+      </div>
+
+      <details class="spectrum-model-details learning-only" id="spectrumLearningExplanation">
+        <summary>🛝 フォルマントのあいだの深い谷（「レモン形の谷」）はどうしてできるの？</summary>
+        <div class="spectrum-model-body">
+          <p>橙色の線が、山と山のあいだで両側からすぼまるように深く落ちこむところを、この解説では<strong>「レモン形の谷」</strong>と呼ぶよ（とがった先がレモンのはしに似ているから）。</p>
+          <ol>
+            <li>ブランコには、自然にゆれやすい速さがあるね。F1・F2・F3のフィルターにも、それぞれ通しやすい周波数（中心周波数）がある。</li>
+            <li>ブランコを自然なゆれより<strong>ゆっくり</strong>押すと押す手とそろって動き、<strong>速く</strong>押すと押す手と逆向きに動きやすい。フィルターも同じように、中心より<strong>低い</strong>音と<strong>高い</strong>音とでは、出てくる波のタイミング（<strong>位相</strong>）のずれ方が反対になる。</li>
+            <li>F1とF2のあいだの音は、F1のフィルターにとっては「高い音」、F2のフィルターにとっては「低い音」。だから2つのフィルターから出てくる波は<strong>ほぼ逆向き</strong>になる。</li>
+            <li>このアプリは3つのフィルターの出力を<strong>足し合わせて</strong>音を作る（並列型）。逆向きの波を足すと打ち消し合い、2つの強さが同じくらいの所ではとても小さくなる。これがレモン形の谷だよ。</li>
+          </ol>
+          <p>「F1・F2・F3の内訳を重ねる」をONにすると、3本の線でそれぞれのフィルターの<strong>強さだけ</strong>が見えるよ。橙色は<strong>位相（向き）も考えて足した結果</strong>だから、谷は3本の線のどれよりも深くなることがある。もともと谷のあたりは、どのフィルターも通しにくい周波数でもあるので、谷の深さは「打ち消し合い」と「もともと弱い」の両方で決まるよ。</p>
+          <h3>人の声との関係</h3>
+          <p>このレモン形の深い谷は、<strong>3つのフィルターを並列に足す</strong>というこのアプリの作り方によって強く出る性質だよ。人の声でも、鼻にかかった母音（鼻音化）などでは「反共鳴」とよばれる谷ができることがある。でも、このアプリの深い谷を、一般的な声道の性質と同じものだと考えないでね。自分の声をPraatなどで分析して、谷の形を比べてみるのもおすすめ。</p>
+        </div>
+      </details>
+
+      <details class="spectrum-model-details research-only" id="spectrumResearchSpecification">
+        <summary>合成モデルの数式・係数・再現条件（Research）</summary>
+        <div class="spectrum-model-body">
+          <h3>1. 音源とフィルターの接続</h3>
+          <p>現行の <code>scheduleSynthesis()</code> は、<code>OscillatorNode</code> の <code>sawtooth</code>（基本周波数 F0）を音源とし、ゲイン 0.32 を通して3本の <code>BiquadFilterNode</code>（<code>type = "bandpass"</code>）に<strong>並列</strong>入力する。分岐のゲインは F1 = 1.00、F2 = 0.68、F3 = 0.42。合流後に 0.62 を掛け、さらに時間変化する master gain を掛ける。</p>
+          <pre class="spectrum-math" aria-label="音源から出力への信号経路">sawtooth(F0) → gain 0.32
+             ├→ bandpass F1 → gain 1.00 ┐
+             ├→ bandpass F2 → gain 0.68 ├→ sum × 0.62
+             └→ bandpass F3 → gain 0.42 ┘
+                        → master envelope → output</pre>
+          <h3>2. biquad の係数：W3C bandpass</h3>
+          <p>以下は <code>BiquadFilterNode</code> が従う<strong>規範的なフィルター特性</strong>の係数であり、独自に設計した別のフィルターではない。<code>f_c</code> はその分岐の中心周波数（F1/F2/F3）、<code>F_s</code> は AudioContext のサンプリング周波数、<code>Q</code> はフィルターのQ値。</p>
+          <pre class="spectrum-math" aria-label="バンドパスの中心角周波数と係数">ω₀ = 2π f_c / F_s
+α  = sin(ω₀) / (2Q)
+
+b₀ =  α        b₁ = 0          b₂ = -α
+a₀ = 1 + α     a₁ = -2 cos ω₀  a₂ = 1 - α</pre>
+          <h3>3. 入出力の差分方程式</h3>
+          <p><code>x[n]</code> が入力、<code>y[n]</code> が出力、<code>n</code> がサンプル番号。過去2サンプル分の入力と出力が今の出力に関与する。</p>
+          <pre class="spectrum-math" aria-label="二次IIRフィルターの差分方程式">a₀ y[n] + a₁ y[n-1] + a₂ y[n-2]
+  = b₀ x[n] + b₁ x[n-1] + b₂ x[n-2]
+
+y[n] = (b₀x[n] + b₁x[n-1] + b₂x[n-2]
+        - a₁y[n-1] - a₂y[n-2]) / a₀</pre>
+          <h3>4. 3分岐の複素伝達関数</h3>
+          <p>各分岐の伝達関数は分子・分母に上の係数を使う。周波数応答の<strong>複素数</strong>を足すため、位相の干渉によって深い谷が生じうる。</p>
+          <pre class="spectrum-math" aria-label="並列フィルターの合成伝達関数">Hₖ(z) = (b₀ + b₁z⁻¹ + b₂z⁻²)
+        / (a₀ + a₁z⁻¹ + a₂z⁻²)
+
+H_sum(z) = 0.62 × [1.00H₁(z)
+                 + 0.68H₂(z) + 0.42H₃(z)]
+
+固定パラメータ時の合成器本体:
+H_source→sum(z) = 0.32 × H_sum(z)</pre>
+          <p>橙色の線は <code>20 log10(|H_sum(e^(jω))|)</code> を示す。各分岐の薄い破線は <code>20 log10(|0.62 × gₖ × Hₖ(e^(jω))|)</code> を示す。各分岐の<strong>振幅だけを足した曲線ではない</strong>。</p>
+          <h3>5. 表示の正規化（青・緑・橙の関係）</h3>
+          <pre class="spectrum-math" aria-label="倍音レベルの表示式">ω_k = 2π k F0 / F_s
+      (k = 1, 2, … ;  k F0 ≤ maxHz)
+L_src(k) = −20 log10(k)  [dB re 第1倍音]
+L_out(k) = L_src(k)
+         + 20 log10|H_sum(e^(jω_k))|</pre>
+          <p>音源レベルはのこぎり波の倍音振幅比 1/k による（2026-10-28、Chromium で合成音の定常部をDFTし、表示値と0.01 dB以内で一致することを確認）。共通の定数倍 <code>20 log10(0.32 × 0.75) ≈ −12.4 dB</code>（source gain × master 持続部）と attack/release のエンベロープは表示から除いている。したがって緑の高さは同じ周波数で青と橙の dB 和に等しいが、出力の絶対レベル（dBFS）ではない。表示範囲は −60〜+3 dB で、−60 dB 未満は描画しない。</p>
+          <h3>6. 並列構成による谷と反共鳴</h3>
+          <p>3分岐を同符号で加算するため、隣接する中心周波数 f_k &lt; f_(k+1) のあいだでは、分岐 k の位相は −90°、分岐 k+1 の位相は +90° に近づく。両者の振幅が近い周波数で <code>H_sum</code> は深い極小（零点に近い谷）をとる。全極（カスケード）型の声道モデルは z = 0 以外に零点をもたないため、この谷はモデル構成に由来する。一方、実音声でも鼻腔との結合などにより反共鳴（零点）は生じうる。したがって要点は谷の有無ではなく、本アプリの並列構成による深い谷を、口母音の一般的な声道特性と同一視しないことである。</p>
+          <h3>7. Q・時間変化と表示上の限界</h3>
+          <p><strong>Manual Q</strong> では各分岐のQをスライダーの値に設定。<strong>Empirical bandwidth</strong> ではアプリに収録した帯域幅 B と対応する中心周波数から <code>Q = clamp(f_c / B, 0.2, 80)</code> を計算する。実際の合成処理は、F1〜F3の描画軌跡を平滑化し、<strong>220区間</strong>の <code>linearRampToValueAtTime</code> でフィルター中心周波数とQを時間変化させる。中心周波数は <code>80 Hz</code> 以上、<code>min(maxHz, F_s/2 - 200 Hz)</code> 以下に制限する。グラフの計算はこの周波数制限を適用していないため、80 Hz 未満を描いた場合のみ合成音と差が生じうる。</p>
+          <p>master gain は冒頭と末尾で指数変化し、持続部は <code>0.75</code>。この時変系を単一の時間不変伝達関数で完全に記述することはできない。「音のX線」は選択時刻のパラメータを固定した<strong>定常近似</strong>であり、過渡応答・attack/release・実録音・声道の物理形状を直接示すものではない。再生していないときのグラフ計算は <code>F_s = 48000 Hz</code> を仮定し、再生中は AudioContext の値を使用するため、実環境で差が生じうる。</p>
+          <p class="spectrum-note">出典：<a href="https://www.w3.org/TR/webaudio/#BiquadFilterNode" target="_blank" rel="noopener noreferrer">W3C Web Audio API — BiquadFilterNode</a>。実装：<a href="https://github.com/daddyboubakiki-stack/FormantCanvas/blob/main/index.html" target="_blank" rel="noopener noreferrer">scheduleSynthesis / spectrumBandpassResponse（GitHub）</a>。ここに記した係数はWeb Audioの定義、固定ゲイン・接続・更新方法は本アプリの実装に対応する。</p>
+        </div>
+      </details>
+    </div>
+  </details>
 
   <section class="beginner-compare" id="beginnerCompareWrap" hidden aria-label="同じ母音のくらべ聴き">
     <div class="compare-launch">
@@ -1665,6 +1853,201 @@
     hint.classList.toggle('is-visible',empty);
   }
 
+
+  // Spectrum X-ray: a read-only view of the existing oscillator and parallel biquad model.
+  // Does not change synthesis, trajectories, literature-derived values, or exported audio.
+  const spectrumLab = document.getElementById('spectrumLab');
+  const spectrumPlot = document.getElementById('spectrumPlot');
+  const spectrumTime = document.getElementById('spectrumTime');
+  const spectrumTimeValue = document.getElementById('spectrumTimeValue');
+  const spectrumValues = document.getElementById('spectrumValues');
+  const spectrumComponentLegend = document.getElementById('spectrumComponentLegend');
+  const spectrumBreakdownNote = document.getElementById('spectrumBreakdownNote');
+  const spectrumLayers = {
+    source: document.getElementById('spectrumLayerSource'),
+    filter: document.getElementById('spectrumLayerFilter'),
+    output: document.getElementById('spectrumLayerOutput'),
+    components: document.getElementById('spectrumLayerComponents')
+  };
+  let spectrumLastFrame = 0;
+
+  // The Web Audio bandpass coefficients (constant 0 dB peak gain) from W3C Web Audio API.
+  // Returns the *complex* response, so parallel filters sum with their phases preserved.
+  function spectrumBandpassResponse(freq,center,q,sampleRate){
+    const w0=2*Math.PI*center/sampleRate;
+    const alpha=Math.sin(w0)/(2*Math.max(0.001,q));
+    const c0=Math.cos(w0);
+    const w=2*Math.PI*freq/sampleRate;
+    const c=Math.cos(w), s=Math.sin(w), c2=Math.cos(2*w), s2=Math.sin(2*w);
+    const nr=alpha*(1-c2), ni=alpha*s2;
+    const dr=(1+alpha)-2*c0*c+(1-alpha)*c2;
+    const di=2*c0*s-(1-alpha)*s2;
+    const den=dr*dr+di*di;
+    if(den<1e-24) return {re:0,im:0};
+    return {re:(nr*dr+ni*di)/den, im:(ni*dr-nr*di)/den};
+  }
+  function spectrumParallelResponse(freq,definitions,sampleRate){
+    let re=0,im=0;
+    for(const def of definitions){
+      const h=spectrumBandpassResponse(freq,def.hz,def.q,sampleRate);
+      re+=def.gain*h.re;
+      im+=def.gain*h.im;
+    }
+    // Matches scheduleSynthesis: sum.gain=0.62 and branch gains 1, .68, .42.
+    return Math.hypot(re,im)*0.62;
+  }
+  // One parallel branch, including its gain and the shared summing gain.
+  // Its magnitude is shown on the same dB reference as the combined response.
+  function spectrumComponentResponse(freq,def,sampleRate){
+    const h=spectrumBandpassResponse(freq,def.hz,def.q,sampleRate);
+    return Math.hypot(h.re,h.im)*def.gain*0.62;
+  }
+  function spectrumDefinitionsAt(t){
+    const index=Math.min(220,Math.max(0,t/Math.max(0.001,duration())*220));
+    return [['F1',1],['F2',0.68],['F3',0.42]].map(([name,gain])=>{
+      // Reuse the exact 220-point smoothing strategy used when scheduling audio.
+      const samples=smoothSamples(name,220);
+      const a=Math.floor(index), b=Math.min(220,a+1);
+      const hz=(samples[a]==null||samples[b]==null) ? null : samples[a]+(samples[b]-samples[a])*(index-a);
+      const q=usingEmpiricalBandwidth() ? qAt(name,t) : Math.max(1,Number(qEl.value));
+      return {name,gain,hz,q};
+    });
+  }
+  function renderSpectrumLab(){
+    if(!spectrumLab || !spectrumLab.open || uiMode==='casual') return;
+    const playback=playCursorT!=null;
+    if(playback && performance.now()-spectrumLastFrame<65) return;
+    spectrumLastFrame=performance.now();
+    const frac=Number(spectrumTime.value)/100;
+    const t=playback?clamp(playCursorT,0,duration()):duration()*frac;
+    if(playback) spectrumTime.value=String(Math.round(t/duration()*100));
+    spectrumTimeValue.textContent=t.toFixed(2)+' s';
+    spectrumTime.setAttribute('aria-valuetext',t.toFixed(2)+'秒');
+    spectrumComponentLegend.hidden=!spectrumLayers.components.checked;
+    spectrumBreakdownNote.hidden=!spectrumLayers.components.checked;
+    const defs=spectrumDefinitionsAt(t);
+    const valid=defs.every(v=>Number.isFinite(v.hz));
+    spectrumValues.textContent=valid
+      ? 'F0 '+Math.round(Number(f0El.value))+' Hz · '+defs.map(v=>v.name+' '+Math.round(v.hz)+' Hz').join(' · ')
+      : 'F1・F2・F3の軌跡を描くか、母音プリセットを選んでね。';
+    const canvas=spectrumPlot;
+    const rect=canvas.getBoundingClientRect();
+    const width=Math.max(1,Math.round(rect.width||320));
+    const height=Math.max(1,Math.round(rect.height||258));
+    const pixelRatio=Math.min(2,window.devicePixelRatio||1);
+    const cw=Math.round(width*pixelRatio),ch=Math.round(height*pixelRatio);
+    if(canvas.width!==cw || canvas.height!==ch){canvas.width=cw;canvas.height=ch;}
+    const ctx=canvas.getContext('2d');
+    if(!ctx) return;
+    ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+    ctx.clearRect(0,0,width,height);
+    const left=width<390?39:46,top=32,right=10,bottom=35;
+    const pw=Math.max(1,width-left-right),ph=Math.max(1,height-top-bottom);
+    const limit=maxHz();
+    const x=f=>left+f/limit*pw;
+    const y=db=>top+(3-clamp(db,-60,3))/63*ph;
+    const dB=amp=>20*Math.log10(Math.max(1e-8,amp));
+    ctx.font='11px system-ui, sans-serif';
+    ctx.textBaseline='middle';
+    for(const db of [-60,-40,-20,0]){
+      ctx.strokeStyle='#e8ebf1';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+      ctx.beginPath();ctx.moveTo(left,y(db));ctx.lineTo(width-right,y(db));ctx.stroke();
+      ctx.fillStyle='#596579';ctx.textAlign='right';ctx.fillText(String(db),left-6,y(db));
+    }
+    ctx.setLineDash([]);
+    const step=width<470?1000:500;
+    ctx.textAlign='center';ctx.fillStyle='#596579';
+    for(let hz=0;hz<=limit;hz+=step){
+      ctx.fillText(hz>=1000?String(hz/1000)+'k':String(hz),x(hz),height-21);
+    }
+    ctx.textAlign='left';ctx.font='10px system-ui, sans-serif';
+    ctx.fillText('相対レベル (dB)',left,13);
+    ctx.textAlign='right';ctx.fillText('周波数 (Hz)',width-right,height-8);
+
+    if(!valid){
+      canvas.setAttribute('aria-label','スペクトル図：F1・F2・F3の軌跡がまだないため、グラフは空です。');
+      return;
+    }
+    const sampleRate=audio?.ctx?.sampleRate || 48000;
+    const harmonics=[];
+    const f0=Number(f0El.value);
+    for(let n=1;n*f0<=limit;n++){
+      const hz=n*f0,sourceDb=-20*Math.log10(n);
+      harmonics.push({hz,n,sourceDb,outputDb:sourceDb+dB(spectrumParallelResponse(hz,defs,sampleRate))});
+    }
+    if(spectrumLayers.source.checked){
+      ctx.strokeStyle='#3175b8';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);
+      for(const h of harmonics){
+        ctx.beginPath();ctx.moveTo(x(h.hz),y(-60));ctx.lineTo(x(h.hz),y(h.sourceDb));ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
+    if(spectrumLayers.components.checked){
+      // Solid colours keep >=3:1 contrast; the dash pattern, not hue alone, identifies each formant.
+      const shades={F1:'#b94e68',F2:'#4178be',F3:'#7859ad'};
+      const dashes={F1:[10,4],F2:[8,3,2,3],F3:[0.1,4.5]};
+      ctx.lineWidth=1.6;
+      for(const def of defs){
+        ctx.strokeStyle=shades[def.name];ctx.setLineDash(dashes[def.name]);ctx.lineCap=def.name==='F3'?'round':'butt';
+        ctx.beginPath();
+        const steps=Math.max(120,Math.ceil(pw));
+        for(let i=0;i<=steps;i++){
+          const freq=limit*i/steps;
+          const xx=x(freq),yy=y(dB(spectrumComponentResponse(freq,def,sampleRate)));
+          if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+        }
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);ctx.lineCap='butt';
+    }
+    if(spectrumLayers.filter.checked){
+      ctx.strokeStyle='rgba(173,118,27,.27)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      for(const def of defs){
+        ctx.beginPath();ctx.moveTo(x(def.hz),top+14);ctx.lineTo(x(def.hz),y(-60));ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.strokeStyle='#ad761b';ctx.lineWidth=2.6;
+      ctx.beginPath();
+      for(let i=0;i<=Math.max(120,Math.ceil(pw));i++){
+        const freq=limit*i/Math.max(120,Math.ceil(pw));
+        const xx=x(freq),yy=y(dB(spectrumParallelResponse(freq,defs,sampleRate)));
+        if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+      }
+      ctx.stroke();
+      ctx.font='bold 10px system-ui, sans-serif';ctx.textAlign='center';ctx.fillStyle='#865a16';
+      for(const def of defs) ctx.fillText(def.name,x(def.hz),top+8);
+    }
+    if(spectrumLayers.output.checked){
+      ctx.strokeStyle='#137b68';ctx.lineWidth=2.9;ctx.setLineDash([]);
+      for(const h of harmonics){
+        ctx.beginPath();ctx.moveTo(x(h.hz),y(-60));ctx.lineTo(x(h.hz),y(h.outputDb));ctx.stroke();
+      }
+    }
+    // Text alternative: the features a sighted learner reads from the plot (valleys, strongest output harmonic).
+    const valleys=[];
+    for(let k=0;k<defs.length-1;k++){
+      const lo=Math.min(defs[k].hz,defs[k+1].hz),hi=Math.max(defs[k].hz,defs[k+1].hz);
+      let best=null;
+      for(let i=1;i<200;i++){
+        const freq=lo+(hi-lo)*i/200;
+        const level=dB(spectrumParallelResponse(freq,defs,sampleRate));
+        if(!best || level<best.level) best={freq,level};
+      }
+      if(best) valleys.push(defs[k].name+'と'+defs[k+1].name+'のあいだ 約'+Math.round(best.freq)+' Hz（'+Math.round(best.level)+' dB）');
+    }
+    const strongest=harmonics.reduce((a,h)=>(!a || h.outputDb>a.outputDb)?h:a,null);
+    const shown=[['source','音源の倍音'],['filter','合成フィルター特性'],['output','合成後の倍音'],['components','F1・F2・F3の内訳']]
+      .filter(([key])=>spectrumLayers[key].checked).map(([,label])=>label);
+    canvas.setAttribute('aria-label','スペクトル図（'+t.toFixed(2)+'秒時点）。F0 '+Math.round(f0)+' Hz、'+defs.map(d=>d.name+' '+Math.round(d.hz)+' Hz').join('、')+'。'
+      +'合成フィルター特性の深い谷：'+valleys.join('、')+'。'
+      +(strongest?'合成後にいちばん強い倍音：第'+strongest.n+'倍音（'+Math.round(strongest.hz)+' Hz）。':'')
+      +'表示中：'+(shown.length?shown.join('・'):'なし')+'。');
+  }
+  spectrumLab.addEventListener('toggle',()=>requestAnimationFrame(renderSpectrumLab));
+  spectrumTime.addEventListener('input',renderSpectrumLab);
+  Object.values(spectrumLayers).forEach(box=>box.addEventListener('change',renderSpectrumLab));
+  if(window.ResizeObserver) new ResizeObserver(()=>requestAnimationFrame(renderSpectrumLab)).observe(spectrumPlot.parentElement);
+
   function render(){
     updateCanvasEmptyHint();
     drawGrid();
@@ -1679,6 +2062,7 @@
     if(showEvidence && !presetDirty) drawEvidenceModeledPaths(false);
     drawEvidenceMarkers();
     drawCursor();
+    renderSpectrumLab();
   }
 
   function getEventClientPoint(e){

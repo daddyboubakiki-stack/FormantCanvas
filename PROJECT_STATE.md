@@ -204,3 +204,54 @@ PRのmerge・close・force update、既存branchへの書き込み・削除は�
 
 - 本番originを管理設定と未認証画面で確定し、作品集/README/SEOの一致を別作業で整える。
 - 研究系PR #2/#4と独立ベロちゃん移行に関係するPR #5を個別に根拠監査する。
+
+
+---
+
+## 2026-10-28 — Spectrum X-ray layer preview (feature branch only)
+
+- Branch: feat/spectrum-layer-xray-20261028 (not merged to main).
+- Scope: a collapsible Learning/Research spectrum inspector underneath the existing F1/F2/F3 trajectory workspace.
+- User goal: overlay three independently togglable layers on the same frequency axis: input source harmonics, summed parallel-filter response, and modeled post-filter output harmonics.
+- Initial state: source hidden, filter + output visible. A time scrubber selects a snapshot of the current trajectory; while playing, the display follows the playback cursor.
+- Visual design: restrained warm panel, line-style/width cues beyond color, native keyboard-operable checkboxes, mobile width rules, no autoplay or extra sound.
+- Technical model: sawtooth input at existing F0; 3 parallel Web Audio bandpass responses with their existing gains (F1 1, F2 .68, F3 .42; sum .62). Complex responses are summed to retain phase, based on standard BiquadFilterNode coefficients. The view is a steady-state approximation; attack/release envelope and time-varying transient response are explicitly excluded.
+- Protected research trajectories, cited values, evidence labels and the audio-generation/export implementation are unmodified.
+- Static QA: all embedded script blocks compile; markup/UI hookups and source-preservation reconstruction pass.
+- Mock-functional QA: 14 assertions pass in tests/spectrum-layer.test.cjs (math, controls, readouts, canvas render).
+- Remaining: real browser/UI/keyboard/screen-reader QA, mobile width, actual listening comparison and production preview verification. Do not merge or publicly deploy without user approval.
+- Next: inspect the Draft PR diff and any CI/preview evidence, then ask the owner to review visual accuracy and mobile layout.
+
+
+### 2026-10-28 follow-up — individual F1/F2/F3 filter response overlays
+
+- On the existing Draft PR #25, add the optional “F1・F2・F3の内訳を重ねる” toggle (OFF by default) inside the Spectrum X-ray panel.
+- Plot three thin semi-transparent dashed curves: F1 rose, F2 blue, F3 violet, matching the existing track-color semantics; show a compact legend only when enabled.
+- Each separate curve is the magnitude of that bandpass branch including its gain and the 0.62 common summing gain. This uses the same complex-response helper as the orange summed response; therefore the component magnitudes do **not** sum arithmetically into the orange curve.
+- Keep the orange combined response, the blue input harmonics, the green output harmonics, audio synthesis, existing formant trajectories, evidence labels, and all protected research values unchanged.
+- Static JS syntax and synthetic canvas/visibility tests passed (27 assertions, including branch gains and three individual colored curves).
+- Outstanding: visually inspect the refreshed Netlify PR preview on mobile, confirm native checkbox interaction and line visibility, and complete accessibility QA before owner-approved merge. No production release.
+
+
+### 2026-10-28 follow-up — mode-specific explanation and verifiable filter equations
+
+- Learning: add a compact expandable "why lemon-shaped valleys?" explanation below the X-ray controls. It connects previous input/output state to phase shifts and complex summation, with the caveat that not every dip comes solely from cancellation.
+- Research: add an expandable signal-flow technical specification below the X-ray plot. It includes the W3C Web Audio bandpass coefficient definitions (ω₀, α, b₀–b₂, a₀–a₂), the sample-domain biquad recurrence, the complex transfer functions for three parallel branches, the actual existing gains (source 0.32; branches 1.00/0.68/0.42; sum 0.62), Q selection, 220-step smoothing/automation, frequency clamping, master envelope and declared limitations.
+- Key scientific distinction: coefficients come from the normative Web Audio API implementation contract, while fixed gains, branch topology, sample-rate fallback for the visualization and parameter automation are specific to Formantasia. Frozen-time response is an approximation, not a complete transfer function of time-varying synthesis.
+- Placement: inside the existing Learning/Research Spectrum X-ray panel. Both sections closed by default; Casual mode and synthesizer playback/export unchanged.
+- Verified: reconstructing the original HTML with only additive CSS/markup changes; all 3 executable scripts compile; existing X-ray mock math/render tests plus documentation-versus-synthesis static invariants, 45 assertions pass.
+- Remaining: actual smartphone 390px visual and accessibility QA, deploy-preview interaction and checking that math blocks are readable. Do not merge/main or release without user review.
+
+
+### 2026-10-28 follow-up — review fixes (P0 + pre-release P1)
+
+- Source: Claude Code review of PR #25 and the owner's follow-up instructions (P0 and pre-release P1 only; P2 left as proposals; no merge or production deploy).
+- Wording: the orange layer is now "合成フィルター特性" (synthesis filter), not "共鳴特性". The Learning note defines the "レモン形の谷" (the sharp valley between two peaks) and explains it with a phase-flip analogy. It does **not** say real voices lack valleys: anti-resonances can occur (e.g. nasalisation); the point is not to equate this app's parallel-filter valley with general vocal-tract properties.
+- Analogy limit (design note): the swing has one resonance, and its displacement phase (0°/180°) does not equal the band-pass output phase (+90°/−90°); only "the relation flips across the centre frequency" carries over.
+- Learning adds a reading guide (green = blue + orange in dB, on the normalised relative scale; real playback adds a constant gain and fades) and two predict-then-check questions with hidden answers. The answer to "/a/ vs /i/: which F1–F2 valley is deeper?" was checked to be /i/ for all six ja/en voice groups, both bandwidth modes, five time points and Q = 2/25 (/a/ 2–39 dB, /i/ 22–67 dB depending on Q; 12–24 vs 46–51 dB at the defaults).
+- Research adds the plotted-level formulas (L_out = L_src + 20 log10|H_sum|, omitted constant 20 log10(0.32 × 0.75) ≈ −12.4 dB, −60 dB floor), the origin of the parallel-model valley versus anti-resonances, and notes that the graph does not apply the synth's 80 Hz frequency clamp. Implementation link now points to main.
+- Accessibility: unchecked layer labels no longer fade below text contrast; F1/F2/F3 component curves are solid colours (≥4.5:1) with distinct dash patterns (long dash / dash-dot / dots) and an SVG legend; the time slider is named by its visible label, has aria-valuetext in seconds and a 24 px target; the canvas text alternative reports the valleys, the strongest output harmonic and visible layers, and no longer goes stale when trajectories are missing.
+- CI: `.github/workflows/spectrum-layer-test.yml` runs `node tests/spectrum-layer.test.cjs` on every PR and on pushes to main. The test also parses every inline script.
+- Unchanged: `scheduleSynthesis`, WAV export, research trajectories, bandwidth data, citations and evidence labels. Check: the 75 presets render identically to main; WAV samples for 40 presets differ from main by at most 1 LSB, which is the same as main-vs-main run-to-run variation in Chromium's offline rendering (WAV bytes are not reproducible run to run, so byte-hash comparison is not a valid regression check).
+- Remaining: real-device mobile check, VoiceOver/NVDA, Safari/Firefox, Netlify preview (login-protected). The signal-flow diagram block still scrolls horizontally by ~26 px at 390 px width.
+- Proposals, not implemented: P2 items (restore observation time after playback, mark harmonics below −60 dB, apply the 80 Hz clamp in the graph, harmonic table) and a cascade/all-pole model comparison, which would change synthesis and therefore needs a separate owner-approved task.
