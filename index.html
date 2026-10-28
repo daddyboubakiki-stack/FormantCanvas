@@ -544,6 +544,43 @@
     margin:8px 0 0;
   }
 
+
+  /* The X-ray view belongs to Learning/Research; the drawing canvas stays the hero. */
+  .spectrum-lab { margin:12px 0 0; padding:0 16px; background:#fffcf7; border:1px solid #e5ddcf; border-radius:17px; }
+  .spectrum-lab > summary { cursor:pointer; padding:14px 0; font-size:14px; font-weight:800; color:var(--text); }
+  .spectrum-lab > summary:focus-visible { outline:3px solid #3b82c4; outline-offset:4px; border-radius:4px; }
+  .spectrum-lab > summary .spectrum-summary-sub { margin-left:8px; font-size:12px; font-weight:500; color:#667085; }
+  .spectrum-lab-body { padding:0 0 16px; }
+  .spectrum-intro, .spectrum-caption { margin:3px 0 10px; color:#576273; font-size:12px; line-height:1.65; }
+  .spectrum-toggles { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:9px 0 11px; }
+  .spectrum-toggle { display:inline-flex; gap:7px; align-items:center; padding:8px 11px; border:1px solid #d6dce6; border-radius:999px; background:white; font-size:12px; font-weight:700; cursor:pointer; color:#26334c; }
+  .spectrum-toggle:has(input:not(:checked)) { opacity:.6; }
+  .spectrum-toggle:focus-within { outline:2px solid #3b82c4; outline-offset:2px; }
+  .spectrum-toggle input { width:16px; height:16px; margin:0; }
+  #spectrumLayerSource { accent-color:#3175b8; }
+  #spectrumLayerFilter { accent-color:#ad761b; }
+  #spectrumLayerOutput { accent-color:#137b68; }
+  .spectrum-swatch { display:inline-block; width:17px; height:0; border-top:3px solid; }
+  .spectrum-swatch.source { border-top:2px dashed #3175b8; }
+  .spectrum-swatch.filter { border-top-color:#ad761b; }
+  .spectrum-swatch.output { border-top-color:#137b68; }
+  .spectrum-plot-wrap { background:white; border:1px solid #e4e7ed; border-radius:12px; overflow:hidden; }
+  canvas.spectrum-plot { display:block; position:static; inset:auto; width:100%; height:258px; touch-action:pan-y; }
+  .spectrum-time-control { display:flex; align-items:center; gap:11px; margin-top:11px; font-size:12px; font-weight:700; color:#34425b; }
+  .spectrum-time-control label { flex:0 0 auto; }
+  .spectrum-time-control input { flex:1; min-width:48px; accent-color:#6677ac; }
+  .spectrum-time-control output { flex:0 0 51px; text-align:right; font-variant-numeric:tabular-nums; }
+  .spectrum-values { margin:8px 0 0; font-size:12px; line-height:1.6; color:#34425b; font-variant-numeric:tabular-nums; }
+  .spectrum-caption { margin:9px 0 0; }
+  @media (max-width:600px) {
+    .spectrum-lab { padding:0 10px; }
+    .spectrum-lab > summary { font-size:13px; }
+    .spectrum-lab > summary .spectrum-summary-sub { display:block; margin:3px 0 0 19px; font-size:11px; }
+    .spectrum-toggles { gap:5px; }
+    .spectrum-toggle { padding:8px 7px; font-size:11px; gap:5px; }
+    canvas.spectrum-plot { height:235px; }
+  }
+
 </style>
 </head>
 <body data-ui-mode="casual">
@@ -632,6 +669,29 @@
     </div>
   </div>
   </section>
+
+
+  <details id="spectrumLab" class="spectrum-lab learning-plus">
+    <summary>🔬 音のX線 <span class="spectrum-summary-sub">音源・共鳴・合成結果を重ねて観察</span></summary>
+    <div class="spectrum-lab-body">
+      <p class="spectrum-intro">同じ周波数軸で、倍音の位置とフィルターの働きをくらべよう。レイヤーは自由に切り替えられるよ。</p>
+      <div class="spectrum-toggles" role="group" aria-label="グラフの表示・非表示">
+        <label class="spectrum-toggle"><input id="spectrumLayerSource" type="checkbox" aria-controls="spectrumPlot" /><i class="spectrum-swatch source" aria-hidden="true"></i>音源の倍音</label>
+        <label class="spectrum-toggle"><input id="spectrumLayerFilter" type="checkbox" aria-controls="spectrumPlot" checked /><i class="spectrum-swatch filter" aria-hidden="true"></i>共鳴特性</label>
+        <label class="spectrum-toggle"><input id="spectrumLayerOutput" type="checkbox" aria-controls="spectrumPlot" checked /><i class="spectrum-swatch output" aria-hidden="true"></i>合成後の倍音</label>
+      </div>
+      <div class="spectrum-plot-wrap">
+        <canvas id="spectrumPlot" class="spectrum-plot" role="img" aria-label="音源・共鳴特性・合成後の倍音を比較するスペクトル図"></canvas>
+      </div>
+      <div class="spectrum-time-control">
+        <label for="spectrumTime">観察する時刻</label>
+        <input id="spectrumTime" type="range" min="0" max="100" step="1" value="50" aria-label="スペクトルを観察する時間位置" />
+        <output id="spectrumTimeValue" for="spectrumTime">0.30 s</output>
+      </div>
+      <p class="spectrum-values" id="spectrumValues" aria-live="off">母音プリセットを選ぶか、F1〜F3を描いてみよう。</p>
+      <p class="spectrum-caption">計算による定常スペクトルの近似です（実測音声ではありません）。合成器と同じ3本の並列バンドパス応答を使い、音量エンベロープと時間変化中の過渡応答を省いています。縦軸は音源の第1倍音を0 dBとした相対値です。</p>
+    </div>
+  </details>
 
   <section class="beginner-compare" id="beginnerCompareWrap" hidden aria-label="同じ母音のくらべ聴き">
     <div class="compare-launch">
@@ -1665,6 +1725,150 @@
     hint.classList.toggle('is-visible',empty);
   }
 
+
+  // Spectrum X-ray: a read-only view of the existing oscillator and parallel biquad model.
+  // Does not change synthesis, trajectories, literature-derived values, or exported audio.
+  const spectrumLab = document.getElementById('spectrumLab');
+  const spectrumPlot = document.getElementById('spectrumPlot');
+  const spectrumTime = document.getElementById('spectrumTime');
+  const spectrumTimeValue = document.getElementById('spectrumTimeValue');
+  const spectrumValues = document.getElementById('spectrumValues');
+  const spectrumLayers = {
+    source: document.getElementById('spectrumLayerSource'),
+    filter: document.getElementById('spectrumLayerFilter'),
+    output: document.getElementById('spectrumLayerOutput')
+  };
+  let spectrumLastFrame = 0;
+
+  // The Web Audio bandpass coefficients (constant 0 dB peak gain) from W3C Web Audio API.
+  // Returns the *complex* response, so parallel filters sum with their phases preserved.
+  function spectrumBandpassResponse(freq,center,q,sampleRate){
+    const w0=2*Math.PI*center/sampleRate;
+    const alpha=Math.sin(w0)/(2*Math.max(0.001,q));
+    const c0=Math.cos(w0);
+    const w=2*Math.PI*freq/sampleRate;
+    const c=Math.cos(w), s=Math.sin(w), c2=Math.cos(2*w), s2=Math.sin(2*w);
+    const nr=alpha*(1-c2), ni=alpha*s2;
+    const dr=(1+alpha)-2*c0*c+(1-alpha)*c2;
+    const di=2*c0*s-(1-alpha)*s2;
+    const den=dr*dr+di*di;
+    if(den<1e-24) return {re:0,im:0};
+    return {re:(nr*dr+ni*di)/den, im:(ni*dr-nr*di)/den};
+  }
+  function spectrumParallelResponse(freq,definitions,sampleRate){
+    let re=0,im=0;
+    for(const def of definitions){
+      const h=spectrumBandpassResponse(freq,def.hz,def.q,sampleRate);
+      re+=def.gain*h.re;
+      im+=def.gain*h.im;
+    }
+    // Matches scheduleSynthesis: sum.gain=0.62 and branch gains 1, .68, .42.
+    return Math.hypot(re,im)*0.62;
+  }
+  function spectrumDefinitionsAt(t){
+    const index=Math.min(220,Math.max(0,t/Math.max(0.001,duration())*220));
+    return [['F1',1],['F2',0.68],['F3',0.42]].map(([name,gain])=>{
+      // Reuse the exact 220-point smoothing strategy used when scheduling audio.
+      const samples=smoothSamples(name,220);
+      const a=Math.floor(index), b=Math.min(220,a+1);
+      const hz=(samples[a]==null||samples[b]==null) ? null : samples[a]+(samples[b]-samples[a])*(index-a);
+      const q=usingEmpiricalBandwidth() ? qAt(name,t) : Math.max(1,Number(qEl.value));
+      return {name,gain,hz,q};
+    });
+  }
+  function renderSpectrumLab(){
+    if(!spectrumLab || !spectrumLab.open || uiMode==='casual') return;
+    const playback=playCursorT!=null;
+    if(playback && performance.now()-spectrumLastFrame<65) return;
+    spectrumLastFrame=performance.now();
+    const frac=Number(spectrumTime.value)/100;
+    const t=playback?clamp(playCursorT,0,duration()):duration()*frac;
+    if(playback) spectrumTime.value=String(Math.round(t/duration()*100));
+    spectrumTimeValue.textContent=t.toFixed(2)+' s';
+    const defs=spectrumDefinitionsAt(t);
+    const valid=defs.every(v=>Number.isFinite(v.hz));
+    spectrumValues.textContent=valid
+      ? 'F0 '+Math.round(Number(f0El.value))+' Hz · '+defs.map(v=>v.name+' '+Math.round(v.hz)+' Hz').join(' · ')
+      : 'F1・F2・F3の軌跡を描くか、母音プリセットを選んでね。';
+    const canvas=spectrumPlot;
+    const rect=canvas.getBoundingClientRect();
+    const width=Math.max(1,Math.round(rect.width||320));
+    const height=Math.max(1,Math.round(rect.height||258));
+    const pixelRatio=Math.min(2,window.devicePixelRatio||1);
+    const cw=Math.round(width*pixelRatio),ch=Math.round(height*pixelRatio);
+    if(canvas.width!==cw || canvas.height!==ch){canvas.width=cw;canvas.height=ch;}
+    const ctx=canvas.getContext('2d');
+    if(!ctx) return;
+    ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+    ctx.clearRect(0,0,width,height);
+    const left=width<390?39:46,top=32,right=10,bottom=35;
+    const pw=Math.max(1,width-left-right),ph=Math.max(1,height-top-bottom);
+    const limit=maxHz();
+    const x=f=>left+f/limit*pw;
+    const y=db=>top+(3-clamp(db,-60,3))/63*ph;
+    const dB=amp=>20*Math.log10(Math.max(1e-8,amp));
+    ctx.font='11px system-ui, sans-serif';
+    ctx.textBaseline='middle';
+    for(const db of [-60,-40,-20,0]){
+      ctx.strokeStyle='#e8ebf1';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+      ctx.beginPath();ctx.moveTo(left,y(db));ctx.lineTo(width-right,y(db));ctx.stroke();
+      ctx.fillStyle='#596579';ctx.textAlign='right';ctx.fillText(String(db),left-6,y(db));
+    }
+    ctx.setLineDash([]);
+    const step=width<470?1000:500;
+    ctx.textAlign='center';ctx.fillStyle='#596579';
+    for(let hz=0;hz<=limit;hz+=step){
+      ctx.fillText(hz>=1000?String(hz/1000)+'k':String(hz),x(hz),height-21);
+    }
+    ctx.textAlign='left';ctx.font='10px system-ui, sans-serif';
+    ctx.fillText('相対レベル (dB)',left,13);
+    ctx.textAlign='right';ctx.fillText('周波数 (Hz)',width-right,height-8);
+
+    if(!valid) return;
+    const sampleRate=audio?.ctx?.sampleRate || 48000;
+    const harmonics=[];
+    const f0=Number(f0El.value);
+    for(let n=1;n*f0<=limit;n++){
+      const hz=n*f0,sourceDb=-20*Math.log10(n);
+      harmonics.push({hz,n,sourceDb,outputDb:sourceDb+dB(spectrumParallelResponse(hz,defs,sampleRate))});
+    }
+    if(spectrumLayers.source.checked){
+      ctx.strokeStyle='#3175b8';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);
+      for(const h of harmonics){
+        ctx.beginPath();ctx.moveTo(x(h.hz),y(-60));ctx.lineTo(x(h.hz),y(h.sourceDb));ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
+    if(spectrumLayers.filter.checked){
+      ctx.strokeStyle='rgba(173,118,27,.27)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      for(const def of defs){
+        ctx.beginPath();ctx.moveTo(x(def.hz),top+14);ctx.lineTo(x(def.hz),y(-60));ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.strokeStyle='#ad761b';ctx.lineWidth=2.6;
+      ctx.beginPath();
+      for(let i=0;i<=Math.max(120,Math.ceil(pw));i++){
+        const freq=limit*i/Math.max(120,Math.ceil(pw));
+        const xx=x(freq),yy=y(dB(spectrumParallelResponse(freq,defs,sampleRate)));
+        if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+      }
+      ctx.stroke();
+      ctx.font='bold 10px system-ui, sans-serif';ctx.textAlign='center';ctx.fillStyle='#865a16';
+      for(const def of defs) ctx.fillText(def.name,x(def.hz),top+8);
+    }
+    if(spectrumLayers.output.checked){
+      ctx.strokeStyle='#137b68';ctx.lineWidth=2.9;ctx.setLineDash([]);
+      for(const h of harmonics){
+        ctx.beginPath();ctx.moveTo(x(h.hz),y(-60));ctx.lineTo(x(h.hz),y(h.outputDb));ctx.stroke();
+      }
+    }
+    canvas.setAttribute('aria-label','F0 '+Math.round(f0)+' Hz、'+defs.map(d=>d.name+' '+Math.round(d.hz)+' Hz').join('、')+'。音源・フィルター・出力の相対スペクトル図。');
+  }
+  spectrumLab.addEventListener('toggle',()=>requestAnimationFrame(renderSpectrumLab));
+  spectrumTime.addEventListener('input',renderSpectrumLab);
+  Object.values(spectrumLayers).forEach(box=>box.addEventListener('change',renderSpectrumLab));
+  if(window.ResizeObserver) new ResizeObserver(()=>requestAnimationFrame(renderSpectrumLab)).observe(spectrumPlot.parentElement);
+
   function render(){
     updateCanvasEmptyHint();
     drawGrid();
@@ -1679,6 +1883,7 @@
     if(showEvidence && !presetDirty) drawEvidenceModeledPaths(false);
     drawEvidenceMarkers();
     drawCursor();
+    renderSpectrumLab();
   }
 
   function getEventClientPoint(e){
