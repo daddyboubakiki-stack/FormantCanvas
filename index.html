@@ -566,7 +566,7 @@
   .spectrum-breakdown-toggle input { width:16px; height:16px; margin:0; }
   .spectrum-breakdown-toggle:focus-within { outline:2px solid #3b82c4; outline-offset:2px; }
   .spectrum-component-legend { display:flex; flex-wrap:wrap; gap:8px; font-size:11px; color:#48546a; }
-  .spectrum-component-legend[hidden] { display:none; }
+  .spectrum-component-legend[hidden], .spectrum-caption[hidden] { display:none; }
   .spectrum-component-legend span { display:inline-flex; align-items:center; gap:4px; }
   .spectrum-component-legend i { display:inline-block; width:16px; border-top:2px dashed; }
   .spectrum-component-legend .f1 { border-color:#b94e68; }
@@ -705,7 +705,7 @@
         <output id="spectrumTimeValue" for="spectrumTime">0.30 s</output>
       </div>
       <p class="spectrum-values" id="spectrumValues" aria-live="off">母音プリセットを選ぶか、F1〜F3を描いてみよう。</p>
-      <p class="spectrum-caption">淡い破線はF1・F2・F3の各フィルターの応答（分岐ごとのゲインを反映）。橙色は位相を含めて合成した応答なので、3本の曲線を高さだけ足したものではありません。</p>
+      <p class="spectrum-caption" id="spectrumBreakdownNote" hidden>淡い破線はF1・F2・F3の各フィルターの応答（分岐ごとのゲインを反映）。橙色は位相を含めて合成した応答なので、3本の曲線を高さだけ足したものではありません。</p>
       <p class="spectrum-caption">計算による定常スペクトルの近似です（実測音声ではありません）。合成器と同じ3本の並列バンドパス応答を使い、音量エンベロープと時間変化中の過渡応答を省いています。縦軸は音源の第1倍音を0 dBとした相対値です。</p>
     </div>
   </details>
@@ -1751,6 +1751,7 @@
   const spectrumTimeValue = document.getElementById('spectrumTimeValue');
   const spectrumValues = document.getElementById('spectrumValues');
   const spectrumComponentLegend = document.getElementById('spectrumComponentLegend');
+  const spectrumBreakdownNote = document.getElementById('spectrumBreakdownNote');
   const spectrumLayers = {
     source: document.getElementById('spectrumLayerSource'),
     filter: document.getElementById('spectrumLayerFilter'),
@@ -1811,6 +1812,7 @@
     if(playback) spectrumTime.value=String(Math.round(t/duration()*100));
     spectrumTimeValue.textContent=t.toFixed(2)+' s';
     spectrumComponentLegend.hidden=!spectrumLayers.components.checked;
+    spectrumBreakdownNote.hidden=!spectrumLayers.components.checked;
     const defs=spectrumDefinitionsAt(t);
     const valid=defs.every(v=>Number.isFinite(v.hz));
     spectrumValues.textContent=valid
