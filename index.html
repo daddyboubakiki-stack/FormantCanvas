@@ -560,6 +560,18 @@
   #spectrumLayerSource { accent-color:#3175b8; }
   #spectrumLayerFilter { accent-color:#ad761b; }
   #spectrumLayerOutput { accent-color:#137b68; }
+  #spectrumLayerComponents { accent-color:#78609b; }
+  .spectrum-breakdown { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; margin:-2px 0 11px; }
+  .spectrum-breakdown-toggle { display:inline-flex; align-items:center; gap:7px; padding:7px 10px; border:1px dashed #d6d2df; border-radius:10px; background:#faf9fd; font-size:12px; color:#38405a; font-weight:700; cursor:pointer; }
+  .spectrum-breakdown-toggle input { width:16px; height:16px; margin:0; }
+  .spectrum-breakdown-toggle:focus-within { outline:2px solid #3b82c4; outline-offset:2px; }
+  .spectrum-component-legend { display:flex; flex-wrap:wrap; gap:8px; font-size:11px; color:#48546a; }
+  .spectrum-component-legend[hidden] { display:none; }
+  .spectrum-component-legend span { display:inline-flex; align-items:center; gap:4px; }
+  .spectrum-component-legend i { display:inline-block; width:16px; border-top:2px dashed; }
+  .spectrum-component-legend .f1 { border-color:#b94e68; }
+  .spectrum-component-legend .f2 { border-color:#4178be; }
+  .spectrum-component-legend .f3 { border-color:#7859ad; }
   .spectrum-swatch { display:inline-block; width:17px; height:0; border-top:3px solid; }
   .spectrum-swatch.source { border-top:2px dashed #3175b8; }
   .spectrum-swatch.filter { border-top-color:#ad761b; }
@@ -680,6 +692,10 @@
         <label class="spectrum-toggle"><input id="spectrumLayerFilter" type="checkbox" aria-controls="spectrumPlot" checked /><i class="spectrum-swatch filter" aria-hidden="true"></i>共鳴特性</label>
         <label class="spectrum-toggle"><input id="spectrumLayerOutput" type="checkbox" aria-controls="spectrumPlot" checked /><i class="spectrum-swatch output" aria-hidden="true"></i>合成後の倍音</label>
       </div>
+      <div class="spectrum-breakdown">
+        <label class="spectrum-breakdown-toggle"><input id="spectrumLayerComponents" type="checkbox" aria-controls="spectrumPlot" />F1・F2・F3の内訳を重ねる</label>
+        <div class="spectrum-component-legend" id="spectrumComponentLegend" hidden aria-label="各フィルターの色と線種"><span><i class="f1" aria-hidden="true"></i>F1</span><span><i class="f2" aria-hidden="true"></i>F2</span><span><i class="f3" aria-hidden="true"></i>F3</span></div>
+      </div>
       <div class="spectrum-plot-wrap">
         <canvas id="spectrumPlot" class="spectrum-plot" role="img" aria-label="音源・共鳴特性・合成後の倍音を比較するスペクトル図"></canvas>
       </div>
@@ -689,6 +705,7 @@
         <output id="spectrumTimeValue" for="spectrumTime">0.30 s</output>
       </div>
       <p class="spectrum-values" id="spectrumValues" aria-live="off">母音プリセットを選ぶか、F1〜F3を描いてみよう。</p>
+      <p class="spectrum-caption">淡い破線はF1・F2・F3の各フィルターの応答（分岐ごとのゲインを反映）。橙色は位相を含めて合成した応答なので、3本の曲線を高さだけ足したものではありません。</p>
       <p class="spectrum-caption">計算による定常スペクトルの近似です（実測音声ではありません）。合成器と同じ3本の並列バンドパス応答を使い、音量エンベロープと時間変化中の過渡応答を省いています。縦軸は音源の第1倍音を0 dBとした相対値です。</p>
     </div>
   </details>
@@ -1733,10 +1750,12 @@
   const spectrumTime = document.getElementById('spectrumTime');
   const spectrumTimeValue = document.getElementById('spectrumTimeValue');
   const spectrumValues = document.getElementById('spectrumValues');
+  const spectrumComponentLegend = document.getElementById('spectrumComponentLegend');
   const spectrumLayers = {
     source: document.getElementById('spectrumLayerSource'),
     filter: document.getElementById('spectrumLayerFilter'),
-    output: document.getElementById('spectrumLayerOutput')
+    output: document.getElementById('spectrumLayerOutput'),
+    components: document.getElementById('spectrumLayerComponents')
   };
   let spectrumLastFrame = 0;
 
@@ -1765,6 +1784,12 @@
     // Matches scheduleSynthesis: sum.gain=0.62 and branch gains 1, .68, .42.
     return Math.hypot(re,im)*0.62;
   }
+  // One parallel branch, including its gain and the shared summing gain.
+  // Its magnitude is shown on the same dB reference as the combined response.
+  function spectrumComponentResponse(freq,def,sampleRate){
+    const h=spectrumBandpassResponse(freq,def.hz,def.q,sampleRate);
+    return Math.hypot(h.re,h.im)*def.gain*0.62;
+  }
   function spectrumDefinitionsAt(t){
     const index=Math.min(220,Math.max(0,t/Math.max(0.001,duration())*220));
     return [['F1',1],['F2',0.68],['F3',0.42]].map(([name,gain])=>{
@@ -1785,6 +1810,7 @@
     const t=playback?clamp(playCursorT,0,duration()):duration()*frac;
     if(playback) spectrumTime.value=String(Math.round(t/duration()*100));
     spectrumTimeValue.textContent=t.toFixed(2)+' s';
+    spectrumComponentLegend.hidden=!spectrumLayers.components.checked;
     const defs=spectrumDefinitionsAt(t);
     const valid=defs.every(v=>Number.isFinite(v.hz));
     spectrumValues.textContent=valid
@@ -1839,6 +1865,22 @@
       }
       ctx.setLineDash([]);
     }
+    if(spectrumLayers.components.checked){
+      const shades={F1:'rgba(185,78,104,.65)',F2:'rgba(65,120,190,.65)',F3:'rgba(120,89,173,.65)'};
+      ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+      for(const def of defs){
+        ctx.strokeStyle=shades[def.name];
+        ctx.beginPath();
+        const steps=Math.max(120,Math.ceil(pw));
+        for(let i=0;i<=steps;i++){
+          const freq=limit*i/steps;
+          const xx=x(freq),yy=y(dB(spectrumComponentResponse(freq,def,sampleRate)));
+          if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+        }
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
     if(spectrumLayers.filter.checked){
       ctx.strokeStyle='rgba(173,118,27,.27)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
       for(const def of defs){
@@ -1862,7 +1904,7 @@
         ctx.beginPath();ctx.moveTo(x(h.hz),y(-60));ctx.lineTo(x(h.hz),y(h.outputDb));ctx.stroke();
       }
     }
-    canvas.setAttribute('aria-label','F0 '+Math.round(f0)+' Hz、'+defs.map(d=>d.name+' '+Math.round(d.hz)+' Hz').join('、')+'。音源・フィルター・出力の相対スペクトル図。');
+    canvas.setAttribute('aria-label','F0 '+Math.round(f0)+' Hz、'+defs.map(d=>d.name+' '+Math.round(d.hz)+' Hz').join('、')+'。音源・フィルター・出力の相対スペクトル図。'+(spectrumLayers.components.checked?'F1・F2・F3各フィルターの内訳を淡い破線で表示中。':''));
   }
   spectrumLab.addEventListener('toggle',()=>requestAnimationFrame(renderSpectrumLab));
   spectrumTime.addEventListener('input',renderSpectrumLab);
