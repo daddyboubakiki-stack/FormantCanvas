@@ -11,6 +11,28 @@ assert.ok(html.includes('class="spectrum-lab learning-plus"'), 'Casual mode rema
 assert.ok(html.includes('    drawCursor();\n    renderSpectrumLab();'), 'Existing drawing refreshes spectrum');
 assert.ok(html.includes('type="checkbox" aria-controls="spectrumPlot"'), 'Layer toggles are native controls');
 
+
+assert.ok(html.includes('id="spectrumLearningExplanation"'), 'Learning note is present');
+assert.ok(html.includes('class="spectrum-model-details learning-only"'), 'Learning note is mode-specific');
+assert.ok(html.includes('id="spectrumResearchSpecification"'), 'Research spec is present');
+assert.ok(html.includes('class="spectrum-model-details research-only"'), 'Research spec is mode-specific');
+assert.ok(html.includes('どうして「レモン」の谷ができるの？'), 'Learning explains phase interference');
+assert.ok(html.includes('過去の入力や出力の影響'), 'Learning uses the system-memory analogy');
+assert.ok(html.includes('y[n-1]') && html.includes('x[n-2]'), 'Research includes IIR recurrence');
+assert.ok(html.includes('b₀ =  α') && html.includes('a₂ = 1 - α'), 'Research includes normative bandpass coefficients');
+assert.ok(html.includes('Q = clamp(f_c / B, 0.2, 80)'), 'Research gives bandwidth-to-Q relation');
+assert.ok(html.includes('H_sum(z) = 0.62') && html.includes('0.68H₂(z) + 0.42H₃(z)'), 'Research shows actual gains');
+assert.ok(html.includes('220区間') && html.includes('linearRampToValueAtTime'), 'Research shows time automation');
+assert.ok(html.includes('https://www.w3.org/TR/webaudio/#BiquadFilterNode'), 'Research points to normative API spec');
+assert.ok(html.includes('時間不変伝達関数で完全に記述することはできない'), 'Research explains frozen-time limitation');
+assert.ok(html.includes('F_s = 48000 Hz'), 'Research discloses idle graph sample-rate assumption');
+// Keep source-filter documentation aligned with the implementation constants.
+const synthesis = html.slice(html.indexOf('function scheduleSynthesis('), html.indexOf('function setTransportPlaying(',html.indexOf('function scheduleSynthesis(')));
+assert.ok(synthesis.includes("osc.type='sawtooth'") && synthesis.includes('sourceGain.gain.value=0.32'), 'Source model claim matches implementation');
+assert.ok(synthesis.includes("['F1',1.00],['F2',0.68],['F3',0.42]"), 'Branch gains match implementation');
+assert.ok(synthesis.includes('sum.gain.value=0.62') && synthesis.includes('master.gain.setValueAtTime(0.75'), 'Master and sum gains match implementation');
+assert.ok(synthesis.includes('const N=220') && synthesis.includes('filter.type=\'bandpass\''), 'Automation and filter type match implementation');
+
 let strokes = 0;
 const stylesDrawn = [];
 const ctx = {
