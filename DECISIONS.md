@@ -205,6 +205,22 @@ Future UI changes should preserve the canvas as the primary visual/interaction t
 
 ---
 
+## D-012 — Order the mode switch as Learning → Research → Casual
+
+**Status:** Accepted  
+**Date:** 2026-10-28
+
+### Decision
+The header mode switch is ordered 📘 学習 → 🔬 研究 → 🌷 ゆるふわ (left to right, and in keyboard/screen-reader order). Casual remains the default mode on first visit.
+
+### Rationale
+This is the owner's explicit choice, stated in the 2026-10-28 review follow-up for PR #25 (the change itself landed in that PR's commits e544016 / b3453d6). It is a product decision, not an accessibility requirement; the order is not meant to express difficulty or the historical order of theories.
+
+### Consequence
+Keep DOM order equal to visual order so keyboard and screen-reader order match. `tests/spectrum-layer.test.cjs` asserts the order; change the test only together with a new decision entry. Casual being the default while sitting rightmost should be watched in usability checks.
+
+---
+
 ## Entry template
 
 ```md
