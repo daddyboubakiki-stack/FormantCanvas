@@ -593,6 +593,23 @@
     canvas.spectrum-plot { height:235px; }
   }
 
+
+  /* Spectrum X-ray explanations: concise Learning / reproducible Research. */
+  .spectrum-model-details { margin:12px 0 0; border-top:1px solid #e8e1d5; padding:0 2px; }
+  .spectrum-model-details > summary { cursor:pointer; padding:13px 0; font-size:13px; font-weight:750; color:#34425b; line-height:1.5; }
+  .spectrum-model-details > summary:focus-visible { outline:3px solid #347cba; outline-offset:3px; border-radius:4px; }
+  .spectrum-model-details > summary:hover { color:#235c8e; }
+  .spectrum-model-body { padding:0 0 14px; line-height:1.75; font-size:13px; color:#34425b; }
+  .spectrum-model-body p { margin:0 0 10px; }
+  .spectrum-model-body ol { padding-left:1.4em; margin:0 0 10px; }
+  .spectrum-model-body li { margin:5px 0; }
+  .spectrum-model-body h3 { font-size:13px; font-weight:800; color:#253047; margin:15px 0 5px; }
+  .spectrum-model-body h3:first-child { margin-top:0; }
+  .spectrum-math { display:block; overflow-x:auto; white-space:pre; line-height:1.7; font-size:12px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; background:#f7f5ef; color:#27364c; border-left:3px solid #c7a060; border-radius:5px; padding:9px 11px; margin:7px 0 10px; }
+  .spectrum-model-body .spectrum-note { color:#5a6476; font-size:12px; }
+  .spectrum-model-body a { color:#185c96; text-decoration:underline; text-underline-offset:2px; }
+  @media (max-width:600px) { .spectrum-model-details > summary { font-size:12px; } .spectrum-math { font-size:11px; padding:8px; } }
+
 </style>
 </head>
 <body data-ui-mode="casual">
@@ -707,6 +724,61 @@
       <p class="spectrum-values" id="spectrumValues" aria-live="off">母音プリセットを選ぶか、F1〜F3を描いてみよう。</p>
       <p class="spectrum-caption" id="spectrumBreakdownNote" hidden>淡い破線はF1・F2・F3の各フィルターの応答（分岐ごとのゲインを反映）。橙色は位相を含めて合成した応答なので、3本の曲線を高さだけ足したものではありません。</p>
       <p class="spectrum-caption">計算による定常スペクトルの近似です（実測音声ではありません）。合成器と同じ3本の並列バンドパス応答を使い、音量エンベロープと時間変化中の過渡応答を省いています。縦軸は音源の第1倍音を0 dBとした相対値です。</p>
+
+      <details class="spectrum-model-details learning-only" id="spectrumLearningExplanation">
+        <summary>🛝 どうして「レモン」の谷ができるの？</summary>
+        <div class="spectrum-model-body">
+          <ol>
+            <li>ブランコは押すのをやめても、直前の運動の影響で動き続けるね。フィルターも、過去の入力や出力の影響を受けながら音を出している。</li>
+            <li>そのため、同じ周波数でも、F1・F2・F3のフィルターを通った波はそれぞれ違うタイミング（位相）になることがある。</li>
+            <li>3つの波を合わせると、ある周波数では強め合い、別の周波数では打ち消し合う。これが橙色の曲線に深い谷ができる理由のひとつだよ。</li>
+          </ol>
+          <p>「F1・F2・F3の内訳を重ねる」をONにしてみよう。ピンク・青・紫の線はそれぞれのフィルターの<strong>強さ</strong>、橙色の線は<strong>位相も考えて合成した結果</strong>なんや。</p>
+          <p class="spectrum-note">※ すべての谷が打ち消し合いだけでできるわけではなく、各フィルターがその周波数を通しにくい影響もあるよ。また、この形はアプリの合成モデルの特性で、人間の声道の実測値ではありません。</p>
+        </div>
+      </details>
+
+      <details class="spectrum-model-details research-only" id="spectrumResearchSpecification">
+        <summary>合成モデルの数式・係数・再現条件（Research）</summary>
+        <div class="spectrum-model-body">
+          <h3>1. 音源とフィルターの接続</h3>
+          <p>現行の <code>scheduleSynthesis()</code> は、<code>OscillatorNode</code> の <code>sawtooth</code>（基本周波数 F0）を音源とし、ゲイン 0.32 を通して3本の <code>BiquadFilterNode</code>（<code>type = "bandpass"</code>）に<strong>並列</strong>入力する。分岐のゲインは F1 = 1.00、F2 = 0.68、F3 = 0.42。合流後に 0.62 を掛け、さらに時間変化する master gain を掛ける。</p>
+          <pre class="spectrum-math" aria-label="音源から出力への信号経路">sawtooth(F0) → gain 0.32
+             ├→ bandpass F1 → gain 1.00 ┐
+             ├→ bandpass F2 → gain 0.68 ├→ sum × 0.62
+             └→ bandpass F3 → gain 0.42 ┘
+                        → master envelope → output</pre>
+          <h3>2. biquad の係数：W3C bandpass</h3>
+          <p>以下は <code>BiquadFilterNode</code> が従う<strong>規範的なフィルター特性</strong>の係数であり、独自に設計した別のフィルターではない。<code>f_c</code> はその分岐の中心周波数（F1/F2/F3）、<code>F_s</code> は AudioContext のサンプリング周波数、<code>Q</code> はフィルターのQ値。</p>
+          <pre class="spectrum-math" aria-label="バンドパスの中心角周波数と係数">ω₀ = 2π f_c / F_s
+α  = sin(ω₀) / (2Q)
+
+b₀ =  α        b₁ = 0          b₂ = -α
+a₀ = 1 + α     a₁ = -2 cos ω₀  a₂ = 1 - α</pre>
+          <h3>3. 入出力の差分方程式</h3>
+          <p><code>x[n]</code> が入力、<code>y[n]</code> が出力、<code>n</code> がサンプル番号。過去2サンプル分の入力と出力が今の出力に関与する。</p>
+          <pre class="spectrum-math" aria-label="二次IIRフィルターの差分方程式">a₀ y[n] + a₁ y[n-1] + a₂ y[n-2]
+  = b₀ x[n] + b₁ x[n-1] + b₂ x[n-2]
+
+y[n] = (b₀x[n] + b₁x[n-1] + b₂x[n-2]
+        - a₁y[n-1] - a₂y[n-2]) / a₀</pre>
+          <h3>4. 3分岐の複素伝達関数</h3>
+          <p>各分岐の伝達関数は分子・分母に上の係数を使う。周波数応答の<strong>複素数</strong>を足すため、位相の干渉によって深い谷が生じうる。</p>
+          <pre class="spectrum-math" aria-label="並列フィルターの合成伝達関数">Hₖ(z) = (b₀ + b₁z⁻¹ + b₂z⁻²)
+        / (a₀ + a₁z⁻¹ + a₂z⁻²)
+
+H_sum(z) = 0.62 × [1.00H₁(z)
+                 + 0.68H₂(z) + 0.42H₃(z)]
+
+固定パラメータ時の合成器本体:
+H_source→sum(z) = 0.32 × H_sum(z)</pre>
+          <p>橙色の線は <code>20 log10(|H_sum(e^(jω))|)</code> を示す。各分岐の薄い破線は <code>20 log10(|0.62 × gₖ × Hₖ(e^(jω))|)</code> を示す。各分岐の<strong>振幅だけを足した曲線ではない</strong>。</p>
+          <h3>5. Q・時間変化と表示上の限界</h3>
+          <p><strong>Manual Q</strong> では各分岐のQをスライダーの値に設定。<strong>Empirical bandwidth</strong> ではアプリに収録した帯域幅 B と対応する中心周波数から <code>Q = clamp(f_c / B, 0.2, 80)</code> を計算する。実際の合成処理は、F1〜F3の描画軌跡を平滑化し、<strong>220区間</strong>の <code>linearRampToValueAtTime</code> でフィルター中心周波数とQを時間変化させる。中心周波数は <code>80 Hz</code> 以上、<code>min(maxHz, F_s/2 - 200 Hz)</code> 以下に制限する。</p>
+          <p>master gain は冒頭と末尾で指数変化し、持続部は <code>0.75</code>。この時変系を単一の時間不変伝達関数で完全に記述することはできない。「音のX線」は選択時刻のパラメータを固定した<strong>定常近似</strong>であり、過渡応答・attack/release・実録音・声道の物理形状を直接示すものではない。再生していないときのグラフ計算は <code>F_s = 48000 Hz</code> を仮定し、再生中は AudioContext の値を使用するため、実環境で差が生じうる。</p>
+          <p class="spectrum-note">出典：<a href="https://www.w3.org/TR/webaudio/#BiquadFilterNode" target="_blank" rel="noopener noreferrer">W3C Web Audio API — BiquadFilterNode</a>。実装：<a href="https://github.com/daddyboubakiki-stack/FormantCanvas/blob/feat/spectrum-layer-xray-20261028/index.html" target="_blank" rel="noopener noreferrer">scheduleSynthesis / spectrumBandpassResponse（GitHub）</a>。ここに記した係数はWeb Audioの定義、固定ゲイン・接続・更新方法は本アプリの実装に対応する。</p>
+        </div>
+      </details>
     </div>
   </details>
 
