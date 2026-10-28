@@ -8,6 +8,13 @@ const start = html.indexOf('  // Spectrum X-ray:');
 const end = html.indexOf('  function render(){', start);
 assert.ok(start > 0 && end > start, 'Spectrum helper stays inside the main application IIFE');
 assert.ok(html.includes('class="spectrum-lab learning-plus"'), 'Casual mode remains uncluttered');
+const modeButtons = html.match(/<div class="mode-switch"[^>]*>([\s\S]*?)<\/div>/);
+assert.ok(modeButtons, 'Mode switch markup is present');
+assert.deepEqual(
+  [...modeButtons[1].matchAll(/id="([^"]+ModeBtn)"/g)].map(match => match[1]),
+  ['learningModeBtn', 'researchModeBtn', 'casualModeBtn'],
+  'Visual, keyboard, and screen reader mode order has Casual on the right'
+);
 assert.ok(html.includes('    drawCursor();\n    renderSpectrumLab();'), 'Existing drawing refreshes spectrum');
 assert.ok(html.includes('type="checkbox" aria-controls="spectrumPlot"'), 'Layer toggles are native controls');
 
