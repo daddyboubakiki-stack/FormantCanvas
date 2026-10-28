@@ -12,9 +12,10 @@ assert.ok(html.includes('    drawCursor();\n    renderSpectrumLab();'), 'Existin
 assert.ok(html.includes('type="checkbox" aria-controls="spectrumPlot"'), 'Layer toggles are native controls');
 
 let strokes = 0;
+const stylesDrawn = [];
 const ctx = {
   setTransform(){}, clearRect(){}, beginPath(){}, moveTo(){}, lineTo(){},
-  stroke(){strokes++;}, fillText(){}, setLineDash(){}
+  stroke(){strokes++;stylesDrawn.push(this.strokeStyle);}, fillText(){}, setLineDash(){}
 };
 const elements = {
   spectrumLab: {open:true,addEventListener(){}},
@@ -26,9 +27,11 @@ const elements = {
   spectrumTime:{value:'50',addEventListener(){}},
   spectrumTimeValue:{textContent:''},
   spectrumValues:{textContent:''},
+  spectrumComponentLegend:{hidden:true},
   spectrumLayerSource:{checked:false,addEventListener(){}},
   spectrumLayerFilter:{checked:true,addEventListener(){}},
-  spectrumLayerOutput:{checked:true,addEventListener(){}}
+  spectrumLayerOutput:{checked:true,addEventListener(){}},
+  spectrumLayerComponents:{checked:false,addEventListener(){}}
 };
 const args = ['document','window','requestAnimationFrame','performance','duration',
   'maxHz','clamp','smoothSamples','usingEmpiricalBandwidth','qAt','qEl','f0El',
@@ -43,7 +46,7 @@ const values = {
   f0El:f0,audio:null,playCursorT:null,uiMode:'learning'
 };
 const api = new Function(...args,
-  html.slice(start,end) + '\nreturn {spectrumBandpassResponse,spectrumParallelResponse,renderSpectrumLab};'
+  html.slice(start,end) + '\nreturn {spectrumBandpassResponse,spectrumComponentResponse,spectrumParallelResponse,renderSpectrumLab};'
 )(...args.map(k=>values[k]));
 const magnitude = h => Math.hypot(h.re,h.im);
 assert.ok(Math.abs(magnitude(api.spectrumBandpassResponse(550,550,8,48000))-1)<1e-7,
@@ -52,11 +55,25 @@ assert.ok(magnitude(api.spectrumBandpassResponse(0,550,8,48000))<1e-7,
   'Bandpass rejects DC');
 const d=[{hz:550,q:8,gain:1},{hz:1450,q:8,gain:.68},{hz:2350,q:8,gain:.42}];
 assert.ok(Number.isFinite(api.spectrumParallelResponse(550,d,48000)), 'Parallel response is finite');
+assert.ok(Math.abs(api.spectrumComponentResponse(550,d[0],48000)-0.62)<1e-7,
+  'F1 branch response includes its gain and shared summing gain');
+assert.ok(Math.abs(api.spectrumComponentResponse(1450,d[1],48000)-0.62*0.68)<1e-7,
+  'F2 branch response uses its own gain without re-normalizing');
 api.renderSpectrumLab();
 assert.match(elements.spectrumValues.textContent,/F0 100 Hz.*F1 550 Hz/);
 assert.equal(elements.spectrumTimeValue.textContent,'0.30 s');
 assert.ok(strokes>20,'Frequency response and output harmonics are drawn');
 assert.match(elements.spectrumPlot['aria-label'],/F1 550 Hz/);
+assert.equal(elements.spectrumComponentLegend.hidden,true,'Component curves start hidden');
+const beforeComponents=strokes;
+elements.spectrumLayerComponents.checked=true;
+api.renderSpectrumLab();
+assert.equal(elements.spectrumComponentLegend.hidden,false,'Enabling components reveals F1/F2/F3 legend');
+assert.ok(strokes-beforeComponents>3,'Each component adds its own rendered curve');
+for(const color of ['rgba(185,78,104,.65)','rgba(65,120,190,.65)','rgba(120,89,173,.65)']){
+  assert.ok(stylesDrawn.includes(color),'Component curve '+color+' is drawn');
+}
+assert.match(elements.spectrumPlot['aria-label'],/各フィルターの内訳/);
 const prev=strokes;
 f0.value='110';
 elements.spectrumLayerSource.checked=true;
@@ -66,6 +83,8 @@ assert.ok(strokes>prev,'Changing F0 and layer visibility redraws');
 elements.spectrumLayerSource.checked=false;
 elements.spectrumLayerFilter.checked=false;
 elements.spectrumLayerOutput.checked=false;
+elements.spectrumLayerComponents.checked=false;
 api.renderSpectrumLab();
+assert.equal(elements.spectrumComponentLegend.hidden,true,'Disabling components hides their legend');
 assert.ok(strokes>prev,'Axes remain available when all overlays are disabled');
-console.log('Spectrum layer math, controls, and rendering smoke checks: PASS');
+console.log('Spectrum layer plus per-formant branch math, controls, and rendering smoke checks: PASS');
