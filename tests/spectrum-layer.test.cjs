@@ -28,6 +28,7 @@ const elements = {
   spectrumTimeValue:{textContent:''},
   spectrumValues:{textContent:''},
   spectrumComponentLegend:{hidden:true},
+  spectrumBreakdownNote:{hidden:true},
   spectrumLayerSource:{checked:false,addEventListener(){}},
   spectrumLayerFilter:{checked:true,addEventListener(){}},
   spectrumLayerOutput:{checked:true,addEventListener(){}},
@@ -65,10 +66,12 @@ assert.equal(elements.spectrumTimeValue.textContent,'0.30 s');
 assert.ok(strokes>20,'Frequency response and output harmonics are drawn');
 assert.match(elements.spectrumPlot['aria-label'],/F1 550 Hz/);
 assert.equal(elements.spectrumComponentLegend.hidden,true,'Component curves start hidden');
+assert.equal(elements.spectrumBreakdownNote.hidden,true,'Breakdown explanation starts hidden');
 const beforeComponents=strokes;
 elements.spectrumLayerComponents.checked=true;
 api.renderSpectrumLab();
 assert.equal(elements.spectrumComponentLegend.hidden,false,'Enabling components reveals F1/F2/F3 legend');
+assert.equal(elements.spectrumBreakdownNote.hidden,false,'Breakdown explanation appears only when enabled');
 assert.ok(strokes-beforeComponents>3,'Each component adds its own rendered curve');
 for(const color of ['rgba(185,78,104,.65)','rgba(65,120,190,.65)','rgba(120,89,173,.65)']){
   assert.ok(stylesDrawn.includes(color),'Component curve '+color+' is drawn');
@@ -86,5 +89,6 @@ elements.spectrumLayerOutput.checked=false;
 elements.spectrumLayerComponents.checked=false;
 api.renderSpectrumLab();
 assert.equal(elements.spectrumComponentLegend.hidden,true,'Disabling components hides their legend');
+assert.equal(elements.spectrumBreakdownNote.hidden,true,'Disabling components hides the explanation');
 assert.ok(strokes>prev,'Axes remain available when all overlays are disabled');
 console.log('Spectrum layer plus per-formant branch math, controls, and rendering smoke checks: PASS');
