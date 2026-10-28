@@ -204,3 +204,20 @@ PRのmerge・close・force update、既存branchへの書き込み・削除は�
 
 - 本番originを管理設定と未認証画面で確定し、作品集/README/SEOの一致を別作業で整える。
 - 研究系PR #2/#4と独立ベロちゃん移行に関係するPR #5を個別に根拠監査する。
+
+
+---
+
+## 2026-10-28 — Spectrum X-ray layer preview (feature branch only)
+
+- Branch: feat/spectrum-layer-xray-20261028 (not merged to main).
+- Scope: a collapsible Learning/Research spectrum inspector underneath the existing F1/F2/F3 trajectory workspace.
+- User goal: overlay three independently togglable layers on the same frequency axis: input source harmonics, summed parallel-filter response, and modeled post-filter output harmonics.
+- Initial state: source hidden, filter + output visible. A time scrubber selects a snapshot of the current trajectory; while playing, the display follows the playback cursor.
+- Visual design: restrained warm panel, line-style/width cues beyond color, native keyboard-operable checkboxes, mobile width rules, no autoplay or extra sound.
+- Technical model: sawtooth input at existing F0; 3 parallel Web Audio bandpass responses with their existing gains (F1 1, F2 .68, F3 .42; sum .62). Complex responses are summed to retain phase, based on standard BiquadFilterNode coefficients. The view is a steady-state approximation; attack/release envelope and time-varying transient response are explicitly excluded.
+- Protected research trajectories, cited values, evidence labels and the audio-generation/export implementation are unmodified.
+- Static QA: all embedded script blocks compile; markup/UI hookups and source-preservation reconstruction pass.
+- Mock-functional QA: 14 assertions pass in tests/spectrum-layer.test.cjs (math, controls, readouts, canvas render).
+- Remaining: real browser/UI/keyboard/screen-reader QA, mobile width, actual listening comparison and production preview verification. Do not merge or publicly deploy without user approval.
+- Next: inspect the Draft PR diff and any CI/preview evidence, then ask the owner to review visual accuracy and mobile layout.
