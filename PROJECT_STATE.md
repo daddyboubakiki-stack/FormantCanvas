@@ -231,3 +231,13 @@ PRのmerge・close・force update、既存branchへの書き込み・削除は�
 - Keep the orange combined response, the blue input harmonics, the green output harmonics, audio synthesis, existing formant trajectories, evidence labels, and all protected research values unchanged.
 - Static JS syntax and synthetic canvas/visibility tests passed (27 assertions, including branch gains and three individual colored curves).
 - Outstanding: visually inspect the refreshed Netlify PR preview on mobile, confirm native checkbox interaction and line visibility, and complete accessibility QA before owner-approved merge. No production release.
+
+
+### 2026-10-28 follow-up — mode-specific explanation and verifiable filter equations
+
+- Learning: add a compact expandable "why lemon-shaped valleys?" explanation below the X-ray controls. It connects previous input/output state to phase shifts and complex summation, with the caveat that not every dip comes solely from cancellation.
+- Research: add an expandable signal-flow technical specification below the X-ray plot. It includes the W3C Web Audio bandpass coefficient definitions (ω₀, α, b₀–b₂, a₀–a₂), the sample-domain biquad recurrence, the complex transfer functions for three parallel branches, the actual existing gains (source 0.32; branches 1.00/0.68/0.42; sum 0.62), Q selection, 220-step smoothing/automation, frequency clamping, master envelope and declared limitations.
+- Key scientific distinction: coefficients come from the normative Web Audio API implementation contract, while fixed gains, branch topology, sample-rate fallback for the visualization and parameter automation are specific to Formantasia. Frozen-time response is an approximation, not a complete transfer function of time-varying synthesis.
+- Placement: inside the existing Learning/Research Spectrum X-ray panel. Both sections closed by default; Casual mode and synthesizer playback/export unchanged.
+- Verified: reconstructing the original HTML with only additive CSS/markup changes; all 3 executable scripts compile; existing X-ray mock math/render tests plus documentation-versus-synthesis static invariants, 45 assertions pass.
+- Remaining: actual smartphone 390px visual and accessibility QA, deploy-preview interaction and checking that math blocks are readable. Do not merge/main or release without user review.
